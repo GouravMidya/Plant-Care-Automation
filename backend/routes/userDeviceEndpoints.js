@@ -20,10 +20,10 @@ router.get('/', getUserDevices);
 router.post('/settings', getDeviceSettings);
 
 // Update Device settings
-router.patch('/settings', updateDeviceSettings);
+router.patch('/settings/:deviceId', updateDeviceSettings);
 
-// Update Device settings
-router.delete('/settings', deleteDeviceSettings);
+// Delete User Device
+router.delete('/:deviceId', deleteUserDevice);
 
 // Add other CRUD endpoints as needed...
 
