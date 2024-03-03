@@ -39,6 +39,35 @@ const getDeviceSettings = async (req, res) => {
   }
 };
 
+// Controller function to update device settings
+const updateDeviceSettings = async (req, res) => {
+  try {
+    const { deviceId, checkintervals, PumpDuration } = req.body;
+    const device = await UserDevice.findOne({ deviceId });
+
+    if (!device) {
+      return res.status(404).json({ success: false, message: 'Device not found' });
+    }
+
+    // Update the checkintervals and PumpDuration values if provided
+    if (checkintervals !== undefined) {
+      device.checkintervals = checkintervals;
+    }
+    if (PumpDuration !== undefined) {
+      device.PumpDuration = PumpDuration;
+    }
+
+    // Save the updated device
+    await device.save();
+
+    return res.status(200).json({ success: true, message: 'Device settings updated successfully' });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: 'Error updating device settings' });
+  }
+};
+
+// Controller function to delete a device
+
 // Add other CRUD operations as needed...
 
 module.exports = {
