@@ -2,7 +2,9 @@ const express = require('express');
 const {
   createUserDevice,
   getUserDevices,
-  getDeviceSettings 
+  getDeviceSettings,
+  updateDeviceSettings,
+  deleteUserDevice
   // Add other controller functions as needed...
 } = require('../controllers/userDeviceController');
 
@@ -16,6 +18,12 @@ router.get('/', getUserDevices);
 
 // Get device settings
 router.post('/settings', getDeviceSettings);
+
+// Update Device settings
+router.patch('/settings', updateDeviceSettings);
+
+// Update Device settings
+router.delete('/settings', deleteDeviceSettings);
 
 // Add other CRUD endpoints as needed...
 

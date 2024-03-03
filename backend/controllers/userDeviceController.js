@@ -67,12 +67,30 @@ const updateDeviceSettings = async (req, res) => {
 };
 
 // Controller function to delete a device
+const deleteUserDevice = async (req, res) => {
+  try {
+    const { deviceId } = req.body;
+    const device = await UserDevice.findOne({ deviceId });
+    if (!device) {
+      return res.status(404).json({ success: false, message: 'Device not found' });
+    }
+    // Delete the device
+    await device.remove(); 
+    res.status(200).json({ success: true, message: 'Device deleted successfully' });
+
+  }catch (error) {
+    console.error('Error deleting user device:', error);
+    res.status(500).json({ success: false, message: 'Failed to delete user device' });
+  }
+};
 
 // Add other CRUD operations as needed...
 
 module.exports = {
   createUserDevice,
   getUserDevices,
-  getDeviceSettings
+  getDeviceSettings,
+  updateDeviceSettings,
+  deleteUserDevice
   // Add other controller functions here...
 };
