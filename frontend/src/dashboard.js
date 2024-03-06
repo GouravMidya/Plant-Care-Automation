@@ -10,7 +10,8 @@ function dashboard() {
     return (
       <div className="dashboard">
           <Navigation />
-          <Contact />
+          <div className="chart">
+          </div>
           <Footer />
       </div>
     );

@@ -489,3 +489,8 @@ input {
 .forgot-password {
   font-size: 14px;
 }
+
+.chart{
+  min-width: 100vh;
+  min-height: 100vh;
+}
