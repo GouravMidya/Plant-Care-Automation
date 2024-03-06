@@ -51,6 +51,7 @@ const getSensorRecord = async (req, res) => {
   }
 };
 
+
 module.exports = {
   insertSensorRecord,
   getSensorRecord
