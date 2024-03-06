@@ -1,0 +1,419 @@
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+/* App.css */
+
+.App {
+  display: flex;
+  flex-direction: column; /* Ensure children stack vertically */
+}
+
+.navigation {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #85FF91;
+  color: black;
+  width: 100%;
+  z-index: 999;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+/*
+.links {
+  display: flex;
+  flex-grow: 1;
+  justify-content: center;
+  padding-left: 65px;
+}
+
+.links a {
+  margin-right: 20px;
+  color: black;
+  text-decoration: none;
+}
+
+.actions {
+  display: flex;
+  padding-right: 45px;
+  display: flex;
+}
+
+.login-btn{
+  padding-right: 20px;
+}
+
+.actions button {
+  margin-right: 10px;
+  padding: 8px 16px;
+  border: 10px;
+  background-color: black;
+  color: white;
+  cursor: pointer;
+  border: 1px solid black;
+}
+
+.actions button:hover {
+  background-color: #E4FFE7;
+  color: black;
+  border-color: black;
+}
+*/
+
+/* Media query for small screens */
+@media screen and (max-width: 600px) {
+  .actions {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+  }
+
+  .actions button {
+    margin-top: 5px;
+  }
+}
+
+/* Header.css */
+
+.header {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgb(217, 217, 217);
+}
+
+.card {
+  
+  padding: 30px 15% 30px 15%;
+  text-align: center;
+}
+
+.title {
+  align-self: stretch;
+  color: black;
+  text-align: center;
+  font-size: 56px;
+  font-weight: 700;
+  line-height: 120%; /* 67.2px */
+  font-weight: bold;
+}
+
+.subtitle {
+  align-self: stretch;
+  color: black;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 150%; /* 27px */
+  margin-top: 10px;
+  
+}
+
+.buttons {
+  margin-top: 20px;
+}
+
+.buttons button {
+  margin: 0 10px;
+  padding: 10px 20px;
+  border: 1px solid black; /* Added border style */
+  background-color: black;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.buttons button:hover {
+  background-color: #E4FFE7;
+  color: black;
+  border-color: black; /* Change border color on hover */
+}
+
+/* Layout1.css */
+
+.layout1 {
+  padding: 20px; /* Add padding to the layout */
+  box-sizing: border-box; /* Include padding in the total width and height */
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  width: 100%; /* Ensure the column takes full width */
+}
+
+.row {
+  margin-top: 60px;
+  display: flex;
+  margin-bottom: 60px; /* Add margin between rows */
+}
+
+.left{
+  padding-left: 30px;
+  flex: 1;
+  padding-right: 30px;
+}
+
+.right {
+  flex: 1;
+  margin-right: 30px;
+}
+
+.image-container {
+  margin: 0 30px; /* Margin from screen edges */
+}
+
+.image {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Adjust styles for headings, subheading, paragraph, and buttons according to your preference */
+
+/* Layout2.css */
+
+.layout2 {
+  margin: 30px;
+  padding: 0 20px 0 20px;
+  display: flex;
+}
+
+.left-column {
+  flex: 1;
+  margin-right: 30px;
+}
+
+.right-column {
+  flex: 1;
+}
+
+.subheading {
+  margin-bottom: 10px;
+}
+
+.heading {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.paragraph {
+  margin-bottom: 10px;
+}
+
+.buttons-container {
+  margin-top: 20px;
+}
+
+.button {
+  margin: 0 10px;
+  padding: 10px 20px;
+  border: 1px solid black; /* Added border style */
+  background-color: black;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.button:hover {
+  background-color: #E4FFE7;
+  color: black;
+  border-color: black; /* Change border color on hover */
+}
+
+.image-container {
+  width: 100%;
+  height: 100%;
+}
+
+.image {
+  width: 100%;
+  object-fit: cover;
+}
+
+.subheading1{
+  font-weight: bold;
+}
+
+/* Products.css */
+
+.products-container {
+  margin: 60px 50px 0 50px;
+}
+
+.top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.left1 {
+  flex: 1;
+}
+
+.right1 {
+  display: flex;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.bottom-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 50px 0 50px;
+}
+
+.column1 {
+  flex: 1;
+  margin-right: 20px;
+  text-align: center;
+}
+
+.product-image {
+  width: 100%;
+  height: 100px;
+  padding-top: 100px;
+  margin-bottom: 10px;
+}
+
+.product-name {
+  font-weight: bold;
+}
+
+.product-price {
+  margin-top: 5px;
+}
+
+/* Contact.css */
+
+.contact-container {
+  margin: 60px 50px 0;
+}
+
+.top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.left2 {
+  flex: 1;
+}
+
+.input-group {
+  margin-bottom: 20px;
+}
+
+.input-group input[type="text"]{
+  display: flex;
+  height: 25px;
+  width: 90%;
+  padding: 12px;
+  align-items: center;
+  gap: 8px;
+  align-self: stretch;
+  border: 1px solid var(--Black, #000);
+  background: var(--White, #FFF);
+}
+
+.input-group textarea[id="message"]{
+  display: flex;
+  height: 120px;
+  width: 90%;
+  padding: 12px;
+  align-items: flex-start;
+  align-self: stretch;
+  border: 1px solid var(--Black, #000);
+  background: var(--White, #FFF);
+}
+
+.checkbox-group {
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.checkbox-group input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+.right2 {
+  flex: 1;
+}
+
+.contact-details {
+  margin-left: 50px;
+}
+
+.contact-details p {
+  margin-bottom: 10px;
+}
+
+
+/* Footer.css */
+
+.footer-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: #85FF91;
+}
+
+.left3 {
+  flex: 1;
+}
+
+.middle {
+  flex: 2;
+  text-align: center;
+  margin-right: 20px;
+}
+
+.middle a {
+  margin: 0 10px;
+  text-decoration: none;
+  color: black;
+}
+
+.right3 {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.logo {
+  height: 40px;
+}
+
+.social-logo {
+  width: 30px;
+  height: 30px;
+  margin-left: 10px;
+}
+
+.right4 {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 20px;
+}
