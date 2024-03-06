@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import Navigation from './navigation';
-import SoilMoistureChart from './SoilMoistureChart'; // Import the SoilMoistureChart component
+import SoilMoistureChart from './SoilMoistureChart';
 import Footer from './footer';
 
 function Dashboard() {
-  // State variables for startDate, endDate, and userId
-  const [startDate, setStartDate] = useState("2024-02-26");
-  const [endDate, setEndDate] = useState("2024-03-06");
-  const [userId, setUserId] = useState(1234567891);
+  // State variable for userId
+  const [userId, setUserId] = useState(1234567890);
 
   return (
     <div className="dashboard">
@@ -15,8 +13,8 @@ function Dashboard() {
 
       {/* Soil Moisture Chart */}
       <div className="chart">
-        {/* Pass startDate, endDate, and userId as props to SoilMoistureChart */}
-        <SoilMoistureChart deviceId={userId} startDate={startDate} endDate={endDate} />
+        {/* Pass userId as a prop to SoilMoistureChart */}
+        <SoilMoistureChart deviceId={userId} />
       </div>
 
       <Footer />

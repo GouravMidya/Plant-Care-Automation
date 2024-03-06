@@ -1,30 +1,47 @@
 import React, { useState, useEffect } from 'react';
-import { Line } from 'react-chartjs-2';
 import { Chart } from 'chart.js/auto';
 
-const SoilMoistureChart = ({ deviceId, startDate, endDate }) => {
+const SoilMoistureChart = ({ deviceId }) => {
   const [moistureData, setMoistureData] = useState([]);
+  const [timeRange, setTimeRange] = useState('month'); // Default time range is set to 'month'
 
-  // Fetch soil moisture data when the component mounts or when startDate/endDate changes
   useEffect(() => {
     fetchSoilMoistureData();
-  }, [deviceId, startDate, endDate]);
-
-  // Cleanup function to destroy chart instance when the component unmounts
-  useEffect(() => {
-    const chartInstance = renderChart();
-
-    return () => {
-      if (chartInstance) {
-        chartInstance.destroy();
-      }
-    };
-  }, [moistureData, startDate, endDate]);
+  }, [deviceId, timeRange]);
 
   const fetchSoilMoistureData = async () => {
     try {
-      // Fetch soil moisture data for the specific device and date range
-      const response = await fetch(`/sensor_readings?deviceId=${deviceId}&startDate=${startDate}&endDate=${endDate}`);
+      // Calculate start date based on the selected time range
+      const today = new Date();
+      let startDate;
+
+      switch (timeRange) {
+        case 'day':
+          startDate = new Date(today);
+          startDate.setDate(today.getDate() - 1);
+          break;
+        case 'week':
+          startDate = new Date(today);
+          startDate.setDate(today.getDate() - 7);
+          break;
+        case 'month':
+          startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+          break;
+        case 'year':
+          startDate = new Date(today.getFullYear() - 1, today.getMonth(), 1);
+          break;
+        default:
+          startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+      }
+
+      // Format dates to 'YYYY-MM-DD' for API request
+      const formattedStartDate = formatDate(startDate);
+      const formattedEndDate = formatDate(today);
+
+      // Fetch soil moisture data for the specific device and time range
+      const response = await fetch(
+        `/sensor_readings?deviceId=${deviceId}&startDate=${formattedStartDate}&endDate=${formattedEndDate}`
+      );
       const data = await response.json();
 
       // Extract soil moisture values from the fetched data
@@ -37,17 +54,27 @@ const SoilMoistureChart = ({ deviceId, startDate, endDate }) => {
     }
   };
 
-  // Chart rendering logic
   const renderChart = () => {
     const ctx = document.getElementById('soilMoistureChart');
 
-    return new Chart(ctx, {
-      type: 'line',
-      data: chartData,
-    });
+    if (ctx) {
+      return new Chart(ctx, {
+        type: 'line',
+        data: chartData,
+      });
+    }
   };
 
-  // Chart configuration for soil moisture
+  useEffect(() => {
+    const chartInstance = renderChart();
+
+    return () => {
+      if (chartInstance) {
+        chartInstance.destroy();
+      }
+    };
+  }, [moistureData]);
+
   const chartData = {
     labels: Array.from({ length: moistureData.length }, (_, i) => i + 1),
     datasets: [
@@ -60,9 +87,28 @@ const SoilMoistureChart = ({ deviceId, startDate, endDate }) => {
     ],
   };
 
+  // Function to handle time range button click
+  const handleTimeRangeButtonClick = (range) => {
+    setTimeRange(range);
+  };
+
+  // Function to format date as 'YYYY-MM-DD'
+  const formatDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   return (
     <div>
       <h2>Soil Moisture Chart</h2>
+      <div>
+        <button onClick={() => handleTimeRangeButtonClick('day')}>Day</button>
+        <button onClick={() => handleTimeRangeButtonClick('week')}>Week</button>
+        <button onClick={() => handleTimeRangeButtonClick('month')}>Month</button>
+        <button onClick={() => handleTimeRangeButtonClick('year')}>Year</button>
+      </div>
       <canvas id="soilMoistureChart"></canvas>
     </div>
   );
