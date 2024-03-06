@@ -1,5 +1,6 @@
 import './App.css';
 import React, { useRef, useEffect, useState } from 'react';
+import { BrowserRouter as Router,Routes, Route } from 'react-router-dom';
 import Navigation from './navigation';
 import Header from './header';
 import Layout1 from './layout1';
@@ -7,8 +8,24 @@ import Layout2 from './layout2';
 import Products from './products';
 import Contact from './contact';
 import Footer from './footer';
+import Login from './login';
 
 function App() {
+
+
+  return (
+    <div className="App">
+      <Router>
+        <Routes>
+        <Route path='/' element={<HomeWithLayout />} />
+        <Route path="/login" element={<Login />} />
+        </Routes>
+      </Router>
+    </div>
+  );
+}
+
+function HomeWithLayout() {
   const headerRef = useRef(null); // Create a ref for the header element
   const [headerHeight, setHeaderHeight] = useState(0); // State to store the header height
 
@@ -18,18 +35,17 @@ function App() {
       setHeaderHeight(headerRef.current.offsetHeight);
     }
   }, []);
-
-
+  
   return (
-    <div className="App">
-        <Navigation />
-        <Header ref={headerRef} />
-        <Layout1 headerHeight={headerHeight} />
-        <Layout2 />
-        <Products />
-        <Contact />
-        <Footer />
-    </div>
+    <>
+    <Navigation />
+    <Header ref={headerRef} />
+    <Layout1 headerHeight={headerHeight} />
+    <Layout2 />
+    <Products />
+    <Contact />
+    <Footer />
+    </>
   );
 }
 
