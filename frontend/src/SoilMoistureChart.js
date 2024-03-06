@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Chart } from 'chart.js/auto';
+import { startOfToday, addDays, addWeeks, addMonths, addYears, format } from 'date-fns';
+import 'chartjs-adapter-date-fns';
 
 const SoilMoistureChart = ({ deviceId }) => {
-  const [moistureData, setMoistureData] = useState([]);
+  const [moistureData, setMoistureData] = useState({ values: [] });
   const [timeRange, setTimeRange] = useState('month'); // Default time range is set to 'month'
 
   useEffect(() => {
@@ -12,31 +14,31 @@ const SoilMoistureChart = ({ deviceId }) => {
   const fetchSoilMoistureData = async () => {
     try {
       // Calculate start date based on the selected time range
-      const today = new Date();
+      const today = startOfToday();
       let startDate;
 
       switch (timeRange) {
         case 'day':
-          startDate = new Date(today);
-          startDate.setDate(today.getDate() - 1);
+          startDate = addDays(today, -1);
           break;
         case 'week':
-          startDate = new Date(today);
-          startDate.setDate(today.getDate() - 7);
+          startDate = addWeeks(today, -1);
           break;
         case 'month':
-          startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+          startDate = startOfToday();
+          startDate.setMonth(today.getMonth() - 1);
           break;
         case 'year':
-          startDate = new Date(today.getFullYear() - 1, today.getMonth(), 1);
+          startDate = startOfToday();
+          startDate.setFullYear(today.getFullYear() - 1);
           break;
         default:
-          startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+          startDate = startOfToday();
       }
 
       // Format dates to 'YYYY-MM-DD' for API request
-      const formattedStartDate = formatDate(startDate);
-      const formattedEndDate = formatDate(today);
+      const formattedStartDate = format(startDate, 'yyyy-MM-dd');
+      const formattedEndDate = format(today, 'yyyy-MM-dd');
 
       // Fetch soil moisture data for the specific device and time range
       const response = await fetch(
@@ -44,11 +46,12 @@ const SoilMoistureChart = ({ deviceId }) => {
       );
       const data = await response.json();
 
-      // Extract soil moisture values from the fetched data
+      // Extract soil moisture values and timestamps from the fetched data
       const moistureValues = data.data.map((reading) => reading.soilMoisture);
+      const timestamps = data.data.map((reading) => new Date(reading.timestamp));
 
       // Update the state with the soil moisture data
-      setMoistureData(moistureValues);
+      setMoistureData({ values: moistureValues, timestamps });
     } catch (error) {
       console.error('Error fetching soil moisture data:', error);
     }
@@ -61,6 +64,26 @@ const SoilMoistureChart = ({ deviceId }) => {
       return new Chart(ctx, {
         type: 'line',
         data: chartData,
+        options: {
+          scales: {
+            x: {
+              type: 'time',
+              time: {
+                unit: 'day', // You can customize the time unit as needed
+              },
+              title: {
+                display: true,
+                text: 'Time',
+              },
+            },
+            y: {
+              title: {
+                display: true,
+                text: 'Soil Moisture',
+              },
+            },
+          },
+        },
       });
     }
   };
@@ -76,11 +99,11 @@ const SoilMoistureChart = ({ deviceId }) => {
   }, [moistureData]);
 
   const chartData = {
-    labels: Array.from({ length: moistureData.length }, (_, i) => i + 1),
+    labels: moistureData.timestamps,
     datasets: [
       {
         label: 'Soil Moisture',
-        data: moistureData,
+        data: moistureData.values,
         fill: false,
         borderColor: 'rgba(75,192,192,1)',
       },
@@ -90,14 +113,6 @@ const SoilMoistureChart = ({ deviceId }) => {
   // Function to handle time range button click
   const handleTimeRangeButtonClick = (range) => {
     setTimeRange(range);
-  };
-
-  // Function to format date as 'YYYY-MM-DD'
-  const formatDate = (date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
   };
 
   return (
