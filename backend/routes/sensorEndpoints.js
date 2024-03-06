@@ -1,11 +1,11 @@
-const express = require('express')
+const express = require('express');
+const { insertSensorRecord, getSensorRecord } = require('../controllers/sensorController');
+const router = express.Router();
 
-const {insertSensorRecord,
-} = require('../controllers/sensorController')
+// Insert sensor record
+router.post('/', insertSensorRecord);
 
-const router = express.Router()
+// Get sensor records
+router.get('/', getSensorRecord);
 
-//insert sensor record
-router.post('/',insertSensorRecord);
-
-module.exports = router
+module.exports = router;
