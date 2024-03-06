@@ -9,6 +9,7 @@ const mongoose = require('mongoose')
 const sensorRoutes = require('./routes/sensorEndpoints');
 const userRoutes = require('./routes/userEndpoints');
 const userDeviceRoutes = require('./routes/userDeviceEndpoints');
+const pumpRoutes = require('./routes/pumpEndpoints')
 
 //express app
 const app = express()
@@ -25,6 +26,7 @@ app.use((req,res,next) =>{
 app.use('/sensor_readings', sensorRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/user_devices', userDeviceRoutes);
+app.use('/pump',pumpRoutes)
 
 //mongodb
 mongoose.connect(process.env.MONG_URI)
