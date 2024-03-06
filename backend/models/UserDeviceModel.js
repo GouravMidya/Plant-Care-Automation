@@ -11,6 +11,18 @@ const userDeviceSchema = new mongoose.Schema({
     unique: true,
     required: true
   },
+  deviceName: {
+    type: String, // Assuming device name is a string
+    required: true
+  },
+  location: {
+    type: String, // Assuming location is a string
+    required: true
+  },
+  description: {
+    type: String, // Assuming description is a string
+    required: true
+  },
   checkIntervals: {
     type: Number,
     required: true
