@@ -1,11 +1,12 @@
 import './App.css';
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 function Navigation() {
   return (
     <div className="navigation">
       <div className="left3">
-      <div className="logo">LOGO</div>
+      <Link to="/"><div className="logo">LOGO</div></Link>
       </div>
       <div className="middle">
         <a href="#">About Us</a>
@@ -13,7 +14,7 @@ function Navigation() {
         <a href="#">Dashboard</a>
       </div>
       <div className="right4">
-        <button class="button">Login</button>
+        <Link to="/Login"><button class="button">Login</button></Link>
         <button class="button">Sign Up</button>
       </div>
     </div>
