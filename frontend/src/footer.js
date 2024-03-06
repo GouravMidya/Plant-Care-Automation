@@ -1,16 +1,17 @@
 import React from 'react';
 import './App.css';
+import { Link } from 'react-router-dom';
 
 function Footer() {
   return (
     <div className="footer-container">
       <div className="left3">
-      <div className="logo">LOGO</div>
+      <Link to="/"><div className="logo">LOGO</div></Link>
       </div>
       <div className="middle">
-        <a href="#">About Us</a>
-        <a href="#">Products</a>
-        <a href="#">Dashboard</a>
+        <Link to="/aboutus"><a href="#">About Us</a></Link>
+        <Link to="/productpage"><a href="#">Products</a></Link>
+        <Link to="/dashboard"><a href="#">Dashboard</a></Link>
       </div>
       <div className="right3">
         <a href="#"><img src="facebook.png" alt="Facebook" className="social-logo" /></a>
