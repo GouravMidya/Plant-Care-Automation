@@ -11,11 +11,10 @@ function Dashboard() {
     <div className="dashboard">
       <Navigation />
 
-      {/* Soil Moisture Chart */}
-      <div className="chart">
-        {/* Pass userId as a prop to SoilMoistureChart */}
+      <div className="SoilMoistureChart">
         <SoilMoistureChart deviceId={userId} />
       </div>
+      
 
       <Footer />
     </div>

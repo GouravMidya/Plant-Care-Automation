@@ -32,3 +32,9 @@ code {
 ::-webkit-scrollbar-thumb:hover {
   background: #56fa66;
 }
+.SoilMoistureChart{
+    height: 40%;
+    width: 40%;
+    padding-left: 5%;
+    padding-right: 5%;
+}
