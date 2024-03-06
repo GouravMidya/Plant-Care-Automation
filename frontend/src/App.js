@@ -9,6 +9,9 @@ import Products from './products';
 import Contact from './contact';
 import Footer from './footer';
 import Login from './login';
+import Aboutus from './aboutus';
+import Dashboard from './dashboard';
+import Productpage from './productpage';
 
 function App() {
 
@@ -19,6 +22,9 @@ function App() {
         <Routes>
         <Route path='/' element={<HomeWithLayout />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/Dashboard" element={<Dashboard />} />
+        <Route path="/aboutus" element={<Aboutus />} />
+        <Route path="/productpage" element={<Productpage />} />
         </Routes>
       </Router>
     </div>

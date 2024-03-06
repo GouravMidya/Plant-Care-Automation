@@ -417,3 +417,75 @@
   justify-content: flex-end;
   padding-right: 20px;
 }
+
+/* login.css */
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.login-box {
+  max-width: calc(100vw / 3);
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+input {
+  width: 100%;
+  display: flex;
+  padding: 12px;
+  align-items: center;
+  gap: 8px;
+  align-self: center;
+  border: 1px solid var(--Black, #000);
+  background: var(--Light-Green, #E4FFE7);
+}
+
+.button1 {
+  align-items: center;
+  align-self: center;
+  margin: 0 10px;
+  padding: 10px 20px;
+  border: 1px solid black; /* Added border style */
+  background-color: black;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  width: 33vw;
+}
+
+.button1:hover {
+  background-color: #E4FFE7;
+  color: black;
+  border-color: black; /* Change border color on hover */
+}
+
+.divider {
+  height: 1px;
+  background-color: #ccc;
+  margin: 20px 0;
+}
+
+.google-login {
+  width: 100%;
+  padding: 10px;
+  background-color: #dd4b39;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.forgot-password {
+  font-size: 14px;
+}
