@@ -69,7 +69,11 @@ const SoilMoistureChart = ({ deviceId }) => {
             x: {
               type: 'time',
               time: {
-                unit: 'day', // You can customize the time unit as needed
+                unit: timeRange === 'day' ? 'hour' : 'day', // Set unit to 'hour' for the 'Day' range
+                displayFormats: {
+                  hour: 'H:mm', // Format for hourly intervals
+                  day: 'MMM d', // Format for daily intervals
+                },
               },
               title: {
                 display: true,
@@ -96,7 +100,7 @@ const SoilMoistureChart = ({ deviceId }) => {
         chartInstance.destroy();
       }
     };
-  }, [moistureData]);
+  }, [moistureData, timeRange]);
 
   const chartData = {
     labels: moistureData.timestamps,
