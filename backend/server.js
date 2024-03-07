@@ -18,6 +18,10 @@ const app = express()
 app.use(express.json())
 
 app.use((req,res,next) =>{
+    // Get the current date and time
+    const now = new Date();
+    
+    console.log("Request timestamp: ",now.toLocaleString())
     console.log(req.path,req.method,req.body)
     next()
 })
