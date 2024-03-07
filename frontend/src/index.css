@@ -32,9 +32,23 @@ code {
 ::-webkit-scrollbar-thumb:hover {
   background: #56fa66;
 }
+
+/* Soil Moisture Chart Dashboard */
 .SoilMoistureChart{
     height: 40%;
-    width: 40%;
-    padding-left: 5%;
-    padding-right: 5%;
+    width: 45%;
+    margin-left: 3%;
+}
+
+/* Temperature Chart Dashboard */
+.TemperatureChart{
+  height: 40%;
+  width: 45%;
+  margin-right: 3%;
+}
+
+.chart-container {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
 }

@@ -207,9 +207,8 @@ const SoilMoistureChart = ({ deviceId }) => {
 
   return (
     <div>
-      <h2>Soil Moisture Chart</h2>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', padding:'4px', border:'1px solid #000' }}>
-        <h4 style={{marginTop:'0px',marginBottom:'-10px', marginRight:'180px'}}>Soil Moisture Chart</h4>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', padding:'4px', border:'1px solid #000', marginTop:'80px' }}>
+        <h4 style={{marginTop:'0px',marginBottom:'-10px', marginRight:'250px'}}>Soil Moisture Chart</h4>
         <button style={{marginRight:'4px'}} onClick={() => handleTimeRangeButtonClick('day')}>Day</button>
         <button style={{marginRight:'4px'}} onClick={() => handleTimeRangeButtonClick('week')}>Week</button>
         <button style={{marginRight:'4px'}} onClick={() => handleTimeRangeButtonClick('month')}>Month</button>
