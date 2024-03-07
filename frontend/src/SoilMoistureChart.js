@@ -193,23 +193,26 @@ const SoilMoistureChart = ({ deviceId }) => {
         <button onClick={() => handleTimeRangeButtonClick('week')}>Week</button>
         <button onClick={() => handleTimeRangeButtonClick('month')}>Month</button>
         <button onClick={() => handleTimeRangeButtonClick('year')}>Year</button>
-        <button onClick={() => handleTimeRangeButtonClick('custom')}>
-          {showStartDatePicker && (
-            <DatePicker
-              selected={customStartDate}
-              onChange={handleCustomStartDateChange}
-              customInput={<img src="./calendaricon.png" alt="Calendar Icon" />}
-            />
-          )}
-          {showEndDatePicker && dateRange.startDate && (
-            <DatePicker
-              selected={dateRange.endDate}
-              onChange={handleCustomEndDateChange}
-              minDate={customStartDate}
-              customInput={<img src="./calendaricon.png" alt="Calendar" />}
-            />
-          )}
-        </button>
+        <button
+  onClick={() => handleTimeRangeButtonClick('custom')}
+  style={{ width: '20px', height: '25px', background: 'transparent', border: 'none', paddingTop:'5px'}}
+>
+  {showStartDatePicker && (
+    <DatePicker
+      selected={customStartDate}
+      onChange={handleCustomStartDateChange}
+      customInput={<img src="calendaricon.png" alt="Calendar Icon" style={{ width: '350%', height: '350%' }} />}
+    />
+  )}
+  {showEndDatePicker && dateRange.startDate && (
+    <DatePicker
+      selected={dateRange.endDate}
+      onChange={handleCustomEndDateChange}
+      minDate={customStartDate}
+      customInput={<img src="calendaricon.png" alt="Calendar" style={{ width: '700%', height: '700%' }} />}
+    />
+  )}
+</button>
       </div>
       <canvas id="soilMoistureChart"></canvas>
     </div>
