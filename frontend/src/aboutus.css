@@ -66,6 +66,7 @@ font-style: normal;
 font-weight: 700;
 line-height: 120%; /* 57.6px */
 margin-left: 50px;
+margin-bottom: -10px;
 }
 
 
@@ -142,7 +143,7 @@ margin-left: 50px;
     align-self: stretch;
 }
 
-h4{
+.aboutl2 h4{
     color: var(--Black, #000);
 text-align: center;
 margin-bottom: 10px;
@@ -163,7 +164,7 @@ line-height: 130%; /* 41.6px */
     align-items: flex-start;
     gap: 50px;
 }
-h2{
+.aboutl3 h2{
     color: var(--Black, #000);
     /* Heading/H2 */
     font-family: Roboto;
@@ -173,6 +174,7 @@ h2{
     line-height: 120%; /* 57.6px */
     align-self: stretch;
     margin-left: 50px;
+    margin-bottom: -10px;
 }
 
 
@@ -284,12 +286,7 @@ height: 395px;
     text-align: left;
 }
 
-.icons{
-    flex: 1;
-    align-items: left;
-    align-content: left;
-    text-align: left;
-}
+
 
 .aboutl3 .left-column .left .icons img{
     width: 24px;
@@ -303,6 +300,8 @@ height: 395px;
     height: 24px;
     padding: 5px;
     margin-left: -5px;
+    align-items: left;
+    text-align: left;
 }
 
 .aboutl3 .left-column .right .icons img{
@@ -310,4 +309,11 @@ height: 395px;
     height: 24px;
     padding: 5px;
     margin-left: -5px;
+}
+
+.aboutl3 .left-column .middle .icons{
+    align-items: left;
+    text-align: left;
+    align-content: left;
+    align-self: left;
 }
