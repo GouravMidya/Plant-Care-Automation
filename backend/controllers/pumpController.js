@@ -1,4 +1,4 @@
-const PumpHistory = require('../models/PumpHistoryModel');
+const PumpHistory = require('../models/pumpHistoryModel');
 
 // Controller function to insert pump history record
 const insertPumpHistory = async (req, res) => {
