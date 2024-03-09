@@ -1,5 +1,5 @@
 {
-  "proxy": "http://localhost:4001",
+  "proxy": "http://backend:4001",
   "name": "plant-care-automation",
   "version": "0.1.0",
   "private": true,
@@ -17,7 +17,8 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.2",
     "react-scripts": "5.0.1",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "mongoose": "^8.1.1"
   },
   "scripts": {
     "start": "react-scripts start",
