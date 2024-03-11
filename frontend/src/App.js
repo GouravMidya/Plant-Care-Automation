@@ -1,21 +1,21 @@
 import './App.css';
 import React, { useRef, useEffect, useState } from 'react';
 import { BrowserRouter as Router,Routes, Route } from 'react-router-dom';
-import Navigation from './navigation';
-import Header from './header';
-import Layout1 from './layout1';
-import Layout2 from './layout2';
-import Products from './products';
-import Contact from './contact';
-import Footer from './footer';
-import Login from './login';
-import Aboutus from './aboutus';
-import Dashboard from './dashboard';
-import Productpage from './productpage';
+import Navigation from './components/navigation';
+import Header from './components/header';
+import Layout1 from './components/layout1';
+import Layout2 from './components/layout2';
+import Products from './components/products';
+import Contact from './components/contact';
+import Footer from './components/footer';
+import Login from './pages/login';
+import Aboutus from './pages/aboutus';
+import Dashboard from './components/dashboard';
+import Productpage from './pages/productpage';
 
 function App() {
 
-
+  
   return (
     <div className="App">
       <Router>
