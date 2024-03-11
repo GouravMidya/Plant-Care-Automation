@@ -82,8 +82,8 @@ const getDailyAverages = async (req, res) => {
     const formattedDailyAverages = hoursInDay.map((hour, index) => {
       const hourString = hour.toString().padStart(2, '0');
       const timestamp = new Date(`2000-01-01T${hourString}:00:00`).toISOString();
-      const avgSoilMoisture = dailyAverages[index].count === 0 ? 0 : dailyAverages[index].sumSoilMoisture / dailyAverages[index].count;
-      const avgTemperature = dailyAverages[index].count === 0 ? 0 : dailyAverages[index].sumTemperature / dailyAverages[index].count;
+      const avgSoilMoisture = dailyAverages[index].count === 0 ? 0 : Number(dailyAverages[index].sumSoilMoisture / dailyAverages[index].count).toFixed(2);
+      const avgTemperature = dailyAverages[index].count === 0 ? 0 : Number(dailyAverages[index].sumTemperature / dailyAverages[index].count).toFixed(2);
 
       return { soilMoisture: avgSoilMoisture, temperature: avgTemperature, timestamp };
     });

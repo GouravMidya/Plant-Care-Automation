@@ -92,8 +92,11 @@ const TemperatureChart = ({ deviceId }) => {
 
       const data = await response.json();
       const temperatureValues = data.data.map((reading) => reading.temperature);
-      const timestamps = data.data.map((reading) => reading.timestamp);
-
+      const timestamps = data.data.map((reading) => {
+        const timestampDate = new Date(reading.timestamp);
+        const formattedTime = `${timestampDate.getHours()}:${timestampDate.getMinutes()}:${timestampDate.getSeconds()}`;
+        return formattedTime;
+      });
       setTemperatureData({ values: temperatureValues, timestamps });
     } catch (error) {
       console.error('Error fetching temperature data:', error);
@@ -146,10 +149,17 @@ const TemperatureChart = ({ deviceId }) => {
               callbacks: {
                 label: (context) => {
                   const timestamp = context.parsed.x;
+                  const formattedHours = new Date(timestamp).getHours();
                   return ` Temperature: ${context.parsed.y}`;
                 },
+                title: (tooltipItems) => {
+                  const formattedHours = new Date(tooltipItems[0].parsed.x).getHours();
+                  return `Time Range: ${formattedHours}:00 - ${formattedHours + 1}:00`;
+                },
               },
+              
             },
+            
             legend: {
               display: false, // Set to false to hide the legend
             },

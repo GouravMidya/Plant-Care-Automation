@@ -92,8 +92,11 @@ const SoilMoistureChart = ({ deviceId }) => {
       
       const data = await response.json();
       const moistureValues = data.data.map((reading) => reading.soilMoisture);
-      const timestamps = data.data.map((reading) => reading.timestamp);
-
+      const timestamps = data.data.map((reading) => {
+        const timestampDate = new Date(reading.timestamp);
+        const formattedTime = `${timestampDate.getHours()}:${timestampDate.getMinutes()}:${timestampDate.getSeconds()}`;
+        return formattedTime;
+      });
       setMoistureData({ values: moistureValues, timestamps });
     } catch (error) {
       console.error('Error fetching soil moisture data:', error);
@@ -146,7 +149,12 @@ const SoilMoistureChart = ({ deviceId }) => {
               callbacks: {
                 label: (context) => {
                   const timestamp = context.parsed.x;
-                  return ` Soil Moisture : ${context.parsed.y}`;
+                  const formattedHours = new Date(timestamp).getHours();
+                  return `Soil Moisture: ${context.parsed.y}`;
+                },
+                title: (tooltipItems) => {
+                  const formattedHours = new Date(tooltipItems[0].parsed.x).getHours();
+                  return `Time Range: ${formattedHours}:00 - ${formattedHours + 1}:00`;
                 },
               },
             },
