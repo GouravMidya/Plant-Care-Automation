@@ -52,7 +52,47 @@ const getSensorRecord = async (req, res) => {
 };
 
 
+// Averages
+
+// Controller function to fetch daily averages
+const getDailyAverages = async (req, res) => {
+  try {
+    const { deviceId, startDate, endDate } = req.query;
+
+    // Construct the query based on parameters
+    const query = { deviceId };
+
+    if (startDate && endDate) {
+      query.timestamp = { $gte: new Date(startDate), $lte: new Date(endDate) };
+    }
+
+    // Fetch sensor records from the database
+    const sensorRecords = await SensorRecord.find(query).sort({ timestamp: 1 });
+
+    // Calculate daily averages
+    const hourlyAverages = Array.from({ length: 24 }, () => ({ count: 0, sum: 0 }));
+
+    sensorRecords.forEach((record) => {
+      const hour = new Date(record.timestamp).getHours();
+      hourlyAverages[hour].count += 1;
+      hourlyAverages[hour].sum += record.soilMoisture;
+    });
+
+    const dailyAverages = hourlyAverages.map((hourlyAverage) => {
+      return hourlyAverage.count === 0 ? 0 : hourlyAverage.sum / hourlyAverage.count;
+    });
+
+    // Respond with the daily averages
+    res.status(200).json({ success: true, data: dailyAverages });
+  } catch (error) {
+    // Handle any errors
+    console.error('Error fetching and calculating daily averages:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch and calculate daily averages' });
+  }
+};
+
 module.exports = {
   insertSensorRecord,
-  getSensorRecord
+  getSensorRecord,
+  getDailyAverages,
 };
