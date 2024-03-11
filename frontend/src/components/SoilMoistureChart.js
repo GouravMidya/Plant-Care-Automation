@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Chart } from 'chart.js/auto';
-import { startOfToday, addDays, addWeeks, addMonths, addYears, format, addHours, addMinutes } from 'date-fns';
+import { startOfToday, addDays, addWeeks, addMonths, addYears, format, addHours } from 'date-fns';
 import 'chartjs-adapter-date-fns';
 import { DateRangePicker } from 'react-date-range';
 import 'react-date-range/dist/styles.css';
@@ -35,7 +35,6 @@ const SoilMoistureChart = ({ deviceId }) => {
         case 'day':
           startDate = addHours(new Date(), -24);
           endDate = new Date();
-          console.log(startDate)
           break;
         case 'week':
           startDate = addWeeks(today, -1);
@@ -57,13 +56,20 @@ const SoilMoistureChart = ({ deviceId }) => {
       // Format dates to 'YYYY-MM-DD' for API request
       const formattedStartDate = format(startDate, 'yyyy-MM-dd HH:mm:ss');
       const formattedEndDate = format(endDate, 'yyyy-MM-dd HH:mm:ss');
-  
-      // Fetch soil moisture data for the specific device and time range
+
+      let endpoint = '/sensor_readings/daily-averages';
+
+      // Update endpoint for 'day' and 'week' to fetch all entries
+      if (timeRange === 'day') {
+        endpoint = '/sensor_readings';
+      }
+
+      // Fetch soil moisture data for the specific device and time range using the appropriate endpoint
       const response = await fetch(
-        `/sensor_readings?deviceId=${deviceId}&startDate=${formattedStartDate}&endDate=${formattedEndDate}`
+        `${endpoint}?deviceId=${deviceId}&startDate=${formattedStartDate}&endDate=${formattedEndDate}`
       );
       const data = await response.json();
-
+  
       // Extract soil moisture values and timestamps from the fetched data
       const moistureValues = data.data.map((reading) => reading.soilMoisture);
       const timestamps = data.data.map((reading) => reading.timestamp);
@@ -98,9 +104,8 @@ const SoilMoistureChart = ({ deviceId }) => {
     const ctx = document.getElementById('soilMoistureChart');
 
     if (ctx) {
-      const timeUnit = timeRange === 'day' ? 'hour' : 'day';
-      const displayFormat = timeRange === 'day' ? 'H:mm' : 'MMM dd';
-      const tooltipFormat = timeRange === 'day' ? 'dd-MM-yyyy HH:mm' : 'dd-MM-yyyy ';
+      const timeUnit = timeRange === 'day' ? 'hour' : 'hour';
+      const displayFormat = timeRange === 'day' ? 'H:mm' : 'H:mm';
 
       return new Chart(ctx, {
         type: 'line',
@@ -113,7 +118,7 @@ const SoilMoistureChart = ({ deviceId }) => {
                 unit: timeUnit,
                 displayFormats: {
                   hour: 'H:mm',
-                  day: displayFormat ,
+                  day: displayFormat,
                 },
               },
               title: {
@@ -203,7 +208,6 @@ const SoilMoistureChart = ({ deviceId }) => {
       setShowStartDatePicker(true);
     }
   };
-  
 
   return (
     <div>
