@@ -1,7 +1,7 @@
 import React from "react";
-import Navigation from "./navigation";
-import './App.css';
-import Footer from './footer';
+import Navigation from "../components/navigation";
+import '../App.css';
+import Footer from '../components/footer';
 
 
 
