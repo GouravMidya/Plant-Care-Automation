@@ -12,6 +12,7 @@ import Login from './pages/login';
 import Aboutus from './pages/aboutus';
 import Dashboard from './components/dashboard';
 import Productpage from './pages/productpage';
+import Blog from './components/blog';
 
 function App() {
 
@@ -24,6 +25,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/Dashboard" element={<Dashboard />} />
         <Route path="/aboutus" element={<Aboutus />} />
+        <Route path="/blog" element={<Blog />} />
         <Route path="/productpage" element={<Productpage />} />
         </Routes>
       </Router>

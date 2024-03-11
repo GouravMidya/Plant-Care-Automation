@@ -9,9 +9,7 @@ function Footer() {
       <Link to="/"><div className="logo">LOGO</div></Link>
       </div>
       <div className="middle">
-        <Link to="/aboutus"><a href="#">About Us</a></Link>
-        <Link to="/productpage"><a href="#">Products</a></Link>
-        <Link to="/dashboard"><a href="#">Dashboard</a></Link>
+        <Link to="/"><a href="#">@2024 BloomBuddy</a></Link>
       </div>
       <div className="right3">
         <a href="#"><img src="facebook.png" alt="Facebook" className="social-logo" /></a>

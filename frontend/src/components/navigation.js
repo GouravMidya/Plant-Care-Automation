@@ -12,6 +12,7 @@ function Navigation() {
         <Link to="/aboutus"><a href="#">About Us</a></Link>
         <Link to="/productpage"><a href="#">Products</a></Link>
         <Link to="/dashboard"><a href="#">Dashboard</a></Link>
+        <Link to="/blog"><a href="#">Blogs</a></Link>
       </div>
       <div className="right4">
         <Link to="/Login"><button class="button">Login</button></Link>

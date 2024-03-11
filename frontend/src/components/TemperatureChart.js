@@ -200,7 +200,7 @@ const TemperatureChart = ({ deviceId }) => {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '4px', border: '1px solid #000', marginTop:'80px' }}>
-        <h4 style={{ marginTop: '0px', marginBottom: '-10px', marginRight: '250px' }}>Temperature Chart</h4>
+        <h4 style={{ marginTop: '0px', marginBottom: '-10px', marginRight: '0px' }}>Temperature Chart</h4>
         <button style={{ marginRight: '4px' }} onClick={() => handleTimeRangeButtonClick('day')}>
           Day
         </button>

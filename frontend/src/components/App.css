@@ -100,9 +100,29 @@
 
 .card {
   
-  padding: 30px 15% 30px 15%;
+  padding: 30px 0 30px 0;
   text-align: center;
 }
+
+.container {
+  text-align: center;
+  background-color: #f0f0f0;
+  padding: 50px;
+  border-radius: 10px;
+  margin: 0 auto;
+  width: 60%;
+}
+
+h1 {
+  font-size: 2em;
+  margin-bottom: 20px;
+}
+
+p {
+  font-size: 1.2em;
+  margin-bottom: 30px;
+}
+
 
 .title {
   align-self: stretch;
@@ -442,7 +462,7 @@ label {
 }
 
 input {
-  width: 100%;
+  width: 33vw;
   display: flex;
   padding: 12px;
   align-items: center;
@@ -490,42 +510,6 @@ input {
   font-size: 14px;
 }
 
-.chart{
-  min-width: 100vh;
-  min-height: 100vh;
-}
-
-.card1 {
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  padding: 20px;
-  width: 300px;
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-}
-
-.card-header h2 {
-  margin: 0;
-}
-
-.card-footer {
-  display: flex;
-  justify-content: space-between;
-}
-
-.subtitle {
-  flex: 1;
-  text-align: center;
-}
-
-.subtitle h3 {
-  margin: 0;
-}
 
 button {
   align-items: center;
@@ -543,4 +527,33 @@ button:hover {
   background-color: #E4FFE7;
   color: black;
   border-color: black;
+}
+
+
+.blog-post {
+  padding-top: 80px;
+  margin-bottom: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 60%;
+  max-width: 800px; /* Optional: Set a maximum width for responsiveness */
+  margin: 0 auto; /* Center the blog post horizontally */
+}
+
+.blog-post img {
+  width: 100%;
+  border-radius: 5px; /* Add rounded corners to the image */
+  margin-bottom: 20px;
+}
+
+.blog-post h2 {
+  font-size: 2em;
+  margin-bottom: 10px;
+}
+
+.blog-post p {
+  font-size: 16px;
+  line-height: 1.5;
+  text-align: justify; /* Justify the text for better readability */
 }

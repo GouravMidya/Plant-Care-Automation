@@ -1,7 +1,7 @@
 /* Layout1 */
 .aboutl1{
     display: flex;
-width: 1440px;
+width: 100%;
 flex-direction: column;
 align-items: center;
 gap: 80px;
@@ -12,7 +12,7 @@ gap: 80px;
 text-align: center;
 
 /* Heading/H1 */
-font-family: Roboto;
+font-family: inherit;
 font-size: 56px;
 font-style: normal;
 font-weight: 700;
@@ -25,10 +25,10 @@ margin-bottom: 24px;
 .aboutl1 p{
     color: var(--Black, #000);
     align-items: center;
-    width: 768px;
+    width: 730px;
     text-align: center;
     /* Text/Medium/Normal */
-    font-family: Roboto;
+    font-family: inherit;
     font-size: 18px;
     font-style: normal;
     font-weight: 400;
@@ -49,7 +49,7 @@ margin-bottom: 24px;
 
 .aboutl2{
     display: flex;
-    width: 1440px;
+    width: 100%;
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
@@ -60,7 +60,7 @@ margin-bottom: 24px;
     color: var(--Black, #000);
 
 /* Heading/H2 */
-font-family: Roboto;
+font-family: inherit;
 font-size: 48px;
 font-style: normal;
 font-weight: 700;
@@ -90,7 +90,7 @@ margin-bottom: -10px;
     text-align: center;
     
     /* Text/Regular/Normal */
-    font-family: Roboto;
+    font-family: inherit;
     font-size: 16px;
     font-style: normal;
     font-weight: 400;
@@ -104,7 +104,7 @@ margin-bottom: -10px;
     text-align: center;
 
     /* Text/Regular/Normal */
-    font-family: Roboto;
+    font-family: inherit;
     font-size: 16px;
     font-style: normal;
     font-weight: 400;
@@ -118,7 +118,7 @@ margin-bottom: -10px;
     text-align: center;
     
     /* Text/Regular/Normal */
-    font-family: Roboto;
+    font-family: inherit;
     font-size: 16px;
     font-style: normal;
     font-weight: 400;
@@ -148,7 +148,7 @@ margin-bottom: -10px;
 text-align: center;
 margin-bottom: 10px;
 /* Heading/H4 */
-font-family: Roboto;
+font-family: inherit;
 font-size: 32px;
 font-style: normal;
 font-weight: 700;
@@ -159,7 +159,7 @@ line-height: 130%; /* 41.6px */
 /* Layout 3 */
 .aboutl3{
     display: flex;
-    width: 1440px;
+    width: 100%;
     flex-direction: column;
     align-items: flex-start;
     gap: 50px;
@@ -167,7 +167,7 @@ line-height: 130%; /* 41.6px */
 .aboutl3 h2{
     color: var(--Black, #000);
     /* Heading/H2 */
-    font-family: Roboto;
+    font-family: inherit;
     font-size: 48px;
     font-style: normal;
     font-weight: 700;
@@ -197,7 +197,7 @@ line-height: 130%; /* 41.6px */
     color: var(--Black, #000);
     
     /* Text/Regular/Normal */
-    font-family: Roboto;
+    font-family: inherit;
     font-size: 16px;
     font-style: normal;
     font-weight: 400;
@@ -210,7 +210,7 @@ line-height: 130%; /* 41.6px */
     color: var(--Black, #000);
 
     /* Text/Regular/Normal */
-    font-family: Roboto;
+    font-family: inherit;
     font-size: 16px;
     font-style: normal;
     font-weight: 400;
@@ -223,7 +223,7 @@ line-height: 130%; /* 41.6px */
     color: var(--Black, #000);
     
     /* Text/Regular/Normal */
-    font-family: Roboto;
+    font-family: inherit;
     font-size: 16px;
     font-style: normal;
     font-weight: 400;
@@ -252,7 +252,7 @@ height: 395px;
     color: var(--Black, #000);
 
     /* Text/Large/Semi Bold */
-    font-family: Roboto;
+    font-family: inherit;
     font-size: 20px;
     font-style: normal;
     font-weight: 600;
@@ -265,7 +265,7 @@ height: 395px;
     color: var(--Black, #000);
 
     /* Text/Medium/Normal */
-    font-family: Roboto;
+    font-family: inherit;
     font-size: 18px;
     font-style: normal;
     font-weight: 400;
@@ -277,7 +277,7 @@ height: 395px;
 .quote{
     color: var(--Black, #000);
     /* Text/Regular/Normal */
-    font-family: Roboto;
+    font-family: inherit;
     font-size: 16px;
     font-style: normal;
     font-weight: 400;

@@ -11,22 +11,6 @@ function Dashboard() {
   return (
     <div className="dashboard">
       <Navigation />
-      <div class="card">
-        <div class="card-header">
-          <h2>Title</h2>
-          <button>Button</button>
-        </div>
-        <div class="card-footer">
-          <div class="subtitle">
-            <h3>Subtitle 1</h3>
-            <button>Button 1</button>
-          </div>
-          <div class="subtitle">
-            <h3>Subtitle 2</h3>
-            <button>Button 2</button>
-          </div>
-        </div>
-      </div>
 
     <div className="chart-container">
       <div className="SoilMoistureChart">
