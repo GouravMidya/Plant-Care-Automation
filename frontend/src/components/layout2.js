@@ -15,8 +15,8 @@ function Layout2() {
         </div>
       </div>
       <div className="right-column">
-        <div className="image-container">
-          <img src="0.jpg" alt="Your Image" className="image" />
+        <div className="image-container1">
+          <img src="1.jpg" alt="Your Image" className="image1" />
         </div>
       </div>
     </div>

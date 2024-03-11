@@ -1,5 +1,5 @@
 {
-  "proxy": "https://backend-server-lg5msmrrza-el.a.run.app",
+  "proxy": "http://localhost:4001",
   "name": "plant-care-automation",
   "version": "0.1.0",
   "private": true,

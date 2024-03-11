@@ -28,9 +28,18 @@ function Contact() {
         </div>
         <div className="right2">
           <div className="contact-details">
-            <p>Email: example@example.com</p>
-            <p>Office: 123 Street, City</p>
-            <p>Phone: +1234567890</p>
+            <div>
+            <img src='email.png' className='cont-img'></img>
+            <p>bloombuddy@admin.com</p>
+            </div>
+            <div>
+            <img src='location.png' className='cont-img'></img>
+            <p>bloombuddy, silicon valley, 2239 VPC</p>
+            </div>
+            <div>
+            <img src='phone.png' className='cont-img'></img>
+            <p>+1234567890</p>
+            </div>
           </div>
         </div>
       </div>

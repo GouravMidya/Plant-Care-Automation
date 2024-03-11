@@ -12,8 +12,8 @@ function blog() {
     for (let i = 0; i < 5; i++) {
         posts.push(
         <article className="bpost" key={i}>
-            <img src={image} alt={title} />
             <h2>{i+1}. {title}</h2>
+            <img src={image} alt={title} />
             <p>{content}</p>
         </article>
         );
