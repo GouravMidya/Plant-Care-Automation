@@ -53,17 +53,28 @@ const TemperatureChart = ({ deviceId }) => {
           endDate = new Date();
       }
 
+      // Format dates to 'YYYY-MM-DD' for API request
       const formattedStartDate = format(startDate, 'yyyy-MM-dd HH:mm:ss');
       const formattedEndDate = format(endDate, 'yyyy-MM-dd HH:mm:ss');
 
+      let endpoint = '/sensor_readings/daily-averages';
+
+      // Update endpoint for 'day' and 'week' to fetch all entries
+      if (timeRange === 'day') {
+        endpoint = '/sensor_readings';
+      }
+
+      // Fetch temperature data for the specific device and time range using the appropriate endpoint
       const response = await fetch(
-        `/sensor_readings?deviceId=${deviceId}&startDate=${formattedStartDate}&endDate=${formattedEndDate}`
+        `${endpoint}?deviceId=${deviceId}&startDate=${formattedStartDate}&endDate=${formattedEndDate}`
       );
       const data = await response.json();
 
+      // Extract temperature values and timestamps from the fetched data
       const temperatureValues = data.data.map((reading) => reading.temperature);
       const timestamps = data.data.map((reading) => reading.timestamp);
 
+      // Update the state with the temperature data
       setTemperatureData({ values: temperatureValues, timestamps });
     } catch (error) {
       console.error('Error fetching temperature data:', error);
@@ -76,7 +87,7 @@ const TemperatureChart = ({ deviceId }) => {
       const formattedEndDate = format(dateRange.endDate, 'yyyy-MM-dd HH:mm:ss');
 
       const response = await fetch(
-        `/sensor_readings?deviceId=${deviceId}&startDate=${formattedStartDate}&endDate=${formattedEndDate}`
+        `/temperature_readings?deviceId=${deviceId}&startDate=${formattedStartDate}&endDate=${formattedEndDate}`
       );
 
       const data = await response.json();
@@ -93,9 +104,8 @@ const TemperatureChart = ({ deviceId }) => {
     const ctx = document.getElementById('temperatureChart');
 
     if (ctx) {
-      const timeUnit = timeRange === 'day' ? 'hour' : 'day';
-      const displayFormat = timeRange === 'day' ? 'H:mm' : 'MMM dd';
-      const tooltipFormat = timeRange === 'day' ? 'dd-MM-yyyy HH:mm' : 'dd-MM-yyyy ';
+      const timeUnit = timeRange === 'day' ? 'hour' : 'hour';
+      const displayFormat = timeRange === 'day' ? 'H:mm' : 'H:mm';
 
       return new Chart(ctx, {
         type: 'line',
@@ -115,7 +125,7 @@ const TemperatureChart = ({ deviceId }) => {
                 display: true,
                 text: 'Time',
                 font: {
-                  size: 17,
+                  size: 17, // Set the desired font size
                   weight: 'bold',
                 },
               },
@@ -125,7 +135,7 @@ const TemperatureChart = ({ deviceId }) => {
                 display: true,
                 text: 'Temperature',
                 font: {
-                  size: 17,
+                  size: 17, // Set the desired font size
                   weight: 'bold',
                 },
               },
@@ -136,12 +146,12 @@ const TemperatureChart = ({ deviceId }) => {
               callbacks: {
                 label: (context) => {
                   const timestamp = context.parsed.x;
-                  return ` Temperature: ${context.parsed.y}°C`;
+                  return ` Temperature: ${context.parsed.y}`;
                 },
               },
             },
             legend: {
-              display: false,
+              display: false, // Set to false to hide the legend
             },
           },
         },
@@ -166,7 +176,7 @@ const TemperatureChart = ({ deviceId }) => {
         label: 'Temperature',
         data: temperatureData.values,
         fill: false,
-        borderColor: 'rgba(255,0,0,1)',
+        borderColor: 'rgba(255, 0, 0, 1)', // Red color for temperature
         pointRadius: 1,
       },
     ],
@@ -177,6 +187,7 @@ const TemperatureChart = ({ deviceId }) => {
   };
 
   const handleCustomStartDateChange = (date) => {
+    // Set the start time to 00:00:00
     const startDateWithTime = new Date(date);
     startDateWithTime.setHours(0, 0, 0, 0);
 
@@ -187,6 +198,7 @@ const TemperatureChart = ({ deviceId }) => {
   };
 
   const handleCustomEndDateChange = (date) => {
+    // Set the end time to 23:59:59
     const endDateWithTime = new Date(date);
     endDateWithTime.setHours(23, 59, 59, 999);
 
@@ -200,7 +212,7 @@ const TemperatureChart = ({ deviceId }) => {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '4px', border: '1px solid #000', marginTop:'80px' }}>
-        <h4 style={{ marginTop: '0px', marginBottom: '-10px', marginRight: '0px' }}>Temperature Chart</h4>
+        <h4 style={{ marginTop: '0px', marginBottom: '-10px', marginRight: '250px' }}>Temperature Chart</h4>
         <button style={{ marginRight: '4px' }} onClick={() => handleTimeRangeButtonClick('day')}>
           Day
         </button>
