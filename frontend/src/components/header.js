@@ -1,5 +1,6 @@
 import './App.css'
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const Header = React.forwardRef((props, ref) => {
   return (
@@ -8,8 +9,8 @@ const Header = React.forwardRef((props, ref) => {
         <h1>Revolutionize your plant care<br></br> with our smart monitoring system</h1>
         <p>Experience the future of gardening with real-time insights and automated solutions for healthier, happier plants.</p>
         <div className="buttons">
-          <button className="learn-more">Learn More</button>
-          <button className="signup">Sign Up</button>
+          <Link to="/aboutus"><button className="learn-more">Learn More</button></Link>
+          <Link to="/signup"><button className="signup">Sign Up</button></Link>
         </div>
       </div>
     </div>

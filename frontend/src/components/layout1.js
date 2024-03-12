@@ -1,6 +1,6 @@
-// Layout1.js
 import './App.css'
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 function Layout1({ headerHeight }) {
     const layoutStyle = {
@@ -19,8 +19,8 @@ function Layout1({ headerHeight }) {
           <div className="right">
             <p>Transform your plant care routine with our cutting-edge monitoring system. Achieve precision with real-time insights, automated watering, and personalized alerts. Embrace a seamless blend of technology and nature for healthier, thriving plants. Elevate your gardening experience today and witness the future of smart, effortless plant care.</p>
             <div className="buttons">
-              <button className="learn-more">Learn More</button>
-              <button className="signup">Sign Up</button>
+              <Link to="/aboutus"><button className="learn-more">Learn More</button></Link>
+              <Link to="/signup"><button className="signup">Sign Up</button></Link>
             </div>
           </div>
         </div>
