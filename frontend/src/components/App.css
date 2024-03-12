@@ -357,8 +357,10 @@ p {
 
 .input-group textarea[id="message"]{
   display: flex;
-  height: 120px;
-  width: 90%;
+  min-height: 120px;
+  min-width: 90%;
+  max-height: 120px;
+  max-width: 90%;
   padding: 12px;
   align-items: flex-start;
   align-self: stretch;

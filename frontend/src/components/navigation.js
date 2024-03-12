@@ -16,7 +16,7 @@ function Navigation() {
       </div>
       <div className="right4">
         <Link to="/Login"><button class="button">Login</button></Link>
-        <button class="button">Sign Up</button>
+        <Link to="/signup"><button class="button">Sign Up</button></Link>
       </div>
     </div>
   );

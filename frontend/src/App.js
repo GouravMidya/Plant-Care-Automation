@@ -13,6 +13,7 @@ import Aboutus from './pages/aboutus';
 import Dashboard from './components/dashboard';
 import Productpage from './pages/productpage';
 import Blog from './components/blog';
+import Signup from './pages/signup';
 
 function App() {
 
@@ -23,6 +24,7 @@ function App() {
         <Routes>
         <Route path='/' element={<HomeWithLayout />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
         <Route path="/Dashboard" element={<Dashboard />} />
         <Route path="/aboutus" element={<Aboutus />} />
         <Route path="/blog" element={<Blog />} />

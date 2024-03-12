@@ -489,3 +489,16 @@ button:hover {
   color: black;
   border-color: black;
 }
+
+.signup{
+  padding-top: 100px;
+}
+
+.signup-container {
+  padding-top: 70px;
+  padding-bottom: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
