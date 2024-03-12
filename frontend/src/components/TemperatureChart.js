@@ -7,18 +7,31 @@ import 'react-date-range/dist/styles.css';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
+// Component for displaying a temperature chart
 const TemperatureChart = ({ deviceId }) => {
+  // State to store temperature data
   const [temperatureData, setTemperatureData] = useState({ values: [] });
+
+  // State for time range selection ('day', 'week', 'month', 'year', 'custom')
   const [timeRange, setTimeRange] = useState('day');
+
+  // Current date for default start date in the date range picker
   const today = startOfToday();
+
+  // State to manage date range for custom time range
   const [dateRange, setDateRange] = useState({
     startDate: today,
     endDate: today + 1,
   });
+
+  // State to handle custom start date selection
   const [customStartDate, setCustomStartDate] = useState(null);
+
+  // State to control the visibility of the start and end date pickers
   const [showStartDatePicker, setShowStartDatePicker] = useState(true);
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
 
+  // Fetch temperature data based on selected time range and date range
   useEffect(() => {
     if (timeRange === 'custom') {
       fetchCustomRangeData();
@@ -27,10 +40,12 @@ const TemperatureChart = ({ deviceId }) => {
     }
   }, [deviceId, timeRange, dateRange]);
 
+  // Fetch temperature data from the server
   const fetchTemperatureData = async () => {
     try {
       let startDate, endDate;
 
+      // Set start and end dates based on the selected time range
       switch (timeRange) {
         case 'day':
           startDate = addHours(new Date(), -24);
@@ -57,9 +72,8 @@ const TemperatureChart = ({ deviceId }) => {
       const formattedStartDate = format(startDate, 'yyyy-MM-dd HH:mm:ss');
       const formattedEndDate = format(endDate, 'yyyy-MM-dd HH:mm:ss');
 
+      // Set endpoint for fetching daily averages or all entries based on time range
       let endpoint = '/sensor_readings/daily-averages';
-
-      // Update endpoint for 'day' and 'week' to fetch all entries
       if (timeRange === 'day') {
         endpoint = '/sensor_readings';
       }
@@ -81,35 +95,44 @@ const TemperatureChart = ({ deviceId }) => {
     }
   };
 
+  // Fetch temperature data for the custom date range
   const fetchCustomRangeData = async () => {
     try {
       const formattedStartDate = format(dateRange.startDate, 'yyyy-MM-dd HH:mm:ss');
       const formattedEndDate = format(dateRange.endDate, 'yyyy-MM-dd HH:mm:ss');
 
+      // Fetch temperature data for the specific device and custom date range
       const response = await fetch(
         `/temperature_readings?deviceId=${deviceId}&startDate=${formattedStartDate}&endDate=${formattedEndDate}`
       );
 
       const data = await response.json();
+
+      // Extract temperature values and timestamps from the fetched data
       const temperatureValues = data.data.map((reading) => reading.temperature);
       const timestamps = data.data.map((reading) => {
         const timestampDate = new Date(reading.timestamp);
         const formattedTime = `${timestampDate.getHours()}:${timestampDate.getMinutes()}:${timestampDate.getSeconds()}`;
         return formattedTime;
       });
+
+      // Update the state with the temperature data
       setTemperatureData({ values: temperatureValues, timestamps });
     } catch (error) {
       console.error('Error fetching temperature data:', error);
     }
   };
 
+  // Render the temperature chart using Chart.js
   const renderChart = () => {
     const ctx = document.getElementById('temperatureChart');
 
     if (ctx) {
+      // Set time unit and display format based on the selected time range
       const timeUnit = timeRange === 'day' ? 'hour' : 'hour';
       const displayFormat = timeRange === 'day' ? 'H:mm' : 'H:mm';
 
+      // Create a new Chart instance
       return new Chart(ctx, {
         type: 'line',
         data: chartData,
@@ -157,9 +180,7 @@ const TemperatureChart = ({ deviceId }) => {
                   return `Time Range: ${formattedHours}:00 - ${formattedHours + 1}:00`;
                 },
               },
-              
             },
-            
             legend: {
               display: false, // Set to false to hide the legend
             },
@@ -169,9 +190,11 @@ const TemperatureChart = ({ deviceId }) => {
     }
   };
 
+  // Effect hook to render and destroy the chart based on temperature data and time range changes
   useEffect(() => {
     const chartInstance = renderChart();
 
+    // Cleanup function to destroy the chart instance when the component unmounts
     return () => {
       if (chartInstance) {
         chartInstance.destroy();
@@ -179,6 +202,7 @@ const TemperatureChart = ({ deviceId }) => {
     };
   }, [temperatureData, timeRange]);
 
+  // Data object for the temperature chart
   const chartData = {
     labels: temperatureData.timestamps,
     datasets: [
@@ -192,10 +216,12 @@ const TemperatureChart = ({ deviceId }) => {
     ],
   };
 
+  // Event handler for time range button clicks
   const handleTimeRangeButtonClick = (range) => {
     setTimeRange(range);
   };
 
+  // Event handler for custom start date change
   const handleCustomStartDateChange = (date) => {
     // Set the start time to 00:00:00
     const startDateWithTime = new Date(date);
@@ -207,11 +233,13 @@ const TemperatureChart = ({ deviceId }) => {
     setShowEndDatePicker(true);
   };
 
+  // Event handler for custom end date change
   const handleCustomEndDateChange = (date) => {
     // Set the end time to 23:59:59
     const endDateWithTime = new Date(date);
     endDateWithTime.setHours(23, 59, 59, 999);
 
+    // Update the date range if the end date is after the custom start date
     if (endDateWithTime > customStartDate) {
       setDateRange({ ...dateRange, endDate: endDateWithTime });
       setShowEndDatePicker(false);
@@ -219,9 +247,10 @@ const TemperatureChart = ({ deviceId }) => {
     }
   };
 
+  // JSX structure for rendering the TemperatureChart component
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '4px', border: '1px solid #000', marginTop:'80px' }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '4px', border: '1px solid #000', marginTop: '80px' }}>
         <h4 style={{ marginTop: '0px', marginBottom: '-10px', marginRight: '0px' }}>Temperature Chart</h4>
         <button style={{ marginRight: '4px' }} onClick={() => handleTimeRangeButtonClick('day')}>
           Day
@@ -271,4 +300,5 @@ const TemperatureChart = ({ deviceId }) => {
   );
 };
 
+// Exporting the TemperatureChart component
 export default TemperatureChart;
