@@ -87,8 +87,6 @@ const deleteUserDevice = async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to delete user device' });
   }
 };
-// Add other CRUD operations as needed...
-
 module.exports = {
   createUserDevice,
   getUserDevices,
