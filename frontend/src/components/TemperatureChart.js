@@ -103,18 +103,15 @@ const TemperatureChart = ({ deviceId }) => {
 
       // Fetch temperature data for the specific device and custom date range
       const response = await fetch(
-        `/temperature_readings?deviceId=${deviceId}&startDate=${formattedStartDate}&endDate=${formattedEndDate}`
+        `/sensor_readings/daily-averages?deviceId=${deviceId}&startDate=${formattedStartDate}&endDate=${formattedEndDate}`
       );
 
       const data = await response.json();
 
       // Extract temperature values and timestamps from the fetched data
       const temperatureValues = data.data.map((reading) => reading.temperature);
-      const timestamps = data.data.map((reading) => {
-        const timestampDate = new Date(reading.timestamp);
-        const formattedTime = `${timestampDate.getHours()}:${timestampDate.getMinutes()}:${timestampDate.getSeconds()}`;
-        return formattedTime;
-      });
+      const timestamps = data.data.map((reading) => reading.timestamp);
+
 
       // Update the state with the temperature data
       setTemperatureData({ values: temperatureValues, timestamps });
@@ -248,57 +245,57 @@ const TemperatureChart = ({ deviceId }) => {
   };
 
   // JSX structure for rendering the TemperatureChart component
+
   return (
     <div>
+      {/* Time range buttons and custom date range pickers */}
       <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '4px', border: '1px solid #000', marginTop: '80px' }}>
-        <h4 style={{ marginTop: '0px', marginBottom: '-10px', marginRight: '0px' }}>Temperature Chart</h4>
-        <button style={{ marginRight: '4px' }} onClick={() => handleTimeRangeButtonClick('day')}>
-          Day
-        </button>
-        <button style={{ marginRight: '4px' }} onClick={() => handleTimeRangeButtonClick('week')}>
-          Week
-        </button>
-        <button style={{ marginRight: '4px' }} onClick={() => handleTimeRangeButtonClick('month')}>
-          Month
-        </button>
-        <button style={{ marginRight: '4px' }} onClick={() => handleTimeRangeButtonClick('year')}>
-          Year
-        </button>
+        <h4 style={{ marginTop: '0px', marginBottom: '-10px', marginRight: '0px' }}>Soil Moisture Chart</h4>
+        <button style={{ marginRight: '4px' }} onClick={() => handleTimeRangeButtonClick('day')}>Day</button>
+        <button style={{ marginRight: '4px' }} onClick={() => handleTimeRangeButtonClick('week')}>Week</button>
+        <button style={{ marginRight: '4px' }} onClick={() => handleTimeRangeButtonClick('month')}>Month</button>
+        <button style={{ marginRight: '4px' }} onClick={() => handleTimeRangeButtonClick('year')}>Year</button>
         <button
-          onClick={() => handleTimeRangeButtonClick('custom')}
-          style={{
-            width: '20px',
-            height: '25px',
-            background: 'transparent',
-            border: 'none',
-            paddingTop: '0px',
-            marginRight: '20px',
-            marginTop: '-2px',
-          }}
-        >
-          {showStartDatePicker && (
-            <DatePicker
-              selected={customStartDate}
-              onChange={handleCustomStartDateChange}
-              customInput={<img src="calendaricon.png" alt="Calendar Icon" style={{ width: '350%', height: '350%' }} />}
-              style={{ marginLeft: '10px' }}
-            />
-          )}
-          {showEndDatePicker && dateRange.startDate && (
-            <DatePicker
-              selected={dateRange.endDate}
-              onChange={handleCustomEndDateChange}
-              minDate={customStartDate}
-              customInput={<img src="calendaricon.png" alt="Calendar Icon" style={{ width: '350%', height: '350%' }} />}
-              style={{ marginLeft: '10px' }}
-            />
-          )}
-        </button>
+  onClick={() => handleTimeRangeButtonClick('custom')}
+  style={{
+    width: '80px',
+    height: '30px',
+    background: 'transparent', // Set a background color
+    border: '0px solid #000', // Add a border
+    borderRadius: '5px', // Optional: Add border-radius for rounded corners
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: '20px',
+    marginTop: '-2px',
+  }}
+>
+  <span style={{ marginRight: '5px' }}>
+    {showStartDatePicker && (
+      <DatePicker
+        selected={customStartDate}
+        onChange={handleCustomStartDateChange}
+        customInput={<img src="calendaricon.png" alt="Calendar Icon" style={{ width: '100%', height: '100%' }} />}
+        style={{ marginLeft: '10px' }}
+      />
+    )}
+  </span>
+  {showEndDatePicker && dateRange.startDate && (
+    <DatePicker
+      selected={dateRange.endDate}
+      onChange={handleCustomEndDateChange}
+      minDate={customStartDate}
+      customInput={<img src="calendaricon.png" alt="Calendar Icon" style={{ width: '100%', height: '100%' }} />}
+      style={{ marginLeft: '10px' }}
+    />
+  )}
+</button>
       </div>
+      {/* Canvas for displaying the soil moisture chart */}
       <canvas id="temperatureChart" style={{ border: '1px solid #000', marginTop: '-1px', paddingTop: '10px' }}></canvas>
     </div>
   );
 };
 
-// Exporting the TemperatureChart component
+
 export default TemperatureChart;

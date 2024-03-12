@@ -26,7 +26,7 @@ const insertSensorRecord = async (req, res) => {
   }
 };
 
-// Controller function to fetch sensor records
+// Controller function to fetch all sensor records from start date to end date for a particular device
 const getSensorRecord = async (req, res) => {
   try {
     // Extract parameters from the request, e.g., deviceId, time range, etc.
@@ -51,7 +51,7 @@ const getSensorRecord = async (req, res) => {
   }
 };
 
-
+// Method to get daily averages for a particular device based on start date and end date
 const getDailyAverages = async (req, res) => {
   try {
     const { deviceId, startDate, endDate } = req.query;
