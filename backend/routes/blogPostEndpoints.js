@@ -1,7 +1,7 @@
 const express = require('express');
 const { createBlogPost,
     getAllBlogPosts,
-    getBlogPostById,
+    getBlogPostByTitle,
     updateBlogPost,
     deleteBlogPost} = require('../controllers/blogController');
 
@@ -14,12 +14,12 @@ router.post('/', createBlogPost);
 router.get('/getall',getAllBlogPosts);
 
 // Fetch a specific Blog record by ID
-router.get('/:postId', getBlogPostById);
+router.get('/', getBlogPostByTitle);
 
 // Update a Blog record by ID
-router.put('/:postId', updateBlogPost);
+router.put('/', updateBlogPost);
 
 // Delete a Blog record by ID
-router.delete('/:postId', deleteBlogPost);
+router.delete('/', deleteBlogPost);
 
 module.exports = router;
