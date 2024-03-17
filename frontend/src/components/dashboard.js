@@ -3,6 +3,7 @@ import Navigation from './navigation';
 import SoilMoistureChart from './SoilMoistureChart';
 import TemperatureChart from './TemperatureChart';
 import Footer from './footer';
+import Dashcard from './dashcard';
 
 function Dashboard() {
   // State variable for userId
@@ -11,6 +12,9 @@ function Dashboard() {
   return (
     <div className="dashboard">
       <Navigation />
+    <div className='card-container'>
+      <Dashcard />
+    </div>  
 
     <div className="chart-container">
       <div className="SoilMoistureChart">
