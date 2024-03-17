@@ -22,10 +22,11 @@ const Card = ({ device }) => {
       <p>Device Name: {device.name}</p>
       <p>Device Status: {device.status}</p>
       <button onClick={handleOpen}>Change Values</button>
+      <button >Graph</button>
       {open && (
         <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0, 0, 0, 0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <div style={{ background: '#fff', padding: '20px', maxWidth: '300px' }}>
-            <h3>Popup Content</h3>
+            <h3>Update values</h3>
             <button onClick={handleChangeValues}>Save Changes</button>
             <button onClick={handleClose}>Cancel</button>
           </div>
@@ -45,10 +46,12 @@ const dashcard = () => {
   ];
 
   return (
-    <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-      {devices.map(device => (
-        <Card key={device.id} device={device} />
-      ))}
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+        {devices.map(device => (
+          <Card key={device.id} device={device} />
+        ))}
+      </div>
     </div>
   );
 };

@@ -574,3 +574,12 @@ button:hover {
 .chart-container{
   min-height: 100vh;
 }
+
+.card-container{
+  padding-top: 100px;
+  align-items: center;
+  align-self: center;
+  align-content: center;
+  margin-left: auto;
+  margin-right: auto;
+}
