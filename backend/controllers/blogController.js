@@ -3,8 +3,8 @@ const BlogPost = require('../models/blogPostModel');
 // Controller function to create a new blog post
 const createBlogPost = async (req, res) => {
   try {
-    const { title, content, authorId } = req.body;
-    const blogPost = new BlogPost({ title, content, author: authorId });
+    const { title, content, author } = req.body;
+    const blogPost = new BlogPost({ title, content, author});
     const savedPost = await blogPost.save();
     res.status(201).json({ success: true, message: 'Blog post created successfully', data: savedPost });
   } catch (error) {
