@@ -1,3 +1,4 @@
+// Libraries to be installed in Arduino IDE : Adafruit Unified Sensor, ArduinoJson, DHT kxn, WifiManager by tzapu
 #include <DHT.h>  // Include the library for DHT11 temperature and humidity sensor
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>  // Include the library for https requests
@@ -28,13 +29,13 @@ DHT dht(dht_dpin, DHTTYPE);
 float humidity,temperature;
 int soil_moisture;
 
-//Function to update check delay and pump flow
+// Function to update check delay and pump flow
 void fetchDeviceSettings() {
 
   HTTPClient https;
   BearSSL::WiFiClientSecure client; 
   client.setInsecure();
-   // Define the path for fetching device settings
+  // Define the path for fetching device settings
   const char* path = "/api/user_devices/settings";
 
   // Combine the server IP, port, and path
@@ -78,10 +79,11 @@ void fetchDeviceSettings() {
   https.end();
 }
 
-//Function to send sensor data
+// Function to send sensor data
 void sendDataToServer() {
-  if (soil_moisture <550){
+  if (soil_moisture <=750 && soil_moisture>150){
     
+    // Create a WiFi Client
     HTTPClient https;
       BearSSL::WiFiClientSecure client; 
       client.setInsecure();
@@ -90,8 +92,6 @@ void sendDataToServer() {
 
     // Combine the server IP, port, and path
     String url =  String(serverUrl)+String(path);
-
-    // Create a WiFiClient object
 
     // Create a JSON payload with deviceId, soil moisture, temperature, and humidity
     String payload = "{\"deviceId\": \"" + String(deviceId) + "\"" +
@@ -114,11 +114,11 @@ void sendDataToServer() {
       Serial.print("Error sending data to server. https Response code: ");
       Serial.println(httpsResponseCode);
     }
-
+    Serial.print("Sent data to server.");
     // End the https connection
     https.end();
   }else{
-    Serial.println("Invalid Reading , Sensor not in soil");
+    Serial.println("Invalid Reading , Sensor not in soil/n Reading is:"+String(soil_moisture));
   }
 }
 
@@ -133,7 +133,7 @@ int readSoilMoisture() {
 
 // Function to control water pump
 void controlWaterPump() {
-  if(!pumpActivated && soil_moisture > 500  && soil_moisture < 750){
+  if(!pumpActivated && soil_moisture > 450  && soil_moisture < 750){
     pumpActivated = true;
     lastPumpActivationTime = millis(); // Record the timestamp of pump activation
     digitalWrite(RELAY_PIN, LOW); // Turn on pump
@@ -174,7 +174,7 @@ int readTemperatureHumidity() {
   humidity = dht.readHumidity();
   temperature = dht.readTemperature();
 
-  //check if read successfully
+  // Check if read successfully
   if(isnan(temperature) || isnan(humidity)){
     Serial.println("Failed to read from DHT sensor!");
     return 0;
@@ -192,15 +192,16 @@ int readTemperatureHumidity() {
 }
 
 void setup() {
-  // put your setup code here, to run once:
-  Serial.println("Humidity,Temperature and Soil Moisture Level\n\n");
+  // Put your setup code here, to run once:
+  
+  Serial.println("Humidity, Temperature, and Soil Moisture Level\n\n");
   dht.begin();
 
-  pinMode(wifi_led,OUTPUT);
+  pinMode(wifi_led, OUTPUT);
   digitalWrite(wifi_led, LOW); // Turn off wifi led (blue)
-
   Serial.begin(9600);
-
+  delay(600000); // Delay for 10 minutes to ensure accurate data ****************CHANGE THIS WHEN DEMONSTRATING *************************
+  
   // Create an instance of WiFiManager
   WiFiManager wifiManager;
 
@@ -208,24 +209,26 @@ void setup() {
   wifiManager.autoConnect("ESP8266_AP");
   
   digitalWrite(wifi_led, HIGH); // Turn on wifi led (blue)
-  Serial.println("Humidity,Temperature and Soil Moisture Level\n\n");
+  Serial.println("Humidity, Temperature, and Soil Moisture Level\n\n");
+  
   pinMode(RELAY_PIN, OUTPUT);
-  pinMode(pump_led,OUTPUT);
-  pinMode(server_led,OUTPUT);
+  pinMode(pump_led, OUTPUT);
+  pinMode(server_led, OUTPUT);
   digitalWrite(RELAY_PIN, HIGH); // Turn off pump
+  
   fetchDeviceSettings();
   delay(700);
 }
 
-//main code here, to run repeatedly:
+// Main code here, to run repeatedly:
 void loop() {
-  Serial.println("Humidity,Temperature and Soil Moisture Level\n\n");
+  Serial.println("Humidity, Temperature, and Soil Moisture Level\n\n");
   fetchDeviceSettings();
 
   unsigned long currentTime = millis(); // Get the current time
 
-  if (currentTime - lastPumpActivationTime >= 900000) { //900000
-    // If 15 minutes have elapsed since last pump activation
+  if (currentTime - lastPumpActivationTime >= 3600000) { // 3600000 = 1hour
+    // 900000 If 15 minutes have elapsed since last pump activation
     pumpActivated = false; // Reset the pump activation flag
   }
 
@@ -234,5 +237,5 @@ void loop() {
 
     controlWaterPump();
   }
-  delay(checkDelayDuration); // set value at top of program
+  delay(checkDelayDuration); // Set value at top of program
 }

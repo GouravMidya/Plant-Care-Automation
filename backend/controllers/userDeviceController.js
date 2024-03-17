@@ -3,8 +3,8 @@ const UserDevice = require('../models/UserDeviceModel');
 // Controller function to create a new user device
 const createUserDevice = async (req, res) => {
   try {
-    const { userId, deviceId, checkIntervals, pumpDuration } = req.body;
-    const newUserDevice = new UserDevice({ userId, deviceId, checkIntervals, pumpDuration });
+    const { userId, deviceId, checkIntervals, pumpDuration, location, description, deviceName} = req.body;
+    const newUserDevice = new UserDevice({ userId, deviceId, checkIntervals, pumpDuration, location, description, deviceName });
     await newUserDevice.save();
     res.status(201).json({ success: true, message: 'User device created successfully', data: newUserDevice });
   } catch (error) {

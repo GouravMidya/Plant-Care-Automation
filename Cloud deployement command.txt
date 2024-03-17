@@ -1,0 +1,10 @@
+Steps:
+Deploying Backend on google cloud
+    1. Build Image locally using command
+        docker build -t backend-server:v2 .
+
+    2. Submit the docker image to google container registery
+        gcloud builds submit --region=asia-east1 --tag asia-south1-docker.pkg.dev/bloom-buddy-416508/sensor-backend/backend-server:v2 
+
+    3. Start container of the image on google cloud
+        gcloud run deploy --image asia-south1-docker.pkg.dev/bloom-buddy-416508/sensor-backend/backend-server:v2

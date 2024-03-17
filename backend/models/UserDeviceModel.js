@@ -17,11 +17,11 @@ const userDeviceSchema = new mongoose.Schema({
   },
   location: {
     type: String, // Assuming location is a string
-    required: true
+    required: false
   },
   description: {
     type: String, // Assuming description is a string
-    required: true
+    required: false
   },
   checkIntervals: {
     type: Number,
