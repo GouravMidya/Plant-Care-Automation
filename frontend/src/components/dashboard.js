@@ -6,7 +6,7 @@ import Footer from './footer';
 
 function Dashboard() {
   // State variable for userId
-  const [userId, setUserId] = useState(1000000000);
+  const [userId, setUserId] = useState(1000000001);
 
   return (
     <div className="dashboard">
