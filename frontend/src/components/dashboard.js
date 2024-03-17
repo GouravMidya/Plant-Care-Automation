@@ -10,6 +10,7 @@ function Dashboard() {
   const [userId, setUserId] = useState(null);
   const [graphTitle, setGraphTitle] = useState('');
   const [animationKey, setAnimationKey] = useState(0);
+  const [animationRunning, setAnimationRunning] = useState(true); // New state variable
 
   useEffect(() => {
     // Increment animationKey to reset animation when userId changes
@@ -21,11 +22,17 @@ function Dashboard() {
     setGraphTitle(`Graph for Device ${deviceId} - ${deviceName}`);
   };
 
+  const handleChangeValues = () => {
+    // Implement logic to change device values here
+    setAnimationRunning(false); // Stop animation
+  };
+
   // Sample data for devices
   const devices = [
     { id: 1, name: 'Device 1', status: 'online' },
     { id: 2, name: 'Device 2', status: 'offline' },
     { id: 3, name: 'Device 3', status: 'online' },
+    { id: 4, name: 'Device 4', status: 'online' },
     // Add more devices here...
   ];
 
@@ -46,7 +53,7 @@ function Dashboard() {
         )}
 
         {userId && (
-          <div className="chart-container" key={animationKey} style={{ animation: 'slideIn 1s forwards' }}>
+          <div className="chart-container" key={animationKey} style={{ animation: animationRunning ? 'slideIn 1s forwards' : 'none' }}>
             <div className="SoilMoistureChart">
               <SoilMoistureChart deviceId={userId} />
             </div>

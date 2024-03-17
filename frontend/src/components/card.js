@@ -28,9 +28,11 @@ const Card = ({ device, handleGraphButtonClick }) => {
       <button onClick={handleOpen}>Change Values</button>
       <button onClick={handleGraphClick}>Graph</button>
       {open && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0, 0, 0, 0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0, 0, 0, 0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 2}}>
           <div style={{ background: '#fff', padding: '20px', maxWidth: '300px' }}>
-            <h3>Update values</h3>
+            <h3>Update values of {device.id}</h3>
+            <h4>Pump duration</h4>
+            <h4>temperature</h4>
             <button onClick={handleChangeValues}>Save Changes</button>
             <button onClick={handleClose}>Cancel</button>
           </div>

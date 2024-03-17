@@ -14,7 +14,6 @@ import Dashboard from './components/dashboard';
 import Productpage from './pages/productpage';
 import Blog from './components/blog';
 import Signup from './pages/signup';
-import Usercard from './components/card'
 
 function App() {
 
