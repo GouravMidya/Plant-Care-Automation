@@ -1,51 +1,44 @@
 import React, { useState, useEffect } from 'react';
-import { Chart } from 'chart.js/auto';
-import { startOfToday, addDays, addWeeks, addMonths, addYears, format, addHours } from 'date-fns';
+import 'react-datepicker/dist/react-datepicker.css';
+import Chart from 'react-apexcharts'; // Add this import
+import { startOfToday, addWeeks, addMonths, addYears,addHours } from 'date-fns';
 import 'chartjs-adapter-date-fns';
-import { DateRangePicker } from 'react-date-range';
 import 'react-date-range/dist/styles.css';
-import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
-// Component for displaying a temperature chart
+
 const TemperatureChart = ({ deviceId }) => {
-  // State to store temperature data
-  const [temperatureData, setTemperatureData] = useState({ values: [] });
-
-  // State for time range selection ('day', 'week', 'month', 'year', 'custom')
-  const [timeRange, setTimeRange] = useState('day');
-
-  // Current date for default start date in the date range picker
-  const today = startOfToday();
-
-  // State to manage date range for custom time range
-  const [dateRange, setDateRange] = useState({
-    startDate: today,
-    endDate: today + 1,
+  // State variables
+  const [state, setState] = useState({
+    options: {
+      chart: {
+        id: "basic-bar"
+      },
+      xaxis: {
+        categories: [] // Empty initially, will be filled with time ranges
+      },
+      colors: ['#b4757a']
+    },
+    series: [
+      {
+        name: "Temperature",
+        data: [] // Empty initially, will be filled with Temperature moisture values
+      }
+    ]
   });
 
-  // State to handle custom start date selection
+  const [timeRange, setTimeRange] = useState('day');
   const [customStartDate, setCustomStartDate] = useState(null);
+  const [dateRange, setDateRange] = useState({
+    startDate: new Date(),
+    endDate: new Date(),
+  });
 
-  // State to control the visibility of the start and end date pickers
-  const [showStartDatePicker, setShowStartDatePicker] = useState(true);
-  const [showEndDatePicker, setShowEndDatePicker] = useState(false);
-
-  // Fetch temperature data based on selected time range and date range
-  useEffect(() => {
-    if (timeRange === 'custom') {
-      fetchCustomRangeData();
-    } else {
-      fetchTemperatureData();
-    }
-  }, [deviceId, timeRange, dateRange]);
-
-  // Fetch temperature data from the server
+  // Function to fetch Temperature data
   const fetchTemperatureData = async () => {
     try {
       let startDate, endDate;
-
-      // Set start and end dates based on the selected time range
+      const today = startOfToday();
       switch (timeRange) {
         case 'day':
           startDate = addHours(new Date(), -24);
@@ -63,239 +56,103 @@ const TemperatureChart = ({ deviceId }) => {
           startDate = addYears(today, -1);
           endDate = new Date();
           break;
+        case 'custom':
+          startDate = customStartDate ? customStartDate : new Date();
+          endDate = dateRange.endDate;
+          break;
         default:
           startDate = addMonths(today, -1);
           endDate = new Date();
       }
 
-      // Format dates to 'YYYY-MM-DD' for API request
-      const formattedStartDate = format(startDate, 'yyyy-MM-dd HH:mm:ss');
-      const formattedEndDate = format(endDate, 'yyyy-MM-dd HH:mm:ss');
-
-      // Set endpoint for fetching daily averages or all entries based on time range
-      let endpoint = '/sensor_readings/daily-averages';
+      // Format dates for API request
+      const formattedStartDate = startDate.toISOString().split('T')[0];
+      const formattedEndDate = endDate.toISOString().split('T')[0];
+      let endpoint = '/sensor_readings/avgtemp';
       if (timeRange === 'day') {
-        endpoint = '/sensor_readings';
+        endpoint = '/sensor_readings/avgtemp';
       }
-
-      // Fetch temperature data for the specific device and time range using the appropriate endpoint
+      console.log("Dates are")
+      console.log(formattedStartDate,formattedEndDate)
       const response = await fetch(
         `${endpoint}?deviceId=${deviceId}&startDate=${formattedStartDate}&endDate=${formattedEndDate}`
       );
-      const data = await response.json();
-
-      // Extract temperature values and timestamps from the fetched data
-      const temperatureValues = data.data.map((reading) => reading.temperature);
-      const timestamps = data.data.map((reading) => reading.timestamp);
-
-      // Update the state with the temperature data
-      setTemperatureData({ values: temperatureValues, timestamps });
-    } catch (error) {
-      console.error('Error fetching temperature data:', error);
-    }
-  };
-
-  // Fetch temperature data for the custom date range
-  const fetchCustomRangeData = async () => {
-    try {
-      const formattedStartDate = format(dateRange.startDate, 'yyyy-MM-dd HH:mm:ss');
-      const formattedEndDate = format(dateRange.endDate, 'yyyy-MM-dd HH:mm:ss');
-
-      // Fetch temperature data for the specific device and custom date range
-      const response = await fetch(
-        `/sensor_readings/daily-averages?deviceId=${deviceId}&startDate=${formattedStartDate}&endDate=${formattedEndDate}`
-      );
 
       const data = await response.json();
+      const categories = [];
+      const temperatureData = [];
 
-      // Extract temperature values and timestamps from the fetched data
-      const temperatureValues = data.data.map((reading) => reading.temperature);
-      const timestamps = data.data.map((reading) => reading.timestamp);
-
-
-      // Update the state with the temperature data
-      setTemperatureData({ values: temperatureValues, timestamps });
-    } catch (error) {
-      console.error('Error fetching temperature data:', error);
-    }
-  };
-
-  // Render the temperature chart using Chart.js
-  const renderChart = () => {
-    const ctx = document.getElementById('temperatureChart');
-
-    if (ctx) {
-      // Set time unit and display format based on the selected time range
-      const timeUnit = timeRange === 'day' ? 'hour' : 'hour';
-      const displayFormat = timeRange === 'day' ? 'H:mm' : 'H:mm';
-
-      // Create a new Chart instance
-      return new Chart(ctx, {
-        type: 'line',
-        data: chartData,
-        options: {
-          scales: {
-            x: {
-              type: 'time',
-              time: {
-                unit: timeUnit,
-                displayFormats: {
-                  hour: 'H:mm',
-                  day: displayFormat,
-                },
-              },
-              title: {
-                display: true,
-                text: 'Time',
-                font: {
-                  size: 17, // Set the desired font size
-                  weight: 'bold',
-                },
-              },
-            },
-            y: {
-              title: {
-                display: true,
-                text: 'Temperature',
-                font: {
-                  size: 17, // Set the desired font size
-                  weight: 'bold',
-                },
-              },
-            },
-          },
-          plugins: {
-            tooltip: {
-              callbacks: {
-                label: (context) => {
-                  const timestamp = context.parsed.x;
-                  const formattedHours = new Date(timestamp).getHours();
-                  return ` Temperature: ${context.parsed.y}`;
-                },
-                title: (tooltipItems) => {
-                  const formattedHours = new Date(tooltipItems[0].parsed.x).getHours();
-                  return `Time Range: ${formattedHours}:00 - ${formattedHours + 1}:00`;
-                },
-              },
-            },
-            legend: {
-              display: false, // Set to false to hide the legend
-            },
-          },
-        },
+      data.data.forEach(item => {
+        categories.push(item.timeRange);
+        temperatureData.push(parseFloat(item.temperature));
       });
+
+      setState(prevState => ({
+        ...prevState,
+        options: {
+          ...prevState.options,
+          xaxis: {
+            categories: categories
+          }
+        },
+        series: [
+          {
+            name: "Temperature",
+            data: temperatureData
+          }
+        ]
+      }));
+    } catch (error) {
+      console.error('Error fetching data:', error);
     }
   };
 
-  // Effect hook to render and destroy the chart based on temperature data and time range changes
+  // Effect to fetch data based on changes in deviceId, timeRange, and dateRange
   useEffect(() => {
-    const chartInstance = renderChart();
+    fetchTemperatureData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deviceId, timeRange, dateRange, customStartDate]);
 
-    // Cleanup function to destroy the chart instance when the component unmounts
-    return () => {
-      if (chartInstance) {
-        chartInstance.destroy();
-      }
-    };
-  }, [temperatureData, timeRange]);
-
-  // Data object for the temperature chart
-  const chartData = {
-    labels: temperatureData.timestamps,
-    datasets: [
-      {
-        label: 'Temperature',
-        data: temperatureData.values,
-        fill: false,
-        borderColor: 'rgba(255, 0, 0, 1)', // Red color for temperature
-        pointRadius: 1,
-      },
-    ],
-  };
-
-  // Event handler for time range button clicks
+  // Event handler for time range buttons
   const handleTimeRangeButtonClick = (range) => {
     setTimeRange(range);
+    if (range !== 'custom') {
+      setCustomStartDate(null);
+      setDateRange({ startDate: new Date(), endDate: new Date() });
+    }
   };
 
   // Event handler for custom start date change
   const handleCustomStartDateChange = (date) => {
-    // Set the start time to 00:00:00
-    const startDateWithTime = new Date(date);
-    startDateWithTime.setHours(0, 0, 0, 0);
-
-    setCustomStartDate(startDateWithTime);
-    setDateRange({ ...dateRange, startDate: startDateWithTime, endDate: null });
-    setShowStartDatePicker(false);
-    setShowEndDatePicker(true);
+    setCustomStartDate(date);
+    setDateRange({ ...dateRange, startDate: date });
   };
 
   // Event handler for custom end date change
   const handleCustomEndDateChange = (date) => {
-    // Set the end time to 23:59:59
-    const endDateWithTime = new Date(date);
-    endDateWithTime.setHours(23, 59, 59, 999);
-
-    // Update the date range if the end date is after the custom start date
-    if (endDateWithTime > customStartDate) {
-      setDateRange({ ...dateRange, endDate: endDateWithTime });
-      setShowEndDatePicker(false);
-      setShowStartDatePicker(true);
-    }
+    setDateRange({ ...dateRange, endDate: date });
   };
-
-  // JSX structure for rendering the TemperatureChart component
 
   return (
     <div>
       {/* Time range buttons and custom date range pickers */}
       <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '4px', border: '1px solid #000', marginTop: '80px' }}>
-        <h4 style={{ marginTop: '0px', marginBottom: '-10px', marginRight: '0px' }}>Soil Moisture Chart</h4>
+        <h4 style={{ marginTop: '0px', marginBottom: '-10px', marginRight: '0px' }}>Temperature Chart</h4>
         <button style={{ marginRight: '4px' }} onClick={() => handleTimeRangeButtonClick('day')}>Day</button>
         <button style={{ marginRight: '4px' }} onClick={() => handleTimeRangeButtonClick('week')}>Week</button>
         <button style={{ marginRight: '4px' }} onClick={() => handleTimeRangeButtonClick('month')}>Month</button>
         <button style={{ marginRight: '4px' }} onClick={() => handleTimeRangeButtonClick('year')}>Year</button>
-        <button
-  onClick={() => handleTimeRangeButtonClick('custom')}
-  style={{
-    width: '80px',
-    height: '30px',
-    background: 'transparent', // Set a background color
-    border: '0px solid #000', // Add a border
-    borderRadius: '5px', // Optional: Add border-radius for rounded corners
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: '20px',
-    marginTop: '-2px',
-  }}
->
-  <span style={{ marginRight: '5px' }}>
-    {showStartDatePicker && (
-      <DatePicker
-        selected={customStartDate}
-        onChange={handleCustomStartDateChange}
-        customInput={<img src="calendaricon.png" alt="Calendar Icon" style={{ width: '100%', height: '100%' }} />}
-        style={{ marginLeft: '10px' }}
-      />
-    )}
-  </span>
-  {showEndDatePicker && dateRange.startDate && (
-    <DatePicker
-      selected={dateRange.endDate}
-      onChange={handleCustomEndDateChange}
-      minDate={customStartDate}
-      customInput={<img src="calendaricon.png" alt="Calendar Icon" style={{ width: '100%', height: '100%' }} />}
-      style={{ marginLeft: '10px' }}
-    />
-  )}
-</button>
+        <button style={{ marginRight: '4px' }} onClick={() => handleTimeRangeButtonClick('custom')}>Custom</button> {/* Changed to handle 'custom' button */}
       </div>
-      {/* Canvas for displaying the soil moisture chart */}
-      <canvas id="temperatureChart" style={{ border: '1px solid #000', marginTop: '-1px', paddingTop: '10px' }}></canvas>
+      {/* Chart component */}
+      <Chart
+        options={state.options}
+        series={state.series}
+        type="area"
+        width="550"
+      />
     </div>
   );
 };
-
 
 export default TemperatureChart;

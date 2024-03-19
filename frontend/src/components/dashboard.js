@@ -7,18 +7,18 @@ import Card from './card';
 
 function Dashboard() {
   // State variables
-  const [userId, setUserId] = useState(null);
+  const [deviceId, setDeviceId] = useState(null); // Change state variable name to deviceId
   const [graphTitle, setGraphTitle] = useState('');
   const [animationKey, setAnimationKey] = useState(0);
-  const [animationRunning, setAnimationRunning] = useState(true); // New state variable
+  const [animationRunning, setAnimationRunning] = useState(true);
 
   useEffect(() => {
-    // Increment animationKey to reset animation when userId changes
+    // Increment animationKey to reset animation when deviceId changes
     setAnimationKey(key => key + 1);
-  }, [userId]);
+  }, [deviceId]);
 
   const handleGraphButtonClick = (deviceId, deviceName) => {
-    setUserId(deviceId);
+    setDeviceId(deviceId);
     setGraphTitle(`Graph for Device ${deviceId} - ${deviceName}`);
   };
 
@@ -29,8 +29,8 @@ function Dashboard() {
 
   // Sample data for devices
   const devices = [
-    { id: 1, name: 'Device 1', status: 'online' },
-    { id: 2, name: 'Device 2', status: 'offline' },
+    { id: 1000000001, name: 'Device 1', status: 'online' },
+    { id: 1000000000, name: 'Device 2', status: 'offline' },
     { id: 3, name: 'Device 3', status: 'online' },
     { id: 4, name: 'Device 4', status: 'online' },
     // Add more devices here...
@@ -46,19 +46,19 @@ function Dashboard() {
           ))}
         </div>  
 
-        {userId && (
+        {deviceId && (
           <div style={{ display: 'flex', justifyContent: 'center' }}>
             <h2 style={{ textAlign: 'center' }}>{graphTitle}</h2>
           </div>
         )}
 
-        {userId && (
+        {deviceId && (
           <div className="chart-container" key={animationKey} style={{ animation: animationRunning ? 'slideIn 1s forwards' : 'none' }}>
             <div className="SoilMoistureChart">
-              <SoilMoistureChart deviceId={userId} />
+              <SoilMoistureChart deviceId={deviceId} /> {/* Pass deviceId as a prop to SoilMoistureChart */}
             </div>
             <div className="TemperatureChart">
-              <TemperatureChart deviceId={userId} />
+              <TemperatureChart deviceId={deviceId} />
             </div>
           </div>
         )}

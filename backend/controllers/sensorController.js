@@ -76,9 +76,8 @@ const getAverageSoilMoisture = async (req, res) => {
 
     // Define the time ranges
     const timeRanges = Array.from({ length: 24 }, (_, index) => {
-      const startHour = index.toString().padStart(2, '0');
       const endHour = (index ).toString().padStart(2, '0');
-      return `${startHour}:00 to ${endHour}:59`;
+      return `${endHour}`;
     });
 
     // Calculate average soil moisture for each hour
@@ -106,13 +105,11 @@ const getAverageTemperature = async (req, res) => {
     if (startDate && endDate) {
       query.timestamp = { $gte: new Date(startDate), $lte: new Date(endDate) };
     }
-    console.log(query,deviceId,startDate,endDate)
     // Fetch sensor records from the database
     const sensorRecords = await SensorRecord.find(query);
 
     // Initialize an array to store hourly average temperature
     const hourlyAverages = Array.from({ length: 24 }, () => ({ count: 0, sum: 0 }));
-    console.log(hourlyAverages)
     // Calculate hourly averages
     sensorRecords.forEach((record) => {
       const hour = new Date(record.timestamp).getHours();
@@ -123,8 +120,7 @@ const getAverageTemperature = async (req, res) => {
     // Define the time ranges
     const timeRanges = Array.from({ length: 24 }, (_, index) => {
       const startHour = index.toString().padStart(2, '0');
-      const endHour = (index).toString().padStart(2, '0');
-      return `${startHour}:00 to ${endHour}:59`;
+      return `${startHour}`;
     });
 
     // Calculate average temperature for each hour
@@ -132,8 +128,6 @@ const getAverageTemperature = async (req, res) => {
       const average = hourData.count > 0 ? (hourData.sum / hourData.count).toFixed(2) : 0;
       return { timeRange: timeRanges[hour], temperature: average };
     });
-    console.log("Here")
-    console.log(formattedHourlyAverages)
     // Respond with the hourly average temperature
     res.status(200).json({ success: true, data: formattedHourlyAverages });
   } catch (error) {
