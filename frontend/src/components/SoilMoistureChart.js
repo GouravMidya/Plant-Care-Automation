@@ -118,9 +118,18 @@ const SoilMoistureChart = ({ deviceId }) => {
           }
         });
       }
+      let prevSoilMoisture = null; // Initialize previous soil moisture value
+
       data.data.forEach((item) => {
-        soilMoistureData.push(parseFloat(item.soilMoisture));
-        console.log(parseFloat(item.soilMoisture));
+          let currentSoilMoisture = parseFloat(item.soilMoisture);
+          if (currentSoilMoisture === 0 && prevSoilMoisture !== null) {
+            currentSoilMoisture=prevSoilMoisture;
+            console.log(currentSoilMoisture);
+            soilMoistureData.push (currentSoilMoisture); // Push previous value
+          } else {
+              soilMoistureData.push(currentSoilMoisture); // Push current value
+          }
+          prevSoilMoisture = currentSoilMoisture; // Update previous value
       });
       
       setState((prevState) => ({
