@@ -119,9 +119,18 @@ const TemperatureChart = ({ deviceId }) => {
         });
       }
 
+
+      let prevTemperature = null;// Initialize previous soil moisture value
       data.data.forEach(item => {
-        temperatureData.push(parseFloat(item.temperature));
-      });
+        let currentTemperature = parseFloat(item.temperature);
+        if (currentTemperature === 0 && prevTemperature !== null) {
+          currentTemperature=prevTemperature;
+          temperatureData.push (currentTemperature); // Push previous value
+        } else {
+            temperatureData.push(currentTemperature); // Push current value
+        }
+        prevTemperature = currentTemperature; // Update previous value
+    });
 
       setState(prevState => ({
         ...prevState,
