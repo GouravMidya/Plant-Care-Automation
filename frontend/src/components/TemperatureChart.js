@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import Chart from 'react-apexcharts'; // Add this import
-import { startOfToday, addWeeks, addMonths, addYears,addHours } from 'date-fns';
-import 'chartjs-adapter-date-fns';
-import 'react-date-range/dist/styles.css';
-import 'react-datepicker/dist/react-datepicker.css';
-
+import { addWeeks, addMonths, addYears} from 'date-fns';
+import DatePicker from 'react-datepicker'; // Add this import
+import { addHours } from 'date-fns';
 
 const TemperatureChart = ({ deviceId }) => {
   // State variables
@@ -15,9 +13,18 @@ const TemperatureChart = ({ deviceId }) => {
         id: "basic-bar"
       },
       xaxis: {
+        
         categories: [] // Empty initially, will be filled with time ranges
       },
-      colors: ['#b4757a']
+      yaxis: {
+        title: {
+          text: 'Temperature' // Label for the Y-axis
+        }
+      },
+      colors: ['#b4757a'],
+      dataLabels: {
+        enabled: false  // Hide the data points
+      }
     },
     series: [
       {
@@ -34,15 +41,22 @@ const TemperatureChart = ({ deviceId }) => {
     endDate: new Date(),
   });
 
+  // State to control the visibility of the start and end date pickers
+  const [showStartDatePicker, setShowStartDatePicker] = useState(true);
+  const [showEndDatePicker, setShowEndDatePicker] = useState(false);
+
   // Function to fetch Temperature data
   const fetchTemperatureData = async () => {
     try {
       let startDate, endDate;
-      const today = startOfToday();
+      const today = new Date();
       switch (timeRange) {
         case 'day':
-          startDate = addHours(new Date(), -24);
-          endDate = new Date();
+          // Calculate start date as 24 hours ago from now
+          startDate = addHours(new Date(today),-24);
+          startDate.setMinutes(0);
+          endDate = new Date(today);// End date is current time
+          endDate.setMinutes(0);
           break;
         case 'week':
           startDate = addWeeks(today, -1);
@@ -66,14 +80,14 @@ const TemperatureChart = ({ deviceId }) => {
       }
 
       // Format dates for API request
-      const formattedStartDate = startDate.toISOString().split('T')[0];
-      const formattedEndDate = endDate.toISOString().split('T')[0];
+      const formattedStartDate = startDate.toISOString();
+      const formattedEndDate = endDate.toISOString();
+      
       let endpoint = '/sensor_readings/avgtemp';
       if (timeRange === 'day') {
-        endpoint = '/sensor_readings/avgtemp';
+        endpoint = '/sensor_readings/alltemp';
       }
-      console.log("Dates are")
-      console.log(formattedStartDate,formattedEndDate)
+      
       const response = await fetch(
         `${endpoint}?deviceId=${deviceId}&startDate=${formattedStartDate}&endDate=${formattedEndDate}`
       );
@@ -81,9 +95,31 @@ const TemperatureChart = ({ deviceId }) => {
       const data = await response.json();
       const categories = [];
       const temperatureData = [];
+      
+      if (timeRange === 'day') {
+        // Generate categories representing each hour of the past day
+          data.data.forEach((item) => {
+            if(item.timeRange%3===0){
+              categories.push(item.timeRange+':00');
+            }
+            else{
+              categories.push("");
+            }
+          });
+        
+      } 
+      if(categories.length===0){
+        data.data.forEach((item) => {
+          if(item.timeRange%3===0){
+            categories.push(item.timeRange+':00');
+          }
+          else{
+            categories.push("");
+          }
+        });
+      }
 
       data.data.forEach(item => {
-        categories.push(item.timeRange);
         temperatureData.push(parseFloat(item.temperature));
       });
 
@@ -92,6 +128,9 @@ const TemperatureChart = ({ deviceId }) => {
         options: {
           ...prevState.options,
           xaxis: {
+            title: {
+              text: `Time Range : `+startDate.getDate()+"-"+(startDate.getMonth()+1)+"-"+startDate.getFullYear()+" to "+endDate.getDate()+"-"+(endDate.getMonth()+1)+"-"+endDate.getFullYear()
+            },
             categories: categories
           }
         },
@@ -116,33 +155,122 @@ const TemperatureChart = ({ deviceId }) => {
   // Event handler for time range buttons
   const handleTimeRangeButtonClick = (range) => {
     setTimeRange(range);
-    if (range !== 'custom') {
-      setCustomStartDate(null);
-      setDateRange({ startDate: new Date(), endDate: new Date() });
-    }
   };
 
   // Event handler for custom start date change
   const handleCustomStartDateChange = (date) => {
-    setCustomStartDate(date);
-    setDateRange({ ...dateRange, startDate: date });
+    // Set the start time to 00:00:00
+    const startDateWithTime = new Date(date);
+    startDateWithTime.setHours(0, 0, 0, 0);
+  
+    setCustomStartDate(startDateWithTime);
+    setDateRange({ ...dateRange, startDate: startDateWithTime, endDate: null });
+    setShowStartDatePicker(false);
+    setShowEndDatePicker(true);
   };
-
-  // Event handler for custom end date change
+  
   const handleCustomEndDateChange = (date) => {
-    setDateRange({ ...dateRange, endDate: date });
+    // Set the end time to 23:59:59
+    const endDateWithTime = new Date(date);
+    endDateWithTime.setHours(23, 59, 59, 999);
+  
+    if (endDateWithTime > customStartDate) {
+      setDateRange({ ...dateRange, endDate: endDateWithTime });
+      setShowEndDatePicker(false);
+      setShowStartDatePicker(true);
+    }
   };
 
   return (
     <div>
       {/* Time range buttons and custom date range pickers */}
       <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '4px', border: '1px solid #000', marginTop: '80px' }}>
-        <h4 style={{ marginTop: '0px', marginBottom: '-10px', marginRight: '0px' }}>Temperature Chart</h4>
-        <button style={{ marginRight: '4px' }} onClick={() => handleTimeRangeButtonClick('day')}>Day</button>
-        <button style={{ marginRight: '4px' }} onClick={() => handleTimeRangeButtonClick('week')}>Week</button>
-        <button style={{ marginRight: '4px' }} onClick={() => handleTimeRangeButtonClick('month')}>Month</button>
-        <button style={{ marginRight: '4px' }} onClick={() => handleTimeRangeButtonClick('year')}>Year</button>
-        <button style={{ marginRight: '4px' }} onClick={() => handleTimeRangeButtonClick('custom')}>Custom</button> {/* Changed to handle 'custom' button */}
+      <h4 style={{ marginTop: '0px', marginBottom: '-10px', marginRight: '0px' }}>Temperature Chart</h4>
+        {/* DAY BUTTON */}
+        <button
+          style={{
+            marginRight: '4px',
+            backgroundColor: timeRange === 'day' ? 'black' : 'transparent', // Set color based on time range
+            color: timeRange === 'day' ? 'white' : 'black' // Adjust text color accordingly
+          }}
+          onClick={() => handleTimeRangeButtonClick('day')}
+        >
+          Day
+        </button>
+        
+        {/* WEEK BUTTON */}
+        {/* <button
+          style={{
+            marginRight: '4px',
+            backgroundColor: timeRange === 'week' ? 'black' : 'transparent',
+            color: timeRange === 'week' ? 'white' : 'black'
+          }}
+          onClick={() => handleTimeRangeButtonClick('week')}
+        >
+          Week
+        </button> */}
+
+        {/* MONTH BUTTON */}
+        <button
+          style={{
+            marginRight: '4px',
+            backgroundColor: timeRange === 'month' ? 'black' : 'transparent',
+            color: timeRange === 'month' ? 'white' : 'black'
+          }}
+          onClick={() => handleTimeRangeButtonClick('month')}
+        >
+          Month
+        </button>
+
+        {/* YEAR BUTTON */}
+        <button
+          style={{
+            marginRight: '4px',
+            backgroundColor: timeRange === 'year' ? 'black' : 'transparent',
+            color: timeRange === 'year' ? 'white' : 'black'
+          }}
+          onClick={() => handleTimeRangeButtonClick('year')}
+        >
+          Year
+        </button>
+        
+        {/* CUSTOM BUTTON */}
+        <button
+          onClick={() => handleTimeRangeButtonClick('custom')}
+          style={{
+            width: '80px',
+            height: '30px',
+            background: 'transparent', // Set a background color
+            border: '0px solid #000', // Add a border
+            borderRadius: '5px', // Optional: Add border-radius for rounded corners
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginLeft: '20px',
+            marginTop: '-2px',
+          }}
+        >
+          <span style={{ marginRight: '5px' }}>
+            {showStartDatePicker && (
+              <DatePicker
+                selected={customStartDate}
+                onChange={handleCustomStartDateChange}
+                customInput={<img src="calendaricon.png" alt="Calendar Icon" style={{ width: '100%', height: '100%' }} />}
+                style={{ marginLeft: '10px' }}
+              />
+            )}
+          </span>
+          {showEndDatePicker && dateRange.startDate && (
+            <DatePicker
+              selected={dateRange.endDate}
+              onChange={handleCustomEndDateChange}
+              minDate={customStartDate}
+              customInput={<img src="calendaricon.png" alt="Calendar Icon" style={{ width: '100%', height: '100%' }} />}
+              style={{ marginLeft: '10px' }}
+            />
+          )}
+        </button>
+
       </div>
       {/* Chart component */}
       <Chart

@@ -54,10 +54,10 @@ function Dashboard() {
 
         {deviceId && (
           <div className="chart-container" key={animationKey} style={{ animation: animationRunning ? 'slideIn 1s forwards' : 'none' }}>
-            <div className="SoilMoistureChart">
+            <div className="SoilMoistureChart" style={{ width:'75%', marginRight:'5%', marginLeft:'-5%'}}>
               <SoilMoistureChart deviceId={deviceId} /> {/* Pass deviceId as a prop to SoilMoistureChart */}
             </div>
-            <div className="TemperatureChart">
+            <div className="TemperatureChart" style={{ width:'75%',marginLeft:'5%', marginRight:'0%'}}>
               <TemperatureChart deviceId={deviceId} />
             </div>
           </div>
