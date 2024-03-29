@@ -50,6 +50,31 @@ const getAllSensorRecords = async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to fetch sensor records' });
   }
 };
+
+// Controller function to fetch the latest sensor record for a given deviceId
+const getLatestSensorRecord = async (req, res) => {
+  try {
+    const { deviceId } = req.query;
+    console.log("Device Id: " + deviceId);
+
+    // Find the latest sensor record for the given deviceId
+    const latestRecord = await SensorRecord.findOne({ deviceId })
+      .sort({ timestamp: -1 })
+      .lean();
+
+    if (!latestRecord) {
+      return res
+        .status(404)
+        .json({ success: false, message: 'No sensor records found for the given deviceId' });
+    }
+
+    res.status(200).json({ success: true, data: latestRecord });
+  } catch (error) {
+    console.error('Error fetching the latest sensor record:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch the latest sensor record' });
+  }
+};
+
 const getAverageSoilMoisture = async (req, res) => {
   try {
     const { deviceId, startDate, endDate } = req.query;
@@ -231,5 +256,6 @@ module.exports = {
   getAverageTemperature,
   getAverageSoilMoisture,
   getAllTemperatureRecords,
-  getAllSoilMoistureRecords
+  getAllSoilMoistureRecords,
+  getLatestSensorRecord
 };

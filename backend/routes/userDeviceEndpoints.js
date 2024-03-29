@@ -13,7 +13,7 @@ const router = express.Router();
 // Create a new user device
 router.post('/', createUserDevice);
 
-// Get all user devices
+// Get all user devices for a particular user
 router.get('/', getUserDevices);
 
 // Get device settings

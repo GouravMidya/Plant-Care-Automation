@@ -13,10 +13,15 @@ const createUserDevice = async (req, res) => {
   }
 };
 
-// Controller function to get all user devices
+// Controller function to get all user devices for a particular user
 const getUserDevices = async (req, res) => {
   try {
-    const userDevices = await UserDevice.find();
+    const { userId } = req.query;
+    if (!userId) {
+      return res.status(400).json({ success: false, message: 'User ID is required' });
+    }
+
+    const userDevices = await UserDevice.find({ userId });
     res.status(200).json({ success: true, data: userDevices });
   } catch (error) {
     console.error('Error getting user devices:', error);
