@@ -32,8 +32,6 @@ const Dashboard = () => {
       navigate('/login');
     } else {
       setUser(user);
-      console.log("User")
-      console.log(user)
       fetchUserDevices(user.id);
     }
   }, [navigate]);
@@ -43,40 +41,38 @@ const Dashboard = () => {
       const response = await axios.get(`${API_BASE_URL}/api/user_devices?userId=${userId}`);
       //console.log(response)
       await setDevices(response.data.data);
-      console.log("Devices ")
-      console.log(devices)
-      //await fetchLatestRecords()
+      //console.log("Devices ")
+      //console.log(devices)
     } catch (err) {
       console.error(err); 
     }
   };
 
+  useEffect(() => {
+    const fetchLatestRecords = async () => {
+      try {
+        const latestRecordsData = await Promise.all(
+          devices.map(async (device) => {
+            console.log(device.deviceId)
+            const payload = {
+              deviceId: device.deviceId.toString(),
+            };
+            const response = await axios.post(`${API_BASE_URL}/sensor_readings/latest`,payload);
+            const data = response.data.data;
+            return { [device.deviceId]: data };
+          })
+        );
+        const latestRecordsObj = latestRecordsData.reduce((obj, record) => {
+          return { ...obj, ...record };
+        }, {});
+        setLatestRecords(latestRecordsObj);
+      } catch (error) {
+        console.error('Error fetching latest records:', error);
+      }
+    };
+    fetchLatestRecords();
+  }, [devices]);
 
-  const fetchLatestRecords = async () => {
-    try {
-      const latestRecordsData = await Promise.all(
-        devices.map(async (device) => {
-          console.log(device.deviceId)
-          const payload = {
-            deviceId: device.deviceId,
-          };
-          const response = await axios.post(`${API_BASE_URL}/sensor_readings/latest`,payload);
-          const data = response.data.data;
-          return { [device.deviceId]: data };
-        })
-      );
-      const latestRecordsObj = latestRecordsData.reduce((obj, record) => {
-        return { ...obj, ...record };
-      }, {});
-      setLatestRecords(latestRecordsObj);
-    } catch (error) {
-      console.error('Error fetching latest records:', error);
-    }
-  };
-//   useEffect(() => {
-    
-//     ;
-//   }, [devices]);
 
   const handleExpandClick = (deviceId) => {
     setExpandedDeviceId(deviceId === expandedDeviceId ? null : deviceId);
