@@ -54,7 +54,7 @@ const getAllSensorRecords = async (req, res) => {
 // Controller function to fetch the latest sensor record for a given deviceId
 const getLatestSensorRecord = async (req, res) => {
   try {
-    const { deviceId } = req.query;
+    const { deviceId } = req.body;
     console.log("Device Id: " + deviceId);
 
     // Find the latest sensor record for the given deviceId
