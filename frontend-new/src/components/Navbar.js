@@ -4,22 +4,14 @@ import { AppBar, Toolbar, Typography, Button, Box, IconButton, Menu, MenuItem } 
 import { Link, useNavigate } from 'react-router-dom';
 import { isAuthenticated, logout } from '../utils/authUtils';
 
-const Navbar = () => {
-  const [user, setUser] = useState(null);
+const Navbar = ({ user, setUser }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const storedUser = isAuthenticated();
     setUser(storedUser);
-  }, []); // Run this effect only once on initial render
-
-  useEffect(() => {
-    // This effect will run whenever the 'user' state changes
-    if (!user) {
-      navigate('/login');
-    }
-  }, [user, navigate]);
+  }, [setUser]); 
 
   const handleLogout = () => {
     logout();

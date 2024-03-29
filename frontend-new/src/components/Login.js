@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Container, Typography, TextField, Button } from '@mui/material';
 import { login } from '../services/authServices';
 
-const Login = () => {
+const Login = ({ setUser }) => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -19,8 +19,9 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const { token } = await login(formData);
+      const { token, user } = await login(formData);
       localStorage.setItem('jwt', token);
+      setUser(user); // Pass user object to setUser
       navigate('/');
     } catch (err) {
       if (err.response && err.response.status === 400) {

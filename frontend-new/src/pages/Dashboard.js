@@ -87,14 +87,16 @@ const Dashboard = () => {
   };
 
   return (
-    <Container maxWidth="lg">
+    <Container maxWidth="lg" sx={{padding:"20px"}}>
       <Grid container spacing={isLargeScreen ? 4 : 2}>
         {devices.map((device) => (
           <Grid
             item
-            xs={isLargeScreen ? 6 : 12}
+            xs={12}
+            sm={6}
+            md={4}
             key={device.deviceId}
-            sx={{ display: 'flex' }}
+            // sx={{ display: 'flex' }}
           >
             <Card sx={{ width: '100%' }}>
               <CardHeader
