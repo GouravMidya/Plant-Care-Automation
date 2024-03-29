@@ -93,8 +93,7 @@ const Dashboard = () => {
           <Grid
             item
             xs={12}
-            sm={6}
-            md={4}
+            md={6}
             key={device.deviceId}
             // sx={{ display: 'flex' }}
           >
