@@ -60,7 +60,7 @@ const Dashboard = () => {
           const payload = {
             deviceId: device.deviceId,
           };
-          const response = await axios.post(`${API_BASE_URL}/sensor_records/latest`,payload);
+          const response = await axios.post(`${API_BASE_URL}/sensor_readings/latest`,payload);
           const data = response.data.data;
           return { [device.deviceId]: data };
         })
