@@ -37,7 +37,7 @@ const getDeviceSettings = async (req, res) => {
     if (!device) {
       return res.status(404).json({ success: false, message: 'Device not found' });
     }
-    res.status(200).json({ success: true, checkIntervals: device.checkIntervals, pumpDuration: device.pumpDuration });
+    res.status(200).json({ success: true, data: device });
   } catch (error) {
     console.error('Error fetching device settings:', error);
     res.status(500).json({ success: false, message: 'Failed to fetch device settings' });
@@ -47,26 +47,37 @@ const getDeviceSettings = async (req, res) => {
 // Controller function to update device settings
 const updateDeviceSettings = async (req, res) => {
   try {
-    const { checkintervals, PumpDuration } = req.body;
-    const { deviceId } = req.params; // Retrieve deviceId from URL parameters
+    const { deviceId } = req.params;
+    const {
+      deviceName,
+      checkIntervals,
+      pumpDuration,
+      location,
+      description,
+    } = req.body;
 
     const device = await UserDevice.findOne({ deviceId });
-
     if (!device) {
       return res.status(404).json({ success: false, message: 'Device not found' });
     }
 
-    // Update the checkintervals and PumpDuration values if provided
-    if (checkintervals !== undefined) {
-      device.checkintervals = checkintervals;
+    if (deviceName !== undefined) {
+      device.deviceName = deviceName;
     }
-    if (PumpDuration !== undefined) {
-      device.PumpDuration = PumpDuration;
+    if (checkIntervals !== undefined) {
+      device.checkIntervals = checkIntervals;
+    }
+    if (pumpDuration !== undefined) {
+      device.pumpDuration = pumpDuration;
+    }
+    if (location !== undefined) {
+      device.location = location;
+    }
+    if (description !== undefined) {
+      device.description = description;
     }
 
-    // Save the updated device
     await device.save();
-
     return res.status(200).json({ success: true, message: 'Device settings updated successfully' });
   } catch (error) {
     return res.status(500).json({ success: false, message: 'Error updating device settings' });

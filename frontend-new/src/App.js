@@ -9,6 +9,7 @@ import SignUp from './components/SignUp';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Dashboard from './pages/Dashboard';
+import Troubleshoot from './pages/Troubleshoot';
 
 function App() {
   const [user, setUser] = useState(null); // Initialize user state
@@ -24,6 +25,7 @@ function App() {
               <Route path="/login" element={<Login setUser={setUser}/> } />
               <Route path="/signup" element={<SignUp />} />
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+              <Route path="/troubleshoot/:deviceId" element={<Troubleshoot />} />
             </Routes>
           </div>
           <Footer />

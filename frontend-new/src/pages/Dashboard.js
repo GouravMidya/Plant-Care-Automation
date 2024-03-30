@@ -13,6 +13,7 @@ import {
   Collapse,
   Container,
   useMediaQuery,
+  TextField,
 } from '@mui/material';
 import { isAuthenticated, logout } from '../utils/authUtils';
 
@@ -23,6 +24,8 @@ const Dashboard = () => {
   const [devices, setDevices] = useState([]);
   const [latestRecords, setLatestRecords] = useState({});
   const [expandedDeviceId, setExpandedDeviceId] = useState(null);
+  const [editingDeviceId, setEditingDeviceId] = useState(null);
+  const [formData, setFormData] = useState({});
   const navigate = useNavigate();
   const isLargeScreen = useMediaQuery('(min-width:600px)');
 
@@ -39,10 +42,7 @@ const Dashboard = () => {
   const fetchUserDevices = async (userId) => {
     try {
       const response = await axios.get(`${API_BASE_URL}/api/user_devices?userId=${userId}`);
-      //console.log(response)
       await setDevices(response.data.data);
-      //console.log("Devices ")
-      //console.log(devices)
     } catch (err) {
       console.error(err); 
     }
@@ -53,7 +53,6 @@ const Dashboard = () => {
       try {
         const latestRecordsData = await Promise.all(
           devices.map(async (device) => {
-            console.log(device.deviceId)
             const payload = {
               deviceId: device.deviceId.toString(),
             };
@@ -79,22 +78,71 @@ const Dashboard = () => {
   };
 
   const handleEditClick = (deviceId) => {
-    // Implement logic to navigate to the edit device page
+    setEditingDeviceId(deviceId);
+    const device = devices.find((d) => d.deviceId === deviceId);
+    setFormData({
+      deviceName: device.deviceName,
+      checkIntervals: device.checkIntervals,
+      pumpDuration: device.pumpDuration,
+      location: device.location,
+      description: device.description,
+    });
   };
 
   const handleTroubleshootClick = (deviceId) => {
-    // Implement logic to troubleshoot the device
+    navigate(`/troubleshoot/${deviceId}`);
   };
+
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSave = async (deviceId) => {
+    try {
+      const updatedDevice = {
+        deviceId,
+        deviceName: formData.deviceName,
+        checkIntervals: parseInt(formData.checkIntervals, 10),
+        pumpDuration: parseInt(formData.pumpDuration, 10),
+        location: formData.location,
+        description: formData.description,
+      };
+
+      await axios.patch(`${API_BASE_URL}/api/user_devices/settings/${deviceId}`, updatedDevice);
+      setEditingDeviceId(null);
+      fetchUserDevices(user.id);
+    } catch (error) {
+      console.error('Error updating device:', error);
+    }
+  };
+
+  const handleRaiseTicket = (deviceId) => {
+    // Implement logic to raise a ticket for the device
+    console.log(`Raising ticket for device ${deviceId}`);
+  };
+
+  const checkStatus = (device, latestRecord) => {
+    const currentTimestamp = new Date().getTime(); // Get current timestamp in milliseconds
+    console.log("Current timestamp:")
+    console.log(currentTimestamp.toString())
+    const lastTimestamp = new Date(latestRecord?.timestamp || 0).getTime(); // Get last timestamp in milliseconds (default to 0 if undefined)
+    const checkInterval = device.checkIntervals; // Check interval in milliseconds
+  
+    // Check if the last timestamp plus the check interval is older than the current timestamp
+    if (lastTimestamp + checkInterval < currentTimestamp) {
+      return 'Off'; // Device is considered off
+    } else {
+      return 'On'; // Device is considered on
+    }
+  };
+
 
   return (
     <Container maxWidth="lg" sx={{padding:"20px"}}>
       <Grid container spacing={isLargeScreen ? 4 : 2}>
         {devices.map((device) => (
-          <Grid
-            item
-            xs={12}
-            md={6}
-            key={device.deviceId}
+          <Grid item xs={12} md={6} key={device.deviceId}
             // sx={{ display: 'flex' }}
           >
             <Card sx={{ width: '100%' }}>
@@ -102,10 +150,18 @@ const Dashboard = () => {
                 title={device.deviceName}
                 subheader={`device id: ${device.deviceId}`}
                 action={
-                  <Box>
-                    <Typography variant="body1">
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Typography variant="body1" sx={{ marginRight: 1 }}>
                       Status: {latestRecords[device.deviceId]?.status || 'Off'}
                     </Typography>
+                    <Box
+                      sx={{
+                        width: 16,
+                        height: 16,
+                        borderRadius: '50%',
+                        backgroundColor: latestRecords[device.deviceId]?.status === 'On' ? 'green' : 'red',
+                      }}
+                    />
                   </Box>
                 }
               />
@@ -120,6 +176,11 @@ const Dashboard = () => {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
+                        borderRadius: 1,
+                        border: '2px solid green',
+                        fontSize: '1.2rem',
+                        fontWeight: 'bold',
+                        color: latestRecords[device.deviceId]?.soilMoisture > 500 ? 'red' : 'green',
                       }}
                     >
                       {latestRecords[device.deviceId]?.soilMoisture || '-'}
@@ -134,6 +195,11 @@ const Dashboard = () => {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
+                        borderRadius: 1,
+                        border: '2px solid green',
+                        fontSize: '1.2rem',
+                        fontWeight: 'bold',
+                        color: latestRecords[device.deviceId]?.temperature > 30 ? 'red' : 'green',
                       }}
                     >
                       {latestRecords[device.deviceId]?.temperature || '-'}
@@ -148,6 +214,11 @@ const Dashboard = () => {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
+                        borderRadius: 1,
+                        border: '2px solid green',
+                        fontSize: '1.2rem',
+                        fontWeight: 'bold',
+                        color: latestRecords[device.deviceId]?.humidity > 70 ? 'red' : 'green',
                       }}
                     >
                       {latestRecords[device.deviceId]?.humidity || '-'}
@@ -157,32 +228,58 @@ const Dashboard = () => {
                 <Box mt={2}>
                   <Grid container spacing={2}>
                     <Grid item xs={4}>
-                      <Typography variant="body2">Check Interval</Typography>
-                      <Box
-                        sx={{
-                          height: 50,
-                          backgroundColor: 'grey.200',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}
-                      >
-                        {device.checkIntervals / 60000} m
-                      </Box>
+                      {editingDeviceId === device.deviceId ? (
+                        <TextField
+                          name="checkIntervals"
+                          label="Check Interval (minutes)"
+                          value={formData.checkIntervals}
+                          onChange={handleChange}
+                          fullWidth
+                          margin="normal"
+                        />
+                      ) : (
+                        <Box>
+                          <Typography variant="body2">Check Interval</Typography>
+                          <Box
+                            sx={{
+                              height: 50,
+                              backgroundColor: 'grey.200',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                            }}
+                          >
+                            {device.checkIntervals / 60000} m
+                          </Box>
+                        </Box>
+                      )}
                     </Grid>
                     <Grid item xs={4}>
-                      <Typography variant="body2">Pump Duration</Typography>
-                      <Box
-                        sx={{
-                          height: 50,
-                          backgroundColor: 'grey.200',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}
-                      >
-                        {device.pumpDuration / 1000} s
-                      </Box>
+                      {editingDeviceId === device.deviceId ? (
+                        <TextField
+                        name="pumpDuration"
+                        label="Pump Duration (seconds)"
+                        value={formData.pumpDuration / 1000}
+                        onChange={handleChange}
+                        fullWidth
+                        margin="normal"
+                        />
+                        ) : (
+                          <Box>
+                          <Typography variant="body2">Pump Duration</Typography>
+                          <Box
+                            sx={{
+                              height: 50,
+                              backgroundColor: 'grey.200',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                            }}
+                          >
+                            {device.pumpDuration / 1000} s
+                          </Box>
+                        </Box>
+                      )}
                     </Grid>
                     <Grid item xs={4}>
                       <Typography variant="body2">Threshold</Typography>
@@ -208,43 +305,86 @@ const Dashboard = () => {
                 >
                   {expandedDeviceId === device.deviceId ? 'Collapse' : 'Expand'}
                 </Button>
-                <Button
-                  size="small"
-                  onClick={() => handleEditClick(device.deviceId)}
-                >
-                  Edit Details
-                </Button>
+                {editingDeviceId === device.deviceId ? (
+                  <>
+                    <Button size="small" onClick={() => setEditingDeviceId(null)}>
+                      Cancel
+                    </Button>
+                    <Button size="small" onClick={() => handleSave(device.deviceId)}>
+                      Save
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button size="small" onClick={() => handleEditClick(device.deviceId)}>
+                      Edit Details
+                    </Button>
+                    <Button size="small" onClick={() => handleTroubleshootClick(device.deviceId)}>
+                      Troubleshoot
+                    </Button>
+                    <Button size="small" onClick={() => handleRaiseTicket(device.deviceId)}>
+                      Raise Ticket
+                    </Button>
+                  </>
+                )}
               </CardActions>
               <Collapse in={expandedDeviceId === device.deviceId}>
                 <CardContent>
                   <Grid container spacing={2}>
                     <Grid item xs={12}>
-                      <Typography variant="body1">Location</Typography>
-                      <Box
-                        sx={{
-                          height: 50,
-                          backgroundColor: 'grey.200',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}
-                      >
-                        {device.location}
-                      </Box>
+                      {editingDeviceId === device.deviceId ? (
+                        <TextField
+                        name="location"
+                        label="Location"
+                        value={formData.location}
+                        onChange={handleChange}
+                        fullWidth
+                        margin="normal"
+                        />
+                      ) : (
+                        <Box>
+                          <Typography variant="body1">Location</Typography>
+                          <Box
+                            sx={{
+                              height: 50,
+                              backgroundColor: 'grey.200',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                            }}
+                            >
+                            {device.location}
+                          </Box>
+                        </Box>
+                      )}
                     </Grid>
                     <Grid item xs={12}>
-                      <Typography variant="body1">Description</Typography>
-                      <Box
-                        sx={{
-                          height: 50,
-                          backgroundColor: 'grey.200',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}
-                      >
-                        {device.description}
-                      </Box>
+                      {editingDeviceId === device.deviceId ? (
+                        <TextField
+                        name="description"
+                        label="Description"
+                        value={formData.description}
+                        onChange={handleChange}
+                        fullWidth
+                        margin="normal"
+                        />
+                        
+                      ) : (
+                        <Box>
+                          <Typography variant="body1">Description</Typography>
+                          <Box
+                            sx={{
+                              height: 50,
+                              backgroundColor: 'grey.200',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                            }}
+                          >
+                            {device.description}
+                          </Box>
+                        </Box>
+                      )}
                     </Grid>
                     <Grid item xs={12}>
                       <Typography variant="body1">Last Pumped</Typography>
@@ -255,18 +395,33 @@ const Dashboard = () => {
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
+                          borderRadius: 1,
+                          border: '2px solid green',
+                          fontSize: '1.2rem',
+                          fontWeight: 'bold',
                         }}
                       >
-                        {/* Implement logic to display last pumped */}
+                        {/* Implement logic to display last pumped */}-
                       </Box>
                     </Grid>
                     <Grid item xs={12}>
-                      <Button
-                        variant="contained"
-                        onClick={() => handleTroubleshootClick(device.deviceId)}
+                      <Typography variant="body1">Last Device Reading Time</Typography>
+                      <Box
+                        sx={{
+                          height: 50,
+                          backgroundColor: 'grey.200',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          borderRadius: 1,
+                          border: '2px solid green',
+                          fontSize: '1.2rem',
+                          fontWeight: 'bold',
+                        }}
                       >
-                        Troubleshoot
-                      </Button>
+                        {/* Implement logic to display last pumped */}
+                        {latestRecords[device.deviceId]?.timestamp || '-'}
+                      </Box>
                     </Grid>
                   </Grid>
                 </CardContent>
