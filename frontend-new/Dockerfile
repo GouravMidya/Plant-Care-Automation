@@ -8,6 +8,8 @@ RUN npm install
 
 COPY . .
 
+EXPOSE 3000
+
 # Build the React app
 RUN npm run build
 
