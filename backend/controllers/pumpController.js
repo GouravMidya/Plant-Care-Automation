@@ -28,16 +28,13 @@ const insertPumpHistory = async (req, res) => {
 const getLatestPumpHistory = async (req, res) => {
   try {
     const { deviceId } = req.body;
-
-    // Find the latest pump history record for the given deviceId
     const latestPumpHistory = await PumpHistory.findOne({ deviceId })
       .sort({ timestamp: -1 })
       .lean();
 
     if (!latestPumpHistory) {
-      return res
-        .status(404)
-        .json({ success: false, message: 'No pump history found for the given deviceId' });
+      // Return a default or placeholder value instead of a 404 error
+      return res.status(200).json({ success: true, data: null });
     }
 
     res.status(200).json({ success: true, data: latestPumpHistory });
