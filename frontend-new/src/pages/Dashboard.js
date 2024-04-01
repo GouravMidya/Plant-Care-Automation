@@ -28,6 +28,8 @@ const Dashboard = () => {
   const [formData, setFormData] = useState({});
   const navigate = useNavigate();
   const isLargeScreen = useMediaQuery('(min-width:600px)');
+  const [openRaiseTicketDialog, setOpenRaiseTicketDialog] = useState(false);
+  const [raiseTicketDeviceId, setRaiseTicketDeviceId] = useState(null);
 
   useEffect(() => {
     const user = isAuthenticated();
@@ -118,8 +120,7 @@ const Dashboard = () => {
   };
 
   const handleRaiseTicket = (deviceId) => {
-    // Implement logic to raise a ticket for the device
-    console.log(`Raising ticket for device ${deviceId}`);
+    navigate('/tickets', { state: { deviceId, raiseTicket: true } });
   };
 
   const checkStatus = (device, latestRecord) => {
