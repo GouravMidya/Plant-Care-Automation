@@ -162,6 +162,7 @@ const getAverageTemperature = async (req, res) => {
   }
 };
 
+// Getting record for past 24 hrs , but can be used for any date
 const getAllSoilMoistureRecords = async (req, res) => {
   try {
     const { deviceId, startDate, endDate } = req.query;
@@ -209,6 +210,7 @@ const getAllSoilMoistureRecords = async (req, res) => {
   }
 };
 
+// Getting record for past 24 hrs , but can be used for any date
 const getAllTemperatureRecords = async (req, res) => {
   try {
     const { deviceId, startDate, endDate } = req.query;

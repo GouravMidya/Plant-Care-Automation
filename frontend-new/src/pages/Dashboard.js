@@ -28,8 +28,6 @@ const Dashboard = () => {
   const [formData, setFormData] = useState({});
   const navigate = useNavigate();
   const isLargeScreen = useMediaQuery('(min-width:600px)');
-  const [openRaiseTicketDialog, setOpenRaiseTicketDialog] = useState(false);
-  const [raiseTicketDeviceId, setRaiseTicketDeviceId] = useState(null);
 
   useEffect(() => {
     const user = isAuthenticated();
@@ -58,9 +56,27 @@ const Dashboard = () => {
             const payload = {
               deviceId: device.deviceId.toString(),
             };
-            const response = await axios.post(`${API_BASE_URL}/sensor_readings/latest`,payload);
-            const data = response.data.data;
-            return { [device.deviceId]: data };
+            const sensorReadingResponse = await axios.post(`${API_BASE_URL}/sensor_readings/latest`, payload);
+            const sensorData = sensorReadingResponse.data.data;
+    
+            let pumpData = null;
+            let pumpTimestamp = null;
+            try {
+              const pumpHistoryResponse = await axios.post(`${API_BASE_URL}/pump/latest`, payload);
+              pumpData = pumpHistoryResponse.data.data;
+              pumpTimestamp = pumpData?.timestamp; // Separate the pump timestamp from the pump data object
+            } catch (error) {
+              console.error(`Error fetching latest pump history for device ${device.deviceId}:`, error);
+            }
+    
+            return {
+              [device.deviceId]: {
+                ...sensorData,
+                pumpData,
+                sensorTimestamp: sensorData?.timestamp, // Store the sensor timestamp separately
+                pumpTimestamp,
+              },
+            };
           })
         );
         const latestRecordsObj = latestRecordsData.reduce((obj, record) => {
@@ -72,6 +88,7 @@ const Dashboard = () => {
       }
     };
     fetchLatestRecords();
+    
   }, [devices]);
 
 
@@ -86,13 +103,14 @@ const Dashboard = () => {
       deviceName: device.deviceName,
       checkIntervals: device.checkIntervals,
       pumpDuration: device.pumpDuration,
+      threshold: device.threshold,
       location: device.location,
       description: device.description,
     });
   };
 
   const handleTroubleshootClick = (deviceId) => {
-    navigate(`/troubleshoot/${deviceId}`);
+    navigate('/troubleshoot');
   };
 
 
@@ -250,7 +268,7 @@ const Dashboard = () => {
                               justifyContent: 'center',
                             }}
                           >
-                            {device.checkIntervals / 60000} m
+                            {device.checkIntervals} m
                           </Box>
                         </Box>
                       )}
@@ -260,7 +278,7 @@ const Dashboard = () => {
                         <TextField
                         name="pumpDuration"
                         label="Pump Duration (seconds)"
-                        value={formData.pumpDuration / 1000}
+                        value={formData.pumpDuration}
                         onChange={handleChange}
                         fullWidth
                         margin="normal"
@@ -277,24 +295,37 @@ const Dashboard = () => {
                               justifyContent: 'center',
                             }}
                           >
-                            {device.pumpDuration / 1000} s
+                            {device.pumpDuration} s
                           </Box>
                         </Box>
                       )}
                     </Grid>
                     <Grid item xs={4}>
-                      <Typography variant="body2">Threshold</Typography>
-                      <Box
-                        sx={{
-                          height: 50,
-                          backgroundColor: 'grey.200',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}
-                      >
-                        {/* Implement logic to display threshold */}
-                      </Box>
+                    {editingDeviceId === device.deviceId ? (
+                        <TextField
+                        name="threshold"
+                        label="Watering Threshold"
+                        value={formData.threshold}
+                        onChange={handleChange}
+                        fullWidth
+                        margin="normal"
+                        />
+                        ) : (
+                          <Box>
+                          <Typography variant="body2">Watering threshold</Typography>
+                          <Box
+                            sx={{
+                              height: 50,
+                              backgroundColor: 'grey.200',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                            }}
+                          >
+                            {device.threshold}
+                          </Box>
+                        </Box>
+                      )}
                     </Grid>
                   </Grid>
                 </Box>
@@ -402,7 +433,10 @@ const Dashboard = () => {
                           fontWeight: 'bold',
                         }}
                       >
-                        {/* Implement logic to display last pumped */}-
+                        {latestRecords[device.deviceId]?.pumpTimestamp
+      ? new Date(latestRecords[device.deviceId].pumpTimestamp).toLocaleString()
+      : '-'}
+                        
                       </Box>
                     </Grid>
                     <Grid item xs={12}>
@@ -420,10 +454,11 @@ const Dashboard = () => {
                           fontWeight: 'bold',
                         }}
                       >
-                        {/* Implement logic to display last pumped */}
-                        {latestRecords[device.deviceId]?.timestamp || '-'}
+                        {latestRecords[device.deviceId]?.sensorTimestamp
+                          ? new Date(latestRecords[device.deviceId].sensorTimestamp).toLocaleString()
+                          : '-'}
                       </Box>
-                    </Grid>
+                  </Grid>
                   </Grid>
                 </CardContent>
               </Collapse>
