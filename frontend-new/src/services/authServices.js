@@ -1,7 +1,7 @@
 // frontend/src/services/authServices.js
 import axios from 'axios';
 
-const API_URL = 'http://localhost:4000/api/auth';
+const API_URL = 'http://3.230.109.146:4000/api/auth';
 
 const signUp = async (formData) => {
   try {

@@ -18,7 +18,7 @@ import {
 } from '@mui/material';
 import { isAuthenticated, logout } from '../utils/authUtils';
 
-const API_BASE_URL = 'http://localhost:4000';
+const API_BASE_URL = 'http://3.230.109.146:4000';
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);

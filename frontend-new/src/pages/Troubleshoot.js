@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:4000';
+const API_BASE_URL = 'http://3.230.109.146:4000';
 
 const Troubleshoot = () => {
   const { deviceId } = useParams();
