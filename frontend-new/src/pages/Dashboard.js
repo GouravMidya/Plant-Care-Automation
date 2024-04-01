@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import SoilMoistureChart from '../components/SoilMoistureChart'; // Import the SoilMoistureChart component
 import {
   Grid,
   Card,
@@ -458,7 +459,10 @@ const Dashboard = () => {
                           ? new Date(latestRecords[device.deviceId].sensorTimestamp).toLocaleString()
                           : '-'}
                       </Box>
-                  </Grid>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <SoilMoistureChart deviceId={device.deviceId} /> 
+                    </Grid>
                   </Grid>
                 </CardContent>
               </Collapse>

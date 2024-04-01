@@ -88,14 +88,14 @@
 }
 
 /* Header.css */
-
-.header {
+.header { 
   width: 100%;
   height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: rgb(217, 217, 217);
+  background-image:url('grassbg.png');
+  background-size: 100% 100%;
 }
 
 .card {
@@ -113,10 +113,6 @@
   width: 60%;
 }
 
-h1 {
-  font-size: 2em;
-  margin-bottom: 20px;
-}
 
 p {
   font-size: 1.2em;
@@ -209,7 +205,7 @@ p {
 /* Layout2.css */
 
 .layout2 {
-  margin: 30px;
+  margin-left: 3rem;
   padding: 0 20px 0 20px;
   display: flex;
 }
@@ -256,10 +252,6 @@ p {
   border-color: black; /* Change border color on hover */
 }
 
-.image-container1 {
-  width: 100%;
-  height: 100%;
-}
 
 .image1 {
   width: 90%;

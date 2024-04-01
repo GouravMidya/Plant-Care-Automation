@@ -2,7 +2,7 @@
 const Footer = () => {
     return (
       <footer style={{ backgroundColor: 'green', color: 'white', textAlign: 'center',padding: "15px" }}>
-        Made with love by Gourav Midya
+        Made with love by Bloombuddy
       </footer>
     );
   };

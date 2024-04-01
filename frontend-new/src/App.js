@@ -11,6 +11,7 @@ import Footer from './components/Footer';
 import Dashboard from './pages/Dashboard';
 import Troubleshoot from './pages/Troubleshoot';
 import Tickets from './pages/Tickets';
+import Home from './pages/Home';
 
 function App() {
   const [user, setUser] = useState(null); // Initialize user state
@@ -22,7 +23,7 @@ function App() {
           <div style={{ flex: 1 }}>
             <Navbar user={user} setUser={setUser}/>
             <Routes>
-              <Route path="/" element={<Homepage />} />
+              <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login setUser={setUser}/> } />
               <Route path="/signup" element={<SignUp />} />
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />

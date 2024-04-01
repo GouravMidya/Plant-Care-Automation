@@ -1,10 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import Chart from 'react-apexcharts'; // Add this import
-import {addWeeks, addMonths, addYears} from 'date-fns';
+import {addWeeks, addMonths, addYears, set} from 'date-fns';
 import DatePicker from 'react-datepicker'; // Add this import
 import { addHours } from 'date-fns';
+import { Button, Box, IconButton, Typography } from '@mui/material';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import { styled } from '@mui/material/styles';
+import 'react-datepicker/dist/react-datepicker.css';
 
+const StyledButton = styled(Button)(({ theme }) => ({
+  textTransform: 'none',
+  marginRight: theme.spacing(1),
+  '&.Mui-selected': {
+    backgroundColor: theme.palette.primary.main,
+    color: '#fff',
+  },
+}));
+
+const StyledIconButton = styled(IconButton)(({ theme }) => ({
+  padding: 0,
+  '&:hover': {
+    backgroundColor: 'transparent',
+  },
+}));
 
 const SoilMoistureChart = ({ deviceId }) => {
   
@@ -12,6 +31,7 @@ const SoilMoistureChart = ({ deviceId }) => {
     startDate: new Date(),
     endDate: new Date(),
   });
+
   // State variables
   const [state, setState] = useState({
     options: {
@@ -43,11 +63,11 @@ const SoilMoistureChart = ({ deviceId }) => {
   const [timeRange, setTimeRange] = useState('day');
   
   const [customStartDate, setCustomStartDate] = useState(null);
-  
+  const [customRangeLabel, setCustomRangeLabel] = useState('Custom ');
   // State to control the visibility of the start and end date pickers
-  const [showStartDatePicker, setShowStartDatePicker] = useState(true);
+  const [showStartDatePicker, setShowStartDatePicker] = useState(false);
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
-
+  const [flag, setFlag] = useState(true);
   const fetchSoilMoistureData = async () => {
     try {
       let startDate, endDate;
@@ -155,27 +175,38 @@ const SoilMoistureChart = ({ deviceId }) => {
       console.error('Error fetching data:', error);
     }
   };
-  
   // Effect to fetch data based on changes in deviceId, timeRange, and dateRange
   useEffect(() => {
+    setFlag(false);
     fetchSoilMoistureData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deviceId, timeRange, dateRange, customStartDate]);
 
   // Event handler for time range buttons 
   const handleTimeRangeButtonClick = (range) => {
+    if(customStartDate!==null & dateRange.endDate!==null ){
+      setCustomRangeLabel("Custom");
+    }
+    else if(customStartDate!==null & dateRange.endDate===null){
+      setCustomRangeLabel("End Date");
+    }
+    else{
+      setCustomRangeLabel("StartDate");
+    }
     setTimeRange(range);
   };
 
   const handleCustomStartDateChange = (date) => {
     // Set the start time to 00:00:00
+    setCustomRangeLabel("End Date");
     const startDateWithTime = new Date(date);
     startDateWithTime.setHours(0, 0, 0, 0);
-  
+    setFlag(false);
     setCustomStartDate(startDateWithTime);
     setDateRange({ ...dateRange, startDate: startDateWithTime, endDate: null });
     setShowStartDatePicker(false);
     setShowEndDatePicker(true);
+    
   };
   
   const handleCustomEndDateChange = (date) => {
@@ -186,108 +217,73 @@ const SoilMoistureChart = ({ deviceId }) => {
     if (endDateWithTime > customStartDate) {
       setDateRange({ ...dateRange, endDate: endDateWithTime });
       setShowEndDatePicker(false);
-      setShowStartDatePicker(true);
+      setShowStartDatePicker(false);
+      setCustomRangeLabel("Custom");
+      setFlag(false);
     }
   };
+  
   return (
     <div>
       {/* Time range buttons and custom date range pickers */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '4px', border: '1px solid #000', marginTop: '80px' }}>
-        <h4 style={{ marginTop: '0px', marginBottom: '-10px', marginRight: '0px' }}>Soil Moisture Chart</h4> 
-        {/* DAY BUTTON */}
-        <button
-          style={{
-            marginRight: '4px',
-            backgroundColor: timeRange === 'day' ? 'black' : 'transparent', // Set color based on time range
-            color: timeRange === 'day' ? 'white' : 'black' // Adjust text color accordingly
-          }}
-          onClick={() => handleTimeRangeButtonClick('day')}
-        >
-          Day
-        </button>
-
-        {/* WEEK BUTTON */}
-        {/* <button
-          style={{
-            marginRight: '4px',
-            backgroundColor: timeRange === 'week' ? 'black' : 'transparent',
-            color: timeRange === 'week' ? 'white' : 'black'
-          }}
-          onClick={() => handleTimeRangeButtonClick('week')}
-        >
-          Week
-        </button> */}
-
-       {/* MONTH BUTTON */}
-        <button
-          style={{
-            marginRight: '4px',
-            backgroundColor: timeRange === 'month' ? 'black' : 'transparent',
-            color: timeRange === 'month' ? 'white' : 'black'
-          }}
-          onClick={() => handleTimeRangeButtonClick('month')}
-        >
-          Month
-        </button>
-
-        {/* YEAR BUTTON */}
-        <button
-          style={{
-            marginRight: '4px',
-            backgroundColor: timeRange === 'year' ? 'black' : 'transparent',
-            color: timeRange === 'year' ? 'white' : 'black'
-          }}
-          onClick={() => handleTimeRangeButtonClick('year')}
-        >
-          Year
-        </button>
-
-        {/* CUSTOM BUTTON */}
-        <button
-  onClick={() => handleTimeRangeButtonClick('custom')}
-  style={{
-    width: '80px',
-    height: '30px',
-    background: 'transparent', // Set a background color
-    border: '0px solid #000', // Add a border
-    borderRadius: '5px', // Optional: Add border-radius for rounded corners
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: '20px',
-    marginTop: '-2px',
-  }}
->
-  <span style={{ marginRight: '5px' }}>
-    {showStartDatePicker && (
-      <DatePicker
-        selected={customStartDate}
-        onChange={handleCustomStartDateChange}
-        customInput={<img src="calendaricon.png" alt="Calendar Icon" style={{ width: '100%', height: '100%' }} />}
-        style={{ marginLeft: '10px' }}
-      />
-    )}
-  </span>
-  {showEndDatePicker && dateRange.startDate && (
-    <DatePicker
-      selected={dateRange.endDate}
-      onChange={handleCustomEndDateChange}
-      minDate={customStartDate}
-      customInput={<img src="calendaricon.png" alt="Calendar Icon" style={{ width: '100%', height: '100%' }} />}
-      style={{ marginLeft: '10px' }}
-    />
-  )}
-</button>
-
-      </div>
+      <Box sx={{ padding: 2, backgroundColor: 'background.paper', borderRadius: 1 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <StyledButton
+            className={timeRange === 'day' ? 'Mui-selected' : ''}
+            onClick={() => handleTimeRangeButtonClick('day')}
+          >
+            Day
+          </StyledButton>
+          <StyledButton
+            className={timeRange === 'month' ? 'Mui-selected' : ''}
+            onClick={() => handleTimeRangeButtonClick('month')}
+          >
+            Month
+          </StyledButton>
+          <StyledButton
+            className={timeRange === 'year' ? 'Mui-selected' : ''}
+            onClick={() => handleTimeRangeButtonClick('year')}
+          >
+            Year
+          </StyledButton>
+          <StyledButton
+              onClick={() => handleTimeRangeButtonClick('custom')}
+            >
+              <StyledButton
+                onClick={() =>setShowStartDatePicker(true) }
+              >{customRangeLabel}</StyledButton>
+              
+              <span style={{ marginRight: '5px' }}>
+                {showStartDatePicker && (
+                  <DatePicker
+                    selected={customStartDate}
+                    onChange={handleCustomStartDateChange}
+                    customInput={<CalendarTodayIcon />}
+                    style={{ marginLeft: '10px' }}
+                  />
+                )}
+              </span>
+              {showEndDatePicker && dateRange.startDate && (
+                <DatePicker
+                  selected={dateRange.endDate}
+                  onChange={handleCustomEndDateChange}
+                  minDate={customStartDate}
+                  customInput={<CalendarTodayIcon />}
+                  style={{ marginLeft: '10px' }}
+                />
+              )}
+      </StyledButton>
+          
+        </Box>
       {/* Chart component */}
       <Chart
         options={state.options}
         series={state.series}
         type="area"
-        width="550"
       />
+      </Box>
     </div>
+    
   );
   
 };
