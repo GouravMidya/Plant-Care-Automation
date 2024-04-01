@@ -3,8 +3,8 @@ const UserDevice = require('../models/UserDeviceModel');
 // Controller function to create a new user device
 const createUserDevice = async (req, res) => {
   try {
-    const { userId, deviceId, checkIntervals, pumpDuration, location, description, deviceName} = req.body;
-    const newUserDevice = new UserDevice({ userId, deviceId, checkIntervals, pumpDuration, location, description, deviceName });
+    const { userId, deviceId, checkIntervals, pumpDuration, location, description, deviceName, threshold} = req.body;
+    const newUserDevice = new UserDevice({ userId, deviceId, checkIntervals, pumpDuration, location, description, deviceName, threshold });
     await newUserDevice.save();
     res.status(201).json({ success: true, message: 'User device created successfully', data: newUserDevice });
   } catch (error) {
@@ -54,6 +54,7 @@ const updateDeviceSettings = async (req, res) => {
       pumpDuration,
       location,
       description,
+      threshold,
     } = req.body;
 
     const device = await UserDevice.findOne({ deviceId });
@@ -75,6 +76,10 @@ const updateDeviceSettings = async (req, res) => {
     }
     if (description !== undefined) {
       device.description = description;
+    }
+
+    if (threshold !== undefined) {
+      device.threshold = threshold; 
     }
 
     await device.save();

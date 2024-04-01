@@ -30,6 +30,10 @@ const userDeviceSchema = new mongoose.Schema({
   pumpDuration: {
     type: Number,
     required: true
+  },
+  threshold: { 
+    type: Number,
+    default: 450 
   }
 });
 
