@@ -12,6 +12,7 @@ import Dashboard from './pages/Dashboard';
 import Troubleshoot from './pages/Troubleshoot';
 import Tickets from './pages/Tickets';
 import Home from './pages/Home';
+import Guides from './pages/Guides';
 
 function App() {
   const [user, setUser] = useState(null); // Initialize user state
@@ -28,6 +29,7 @@ function App() {
               <Route path="/signup" element={<SignUp />} />
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/troubleshoot" element={<Troubleshoot />} />
+              <Route path="/guides" element={<Guides />} />
               <Route path="/tickets" element={<ProtectedRoute user={user}><Tickets user={user} /></ProtectedRoute>} />
             </Routes>
           </div>
