@@ -12,8 +12,7 @@ import {
   Collapse,
 } from '@mui/material';
 import axios from 'axios';
-
-const API_BASE_URL = 'http://3.230.109.146:4000';
+import { API_URL } from '../utils/apiConfig'
 
 const Troubleshoot = () => {
   const { deviceId } = useParams();
@@ -26,7 +25,7 @@ const Troubleshoot = () => {
         const payload = {
           deviceId,
         };
-        const response = await axios.post(`${API_BASE_URL}/api/user_devices/settings`, payload);
+        const response = await axios.post(`${API_URL}/api/user_devices/settings`, payload);
         setDevice(response.data.data);
       } catch (error) {
         console.error('Error fetching device:', error);

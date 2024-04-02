@@ -15,8 +15,8 @@ import {
   DialogActions,
   TextField,
 } from '@mui/material';
+import { API_URL } from '../utils/apiConfig'
 
-const API_BASE_URL = 'http://3.230.109.146:4000';
 
 const Tickets = ({ user }) => {
   const [currentTickets, setCurrentTickets] = useState([]);
@@ -44,7 +44,8 @@ const Tickets = ({ user }) => {
 
   const fetchTickets = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/tickets?userId=${user.id}`);
+      console.log(API_URL)
+      const response = await axios.get(`${API_URL}/api/tickets?userId=${user.id}`);
       const { currentTickets, ticketHistory } = response.data;
       setCurrentTickets(currentTickets);
       setTicketHistory(ticketHistory);
@@ -79,7 +80,7 @@ const Tickets = ({ user }) => {
         ...formData,
         userId: user.id,
       };
-      await axios.post(`${API_BASE_URL}/api/tickets`, ticketData);
+      await axios.post(`${API_URL}/api/tickets`, ticketData);
       handleCloseRaiseTicketDialog();
       fetchTickets();
     } catch (error) {

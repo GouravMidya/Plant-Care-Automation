@@ -8,6 +8,7 @@ import { Button, Box, IconButton, Typography } from '@mui/material';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import { styled } from '@mui/material/styles';
 import 'react-datepicker/dist/react-datepicker.css';
+import { API_URL } from '../utils/apiConfig';
 
 const StyledButton = styled(Button)(({ theme }) => ({
   textTransform: 'none',
@@ -103,9 +104,9 @@ const SoilMoistureChart = ({ deviceId }) => {
       const formattedStartDate = startDate.toISOString();
       const formattedEndDate = endDate.toISOString();
       // Fetch data from the appropriate endpoint based on time range
-      let endpoint = '/sensor_readings/avgsoilmoisture';
+      let endpoint = `${API_URL}/sensor_readings/avgsoilmoisture`;
       if (timeRange === 'day') {
-        endpoint = '/sensor_readings/allsoilmoisture';
+        endpoint = `${API_URL}/sensor_readings/allsoilmoisture`;
       }
   
       const response = await fetch(
@@ -144,7 +145,6 @@ const SoilMoistureChart = ({ deviceId }) => {
           let currentSoilMoisture = parseFloat(item.soilMoisture);
           if (currentSoilMoisture === 0 && prevSoilMoisture !== null) {
             currentSoilMoisture=prevSoilMoisture;
-            console.log(currentSoilMoisture);
             soilMoistureData.push (currentSoilMoisture); // Push previous value
           } else {
               soilMoistureData.push(currentSoilMoisture); // Push current value

@@ -17,8 +17,8 @@ import {
   TextField,
 } from '@mui/material';
 import { isAuthenticated, logout } from '../utils/authUtils';
+import { API_URL } from '../utils/apiConfig'
 
-const API_BASE_URL = 'http://3.230.109.146:4000';
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
@@ -42,7 +42,7 @@ const Dashboard = () => {
 
   const fetchUserDevices = async (userId) => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/user_devices?userId=${userId}`);
+      const response = await axios.get(`${API_URL}/api/user_devices?userId=${userId}`);
       await setDevices(response.data.data);
     } catch (err) {
       console.error(err); 
@@ -57,13 +57,13 @@ const Dashboard = () => {
             const payload = {
               deviceId: device.deviceId.toString(),
             };
-            const sensorReadingResponse = await axios.post(`${API_BASE_URL}/sensor_readings/latest`, payload);
+            const sensorReadingResponse = await axios.post(`${API_URL}/sensor_readings/latest`, payload);
             const sensorData = sensorReadingResponse.data.data;
     
             let pumpData = null;
             let pumpTimestamp = null;
             try {
-              const pumpHistoryResponse = await axios.post(`${API_BASE_URL}/pump/latest`, payload);
+              const pumpHistoryResponse = await axios.post(`${API_URL}/pump/latest`, payload);
               pumpData = pumpHistoryResponse.data.data;
               pumpTimestamp = pumpData?.timestamp; // Separate the pump timestamp from the pump data object
             } catch (error) {
@@ -130,7 +130,7 @@ const Dashboard = () => {
         description: formData.description,
       };
 
-      await axios.patch(`${API_BASE_URL}/api/user_devices/settings/${deviceId}`, updatedDevice);
+      await axios.patch(`${API_URL}/api/user_devices/settings/${deviceId}`, updatedDevice);
       setEditingDeviceId(null);
       fetchUserDevices(user.id);
     } catch (error) {

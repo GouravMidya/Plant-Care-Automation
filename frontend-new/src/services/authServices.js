@@ -1,11 +1,11 @@
 // frontend/src/services/authServices.js
 import axios from 'axios';
-
-const API_URL = 'http://3.230.109.146:4000/api/auth';
+import { API_URL } from '../utils/apiConfig';
+const LOCAL_API_URL = `${API_URL}/api/auth`
 
 const signUp = async (formData) => {
   try {
-    const response = await axios.post(`${API_URL}/signup`, formData);
+    const response = await axios.post(`${LOCAL_API_URL}/signup`, formData);
     return response.data;
   } catch (err) {
     throw err;
@@ -14,7 +14,7 @@ const signUp = async (formData) => {
 
 const login = async (formData) => {
   try {
-    const response = await axios.post(`${API_URL}/login`, formData);
+    const response = await axios.post(`${LOCAL_API_URL}/login`, formData);
     return response.data;
   } catch (err) {
     throw err;
