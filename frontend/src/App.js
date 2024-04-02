@@ -1,36 +1,46 @@
-import './App.css';
-import React, { useRef, useEffect, useState } from 'react';
-import { BrowserRouter as Router,Routes, Route } from 'react-router-dom';
-import Navigation from './components/navigation';
-import Products from './components/products';
-import Contact from './components/contact';
-import Footer from './components/footer';
-import Login from './pages/login';
-import Aboutus from './pages/aboutus';
-import Dashboard from './components/dashboard';
-import Productpage from './pages/productpage';
-import Blog from './components/blog';
-import Signup from './pages/signup';
+// frontend/src/App.js
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { ThemeProvider } from '@mui/material/styles';
+import appTheme from './appTheme';
+import Homepage from './components/Homepage';
+import Login from './components/Login';
+import SignUp from './components/SignUp';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+import Dashboard from './pages/Dashboard';
+import Troubleshoot from './pages/Troubleshoot';
+import Tickets from './pages/Tickets';
 import Home from './pages/Home';
 
 function App() {
-
+  const [user, setUser] = useState(null); // Initialize user state
   
   return (
-    <div className="App">
+    <ThemeProvider theme={appTheme}>
       <Router>
-        <Routes>
-        <Route path='/' element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/Dashboard" element={<Dashboard />} />
-        <Route path="/aboutus" element={<Aboutus />} />
-        <Route path="/blog" element={<Blog />} />
-        <Route path="/productpage" element={<Productpage />} />
-        </Routes>
+        <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+          <div style={{ flex: 1 }}>
+            <Navbar user={user} setUser={setUser}/>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login setUser={setUser}/> } />
+              <Route path="/signup" element={<SignUp />} />
+              <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+              <Route path="/troubleshoot" element={<Troubleshoot />} />
+              <Route path="/tickets" element={<ProtectedRoute user={user}><Tickets user={user} /></ProtectedRoute>} />
+            </Routes>
+          </div>
+          <Footer />
+        </div>
       </Router>
-    </div>
+    </ThemeProvider>
   );
 }
+
+const ProtectedRoute = ({ children }) => {
+  const isAuthenticated = localStorage.getItem('jwt');
+  return isAuthenticated ? children : <Navigate to="/login" replace />;
+};
 
 export default App;

@@ -3,16 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Box, Typography, Grid, Button } from '@mui/material';
 import Container from '@mui/material/Container';
-import { styled } from '@mui/material/styles';
 
-const StyledButton = styled(Button)(({ theme }) => ({
-  textTransform: 'none',
-  marginRight: theme.spacing(1),
-  '&.Mui-selected': {
-    backgroundColor: theme.palette.primary.main,
-    color: '#fff',
-  },
-}));
 
 function Homepage() {
   return (
@@ -34,12 +25,10 @@ function Homepage() {
               Experience the future of gardening with real-time insights and automated solutions for healthier, happier plants.
               </strong>
             </Typography>
-            <Container align="center">
-              <div className="buttons" sx={{ marginTop: '1rem' }}>
-                <Link to="/aboutus"><StyledButton variant="contained" className="learn-more">Learn More</StyledButton></Link>
-                <Link to="/signup"><StyledButton variant="contained" className="signup">Sign Up</StyledButton></Link>
-              </div>
-            </Container>
+            <div className="buttons" sx={{ marginTop: '1rem' }}>
+              <Link to="/aboutus"><Button variant="contained" className="learn-more">Learn More</Button></Link>
+              <Link to="/signup"><Button variant="contained" className="signup">Sign Up</Button></Link>
+            </div>
           </div>
         
       </Container>

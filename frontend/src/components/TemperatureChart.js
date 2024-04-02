@@ -95,22 +95,19 @@ const TemperatureChart = ({ deviceId }) => {
       const data = await response.json();
       const categories = [];
       const temperatureData = [];
-      let flag=startDate.getHours();
+      
       if (timeRange === 'day') {
         // Generate categories representing each hour of the past day
           data.data.forEach((item) => {
             if(item.timeRange%3===0){
-              flag+=1;
-              categories.push((flag%24)+':00');
+              categories.push(item.timeRange+':00');
             }
             else{
-              flag+=1;
               categories.push("");
             }
           });
         
       } 
-      flag=0;
       if(categories.length===0){
         data.data.forEach((item) => {
           if(item.timeRange%3===0){

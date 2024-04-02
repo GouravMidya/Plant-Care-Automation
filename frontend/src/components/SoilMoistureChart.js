@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import Chart from 'react-apexcharts'; // Add this import
-import {addWeeks, addMonths, addYears} from 'date-fns';
+import {addWeeks, addMonths, addYears, set} from 'date-fns';
 import DatePicker from 'react-datepicker'; // Add this import
 import { addHours } from 'date-fns';
 import { Button, Box, IconButton, Typography } from '@mui/material';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import { styled } from '@mui/material/styles';
 import 'react-datepicker/dist/react-datepicker.css';
+import { API_URL } from '../utils/apiConfig';
 
 const StyledButton = styled(Button)(({ theme }) => ({
   textTransform: 'none',
@@ -31,6 +32,7 @@ const SoilMoistureChart = ({ deviceId }) => {
     startDate: new Date(),
     endDate: new Date(),
   });
+
   // State variables
   const [state, setState] = useState({
     options: {
@@ -62,11 +64,11 @@ const SoilMoistureChart = ({ deviceId }) => {
   const [timeRange, setTimeRange] = useState('day');
   
   const [customStartDate, setCustomStartDate] = useState(null);
-  const [customRangeLabel, setCustomRangeLabel] = useState('Custom Date Range');
+  const [customRangeLabel, setCustomRangeLabel] = useState('Custom ');
   // State to control the visibility of the start and end date pickers
-  const [showStartDatePicker, setShowStartDatePicker] = useState(true);
+  const [showStartDatePicker, setShowStartDatePicker] = useState(false);
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
-
+  const [flag, setFlag] = useState(true);
   const fetchSoilMoistureData = async () => {
     try {
       let startDate, endDate;
@@ -102,9 +104,9 @@ const SoilMoistureChart = ({ deviceId }) => {
       const formattedStartDate = startDate.toISOString();
       const formattedEndDate = endDate.toISOString();
       // Fetch data from the appropriate endpoint based on time range
-      let endpoint = '/sensor_readings/avgsoilmoisture';
+      let endpoint = `${API_URL}/sensor_readings/avgsoilmoisture`;
       if (timeRange === 'day') {
-        endpoint = '/sensor_readings/allsoilmoisture';
+        endpoint = `${API_URL}/sensor_readings/allsoilmoisture`;
       }
   
       const response = await fetch(
@@ -143,7 +145,6 @@ const SoilMoistureChart = ({ deviceId }) => {
           let currentSoilMoisture = parseFloat(item.soilMoisture);
           if (currentSoilMoisture === 0 && prevSoilMoisture !== null) {
             currentSoilMoisture=prevSoilMoisture;
-            console.log(currentSoilMoisture);
             soilMoistureData.push (currentSoilMoisture); // Push previous value
           } else {
               soilMoistureData.push(currentSoilMoisture); // Push current value
@@ -174,51 +175,53 @@ const SoilMoistureChart = ({ deviceId }) => {
       console.error('Error fetching data:', error);
     }
   };
-  
   // Effect to fetch data based on changes in deviceId, timeRange, and dateRange
   useEffect(() => {
+    setFlag(false);
     fetchSoilMoistureData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deviceId, timeRange, dateRange, customStartDate]);
 
   // Event handler for time range buttons 
   const handleTimeRangeButtonClick = (range) => {
-    setTimeRange(range);
-    if (range === 'custom') {
-      setCustomRangeLabel('Start Date');
-      setShowStartDatePicker(true);
-      setShowEndDatePicker(false);
-    } else {
-      setCustomRangeLabel('Custom Date Range');
-      setShowStartDatePicker(false);
-      setShowEndDatePicker(false);
+    if(customStartDate!==null & dateRange.endDate!==null ){
+      setCustomRangeLabel("Custom");
     }
+    else if(customStartDate!==null & dateRange.endDate===null){
+      setCustomRangeLabel("End Date");
+    }
+    else{
+      setCustomRangeLabel("StartDate");
+    }
+    setTimeRange(range);
   };
 
   const handleCustomStartDateChange = (date) => {
+    // Set the start time to 00:00:00
+    setCustomRangeLabel("End Date");
     const startDateWithTime = new Date(date);
     startDateWithTime.setHours(0, 0, 0, 0);
-  
+    setFlag(false);
     setCustomStartDate(startDateWithTime);
     setDateRange({ ...dateRange, startDate: startDateWithTime, endDate: null });
-    setCustomRangeLabel('End Date'); // Update the label to 'End Date'
-    setShowStartDatePicker(false); // Hide the start date picker
-    setShowEndDatePicker(true); // Show the end date picker
+    setShowStartDatePicker(false);
+    setShowEndDatePicker(true);
+    
   };
   
-
   const handleCustomEndDateChange = (date) => {
+    // Set the end time to 23:59:59
     const endDateWithTime = new Date(date);
     endDateWithTime.setHours(23, 59, 59, 999);
   
     if (endDateWithTime > customStartDate) {
       setDateRange({ ...dateRange, endDate: endDateWithTime });
-      setCustomRangeLabel('Custom Date Range'); // Reset the label to default
-      setShowEndDatePicker(false); // Hide the end date picker
-      setShowStartDatePicker(true); // Show the start date picker
+      setShowEndDatePicker(false);
+      setShowStartDatePicker(false);
+      setCustomRangeLabel("Custom");
+      setFlag(false);
     }
   };
-  
   
   return (
     <div>
@@ -244,36 +247,32 @@ const SoilMoistureChart = ({ deviceId }) => {
             Year
           </StyledButton>
           <StyledButton
-            className={timeRange === 'custom' ? 'Mui-selected' : ''}
-            onClick={() => handleTimeRangeButtonClick('custom')}
-            startIcon={
-              showStartDatePicker && (
-                <StyledIconButton>
+              onClick={() => handleTimeRangeButtonClick('custom')}
+            >
+              <StyledButton
+                onClick={() =>setShowStartDatePicker(true) }
+              >{customRangeLabel}</StyledButton>
+              
+              <span style={{ marginRight: '5px' }}>
+                {showStartDatePicker && (
                   <DatePicker
                     selected={customStartDate}
                     onChange={handleCustomStartDateChange}
                     customInput={<CalendarTodayIcon />}
+                    style={{ marginLeft: '10px' }}
                   />
-                </StyledIconButton>
-              )
-            }
-            endIcon={
-              showEndDatePicker && dateRange.startDate && (
-                <StyledIconButton>
-                  <DatePicker
-                    selected={dateRange.endDate}
-                    onChange={handleCustomEndDateChange}
-                    minDate={customStartDate}
-                    customInput={<CalendarTodayIcon />}
-                  />
-                </StyledIconButton>
-              )
-            }
-          >
-            <Typography onClick={() => handleTimeRangeButtonClick('custom')}>
-              {customRangeLabel}
-            </Typography>
-          </StyledButton>
+                )}
+              </span>
+              {showEndDatePicker && dateRange.startDate && (
+                <DatePicker
+                  selected={dateRange.endDate}
+                  onChange={handleCustomEndDateChange}
+                  minDate={customStartDate}
+                  customInput={<CalendarTodayIcon />}
+                  style={{ marginLeft: '10px' }}
+                />
+              )}
+      </StyledButton>
           
         </Box>
       {/* Chart component */}
@@ -281,7 +280,6 @@ const SoilMoistureChart = ({ deviceId }) => {
         options={state.options}
         series={state.series}
         type="area"
-        width="550"
       />
       </Box>
     </div>
