@@ -1,5 +1,4 @@
 import React from "react";
-import './aboutus.css'
 
 
 function aboutuslay2() {

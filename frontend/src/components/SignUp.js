@@ -33,6 +33,7 @@ const SignUp = () => {
 
   return (
     <Container maxWidth="xs">
+      <br/><br/>
       <Typography variant="h4" align="center" gutterBottom>
         Sign Up
       </Typography>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import SoilMoistureChart from '../components/SoilMoistureChart'; // Import the SoilMoistureChart component
+import TemperatureChart from '../components/TemperatureChart'; // Import the SoilMoistureChart component
 import {
   Grid,
   Card,
@@ -144,11 +145,9 @@ const Dashboard = () => {
 
   const checkStatus = (device, latestRecord) => {
     const currentTimestamp = new Date().getTime(); // Get current timestamp in milliseconds
-    console.log("Current timestamp:")
-    console.log(currentTimestamp.toString())
     const lastTimestamp = new Date(latestRecord?.timestamp || 0).getTime(); // Get last timestamp in milliseconds (default to 0 if undefined)
-    const checkInterval = device.checkIntervals; // Check interval in milliseconds
-  
+    const checkInterval = device.checkIntervals * 60 * 1000; // Convert check interval from minutes to milliseconds
+    
     // Check if the last timestamp plus the check interval is older than the current timestamp
     if (lastTimestamp + checkInterval < currentTimestamp) {
       return 'Off'; // Device is considered off
@@ -171,18 +170,19 @@ const Dashboard = () => {
                 subheader={`device id: ${device.deviceId}`}
                 action={
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <Typography variant="body1" sx={{ marginRight: 1 }}>
-                      Status: {latestRecords[device.deviceId]?.status || 'Off'}
-                    </Typography>
-                    <Box
-                      sx={{
-                        width: 16,
-                        height: 16,
-                        borderRadius: '50%',
-                        backgroundColor: latestRecords[device.deviceId]?.status === 'On' ? 'green' : 'red',
-                      }}
-                    />
-                  </Box>
+                  <Typography variant="body1" sx={{ marginRight: 1 }}>
+                    Status: {checkStatus(device, latestRecords[device.deviceId]) || 'Off'}
+                  </Typography>
+                  <Box
+                    sx={{
+                      width: 16,
+                      height: 16,
+                      borderRadius: '50%',
+                      backgroundColor:
+                        checkStatus(device, latestRecords[device.deviceId]) === 'On' ? 'green' : 'red',
+                    }}
+                  />
+                </Box>
                 }
               />
               <CardContent>
@@ -460,8 +460,13 @@ const Dashboard = () => {
                           : '-'}
                       </Box>
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid item xs={12} sx={{marginTop:'2rem'}}>
+                    <Typography variant="h6"><strong>Soil Moisture Chart</strong></Typography>
                       <SoilMoistureChart deviceId={device.deviceId} /> 
+                    </Grid>
+                    <Grid item xs={12}>
+                    <Typography variant="h6"><strong>Temperature Chart</strong></Typography>
+                      <TemperatureChart deviceId={device.deviceId} /> 
                     </Grid>
                   </Grid>
                 </CardContent>

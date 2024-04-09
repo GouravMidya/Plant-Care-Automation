@@ -7,16 +7,18 @@ import Homepage from './components/Homepage';
 import Login from './components/Login';
 import SignUp from './components/SignUp';
 import Navbar from './components/Navbar';
-import Footer from './components/Footer';
+import Footer from './components/footer';
 import Dashboard from './pages/Dashboard';
 import Troubleshoot from './pages/Troubleshoot';
 import Tickets from './pages/Tickets';
 import Home from './pages/Home';
 import Guides from './pages/Guides';
+import ProductPage from './pages/ProductPage';
+import AboutUs from './pages/aboutus';
 
 function App() {
   const [user, setUser] = useState(null); // Initialize user state
-  
+
   return (
     <ThemeProvider theme={appTheme}>
       <Router>
@@ -24,12 +26,14 @@ function App() {
           <div style={{ flex: 1 }}>
             <Navbar user={user} setUser={setUser}/>
             <Routes>
-              <Route path="/" element={<Home />} />
+              <Route path="/" element={<Home user={user} />} />
               <Route path="/login" element={<Login setUser={setUser}/> } />
               <Route path="/signup" element={<SignUp />} />
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+              <Route path="/products" element={<ProductPage />}/>
               <Route path="/troubleshoot" element={<Troubleshoot />} />
               <Route path="/guides" element={<Guides />} />
+              <Route path="/aboutus" element={<AboutUs />} />
               <Route path="/tickets" element={<ProtectedRoute user={user}><Tickets user={user} /></ProtectedRoute>} />
             </Routes>
           </div>

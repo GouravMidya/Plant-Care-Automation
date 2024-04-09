@@ -14,7 +14,7 @@ const StyledButton = styled(Button)(({ theme }) => ({
   },
 }));
 
-function Homepage() {
+function Homepage({user}) {
   return (
     <div className="header" >
       <Container disableGutters>
@@ -37,7 +37,7 @@ function Homepage() {
             <Container align="center">
               <div className="buttons" sx={{ marginTop: '1rem' }}>
                 <Link to="/aboutus"><StyledButton variant="contained" className="learn-more">Learn More</StyledButton></Link>
-                <Link to="/signup"><StyledButton variant="contained" className="signup">Sign Up</StyledButton></Link>
+                {user ? null : <Link to="/signup"><StyledButton variant="contained" className="signup">Sign Up</StyledButton></Link>}
               </div>
             </Container>
           </div>

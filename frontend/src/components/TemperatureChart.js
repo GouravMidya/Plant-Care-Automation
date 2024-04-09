@@ -1,47 +1,81 @@
 import React, { useState, useEffect } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import Chart from 'react-apexcharts'; // Add this import
-import { addWeeks, addMonths, addYears} from 'date-fns';
+import {addWeeks, addMonths, addYears} from 'date-fns';
 import DatePicker from 'react-datepicker'; // Add this import
 import { addHours } from 'date-fns';
+import { Button, Box} from '@mui/material';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import { styled } from '@mui/material/styles';
+import { API_URL } from '../utils/apiConfig';
+import axios from 'axios';
+
+
+const StyledButton = styled(Button)(({ theme }) => ({
+  textTransform: 'none',
+  marginRight: theme.spacing(1),
+  '&.Mui-selected': {
+    backgroundColor: theme.palette.primary.main,
+    color: '#fff',
+  },
+}));
 
 const TemperatureChart = ({ deviceId }) => {
+  const [dateRange, setDateRange] = useState({
+    startDate: new Date(),
+    endDate: new Date(),
+  });
   // State variables
   const [state, setState] = useState({
     options: {
       chart: {
+        toolbar: {
+          tools: {
+            download: true, 
+            selection: false,
+            zoom: false,
+            zoomin: true ,
+            zoomout: true,
+            pan: true,
+            reset: true | '<img src="/static/icons/reset.png" width="40">',
+          },
+        },
         id: "basic-bar"
       },
       xaxis: {
         
         categories: [] // Empty initially, will be filled with time ranges
       },
+      stroke: {
+        width: [3,3],
+        curve: 'smooth',
+        dashArray: [['straight'],[7]]
+      },
       yaxis: {
         title: {
           text: 'Temperature' // Label for the Y-axis
         }
       },
-      colors: ['#b4757a'],
+      colors: ['#7d947e', '#b4757a'],
       dataLabels: {
         enabled: false  // Hide the data points
-      }
+      },
+      legend: { show: false }
     },
     series: [
       {
         name: "Temperature",
         data: [] // Empty initially, will be filled with Temperature moisture values
-      }
+      },
+      {
+        name: "Null Values", // Add a new series for null values
+        data: [],
+      },
     ]
   });
 
   const [timeRange, setTimeRange] = useState('day');
   const [customStartDate, setCustomStartDate] = useState(null);
-  const [dateRange, setDateRange] = useState({
-    startDate: new Date(),
-    endDate: new Date(),
-  });
-
-  // State to control the visibility of the start and end date pickers
   const [showStartDatePicker, setShowStartDatePicker] = useState(true);
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
 
@@ -52,7 +86,6 @@ const TemperatureChart = ({ deviceId }) => {
       const today = new Date();
       switch (timeRange) {
         case 'day':
-          // Calculate start date as 24 hours ago from now
           startDate = addHours(new Date(today),-24);
           startDate.setMinutes(0);
           endDate = new Date(today);// End date is current time
@@ -83,19 +116,17 @@ const TemperatureChart = ({ deviceId }) => {
       const formattedStartDate = startDate.toISOString();
       const formattedEndDate = endDate.toISOString();
       
-      let endpoint = '/sensor_readings/avgtemp';
+      let endpoint = `${API_URL}/sensor_readings/avgtemp`;
       if (timeRange === 'day') {
-        endpoint = '/sensor_readings/alltemp';
+        endpoint = `${API_URL}/sensor_readings/alltemp`;
       }
-      
-      const response = await fetch(
-        `${endpoint}?deviceId=${deviceId}&startDate=${formattedStartDate}&endDate=${formattedEndDate}`
-      );
-
-      const data = await response.json();
+      const response = await axios.get(`${endpoint}?deviceId=${deviceId}&startDate=${formattedStartDate}&endDate=${formattedEndDate}`);
+  
+      const data = response.data;
       const categories = [];
       const temperatureData = [];
-      
+      const nullValuesData = [];
+
       if (timeRange === 'day') {
         // Generate categories representing each hour of the past day
           data.data.forEach((item) => {
@@ -119,35 +150,60 @@ const TemperatureChart = ({ deviceId }) => {
         });
       }
 
-
-      let prevTemperature = null;// Initialize previous soil moisture value
-      data.data.forEach(item => {
-        let currentTemperature = parseFloat(item.temperature);
-        if (currentTemperature === 0 && prevTemperature !== null) {
-          currentTemperature=prevTemperature;
-          temperatureData.push (currentTemperature); // Push previous value
+      let prevTemperature = 0;
+      let flag=0;
+      let flag2=0;
+      
+      data.data.forEach((item, index) => {
+        const currentTemperature = parseFloat(item.temperature);
+        if (currentTemperature === 0 && prevTemperature) {
+          if (flag===0){
+            flag=1;
+            temperatureData.push(prevTemperature);
+          }
+          else{
+            temperatureData.push(null); // Push null for 0 values
+            flag2=0;
+          }
+          nullValuesData.push(prevTemperature); // Store the index for null values
         } else {
-            temperatureData.push(currentTemperature); // Push current value
+          if (flag2===0){
+            nullValuesData.push(currentTemperature);
+            flag2=1;
+            flag=0;
+            temperatureData.push(currentTemperature);
+            prevTemperature=currentTemperature;
+          }
+          else{
+            nullValuesData.push(null);
+            flag=0;
+            temperatureData.push(currentTemperature);
+            prevTemperature=currentTemperature;
+          }  
         }
-        prevTemperature = currentTemperature; // Update previous value
-    });
+      });
 
       setState(prevState => ({
         ...prevState,
         options: {
           ...prevState.options,
           xaxis: {
+            ...prevState.options.xaxis,
+            categories: categories,
             title: {
-              text: `Time Range : `+startDate.getDate()+"-"+(startDate.getMonth()+1)+"-"+startDate.getFullYear()+" to "+endDate.getDate()+"-"+(endDate.getMonth()+1)+"-"+endDate.getFullYear()
+              text: `Time Range : ${startDate.getDate()}-${startDate.getMonth() + 1}-${startDate.getFullYear()} to ${endDate.getDate()}-${endDate.getMonth() + 1}-${endDate.getFullYear()}`,
             },
-            categories: categories
           }
         },
         series: [
           {
             name: "Temperature",
             data: temperatureData
-          }
+          },
+          {
+            name: 'Null Values',
+            data: nullValuesData,
+          },
         ]
       }));
     } catch (error) {
@@ -155,34 +211,29 @@ const TemperatureChart = ({ deviceId }) => {
     }
   };
 
-  // Effect to fetch data based on changes in deviceId, timeRange, and dateRange
+
   useEffect(() => {
     fetchTemperatureData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deviceId, timeRange, dateRange, customStartDate]);
 
-  // Event handler for time range buttons
   const handleTimeRangeButtonClick = (range) => {
     setTimeRange(range);
   };
 
-  // Event handler for custom start date change
   const handleCustomStartDateChange = (date) => {
-    // Set the start time to 00:00:00
     const startDateWithTime = new Date(date);
     startDateWithTime.setHours(0, 0, 0, 0);
-  
     setCustomStartDate(startDateWithTime);
     setDateRange({ ...dateRange, startDate: startDateWithTime, endDate: null });
     setShowStartDatePicker(false);
     setShowEndDatePicker(true);
   };
-  
+
   const handleCustomEndDateChange = (date) => {
-    // Set the end time to 23:59:59
     const endDateWithTime = new Date(date);
     endDateWithTime.setHours(23, 59, 59, 999);
-  
+
     if (endDateWithTime > customStartDate) {
       setDateRange({ ...dateRange, endDate: endDateWithTime });
       setShowEndDatePicker(false);
@@ -193,103 +244,62 @@ const TemperatureChart = ({ deviceId }) => {
   return (
     <div>
       {/* Time range buttons and custom date range pickers */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '4px', border: '1px solid #000', marginTop: '80px' }}>
-      <h4 style={{ marginTop: '0px', marginBottom: '-10px', marginRight: '0px' }}>Temperature Chart</h4>
-        {/* DAY BUTTON */}
-        <button
-          style={{
-            marginRight: '4px',
-            backgroundColor: timeRange === 'day' ? 'black' : 'transparent', // Set color based on time range
-            color: timeRange === 'day' ? 'white' : 'black' // Adjust text color accordingly
-          }}
-          onClick={() => handleTimeRangeButtonClick('day')}
-        >
-          Day
-        </button>
-        
-        {/* WEEK BUTTON */}
-        {/* <button
-          style={{
-            marginRight: '4px',
-            backgroundColor: timeRange === 'week' ? 'black' : 'transparent',
-            color: timeRange === 'week' ? 'white' : 'black'
-          }}
-          onClick={() => handleTimeRangeButtonClick('week')}
-        >
-          Week
-        </button> */}
-
-        {/* MONTH BUTTON */}
-        <button
-          style={{
-            marginRight: '4px',
-            backgroundColor: timeRange === 'month' ? 'black' : 'transparent',
-            color: timeRange === 'month' ? 'white' : 'black'
-          }}
-          onClick={() => handleTimeRangeButtonClick('month')}
-        >
-          Month
-        </button>
-
-        {/* YEAR BUTTON */}
-        <button
-          style={{
-            marginRight: '4px',
-            backgroundColor: timeRange === 'year' ? 'black' : 'transparent',
-            color: timeRange === 'year' ? 'white' : 'black'
-          }}
-          onClick={() => handleTimeRangeButtonClick('year')}
-        >
-          Year
-        </button>
-        
-        {/* CUSTOM BUTTON */}
-        <button
-          onClick={() => handleTimeRangeButtonClick('custom')}
-          style={{
-            width: '80px',
-            height: '30px',
-            background: 'transparent', // Set a background color
-            border: '0px solid #000', // Add a border
-            borderRadius: '5px', // Optional: Add border-radius for rounded corners
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginLeft: '20px',
-            marginTop: '-2px',
-          }}
-        >
-          <span style={{ marginRight: '5px' }}>
-            {showStartDatePicker && (
-              <DatePicker
-                selected={customStartDate}
-                onChange={handleCustomStartDateChange}
-                customInput={<img src="calendaricon.png" alt="Calendar Icon" style={{ width: '100%', height: '100%' }} />}
-                style={{ marginLeft: '10px' }}
-              />
-            )}
-          </span>
-          {showEndDatePicker && dateRange.startDate && (
-            <DatePicker
-              selected={dateRange.endDate}
-              onChange={handleCustomEndDateChange}
-              minDate={customStartDate}
-              customInput={<img src="calendaricon.png" alt="Calendar Icon" style={{ width: '100%', height: '100%' }} />}
-              style={{ marginLeft: '10px' }}
-            />
-          )}
-        </button>
-
-      </div>
+      <Box sx={{ padding: 2, backgroundColor: 'background.paper', borderRadius: 1 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <StyledButton
+            className={timeRange === 'day' ? 'Mui-selected' : ''}
+            onClick={() => handleTimeRangeButtonClick('day')}
+          >
+            Day
+          </StyledButton>
+          <StyledButton
+            className={timeRange === 'month' ? 'Mui-selected' : ''}
+            onClick={() => handleTimeRangeButtonClick('month')}
+          >
+            Month
+          </StyledButton>
+          <StyledButton
+            className={timeRange === 'year' ? 'Mui-selected' : ''}
+            onClick={() => handleTimeRangeButtonClick('year')}
+          >
+            Year
+          </StyledButton>
+          <StyledButton
+              onClick={() => handleTimeRangeButtonClick('custom')}
+            > 
+              <span style={{ marginRight: '5px' }}>
+                {showStartDatePicker && (
+                  <DatePicker
+                    selected={customStartDate}
+                    onChange={handleCustomStartDateChange}
+                    customInput={<CalendarTodayIcon />}
+                    style={{ marginLeft: '10px' }}
+                  />
+                )}
+              </span>
+              {showEndDatePicker && dateRange.startDate && (
+                <DatePicker
+                  selected={dateRange.endDate}
+                  onChange={handleCustomEndDateChange}
+                  minDate={customStartDate}
+                  customInput={<CalendarTodayIcon />}
+                  style={{ marginLeft: '10px' }}
+                />
+              )}
+      </StyledButton>
+          
+        </Box>
       {/* Chart component */}
       <Chart
         options={state.options}
         series={state.series}
         type="area"
-        width="550"
       />
+      </Box>
     </div>
+    
   );
+  
 };
 
 export default TemperatureChart;

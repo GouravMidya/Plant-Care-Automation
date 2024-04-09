@@ -23,6 +23,7 @@ const pumpRoutes = require('./routes/pumpEndpoints')
 const blogRoutes =require('./routes/blogPostEndpoints');
 const authRoutes = require('./routes/authRoutes');
 const ticketRoutes = require('./routes/ticketRoutes');
+const productRoutes = require('./routes/productRoutes');
 
 app.use((req,res,next) =>{
     // Get the current date and time
@@ -41,6 +42,7 @@ app.use('/pump',pumpRoutes);
 app.use('/blogs',blogRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/tickets', ticketRoutes);
+app.use('/products',productRoutes);
 
 
 //mongodb

@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import Chart from 'react-apexcharts'; // Add this import
-import {addWeeks, addMonths, addYears, set} from 'date-fns';
+import {addWeeks, addMonths, addYears} from 'date-fns';
 import DatePicker from 'react-datepicker'; // Add this import
 import { addHours } from 'date-fns';
-import { Button, Box, IconButton, Typography } from '@mui/material';
+import { Button, Box} from '@mui/material';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import { styled } from '@mui/material/styles';
-import 'react-datepicker/dist/react-datepicker.css';
 import { API_URL } from '../utils/apiConfig';
+import axios from 'axios';
+
 
 const StyledButton = styled(Button)(({ theme }) => ({
   textTransform: 'none',
@@ -19,64 +20,71 @@ const StyledButton = styled(Button)(({ theme }) => ({
   },
 }));
 
-const StyledIconButton = styled(IconButton)(({ theme }) => ({
-  padding: 0,
-  '&:hover': {
-    backgroundColor: 'transparent',
-  },
-}));
-
 const SoilMoistureChart = ({ deviceId }) => {
-  
   const [dateRange, setDateRange] = useState({
     startDate: new Date(),
     endDate: new Date(),
   });
 
-  // State variables
   const [state, setState] = useState({
     options: {
       chart: {
-        id: "basic-bar"
+        toolbar: {
+          tools: {
+            download: true, 
+            selection: false,
+            zoom: false,
+            zoomin: true ,
+            zoomout: true,
+            pan: true,
+            reset: true | '<img src="/static/icons/reset.png" width="40">',
+          },
+        },
+        id: "basic-bar",
       },
       xaxis: {
-        
-        categories: [] // Empty initially, will be filled with time ranges
+        categories: [],
+      },
+      stroke: {
+        width: [3,3],
+        curve: 'smooth',
+        dashArray: [['straight'],[7]]
       },
       yaxis: {
         title: {
-          text: 'Soil Moisture' // Label for the Y-axis
-        }
+          text: 'Soil Moisture',
+        },
       },
-      colors:['#7d947e'],
+      colors: ['#7d947e', '#b4757a'], // Add a different color for null values
       dataLabels: {
-        enabled: false  // Hide the data points
-      }
+        enabled: false,
+      },
+      legend: { show: false }
     },
     series: [
       {
         name: "Soil Moisture",
-        data: [] // Empty initially, will be filled with soil moisture values
-      }
-    ]
+        data: [],
+      },
+      {
+        name: "Null Values", // Add a new series for null values
+        data: [],
+      },
+    ],
   });
 
   const [timeRange, setTimeRange] = useState('day');
-  
   const [customStartDate, setCustomStartDate] = useState(null);
-  const [customRangeLabel, setCustomRangeLabel] = useState('Custom ');
-  // State to control the visibility of the start and end date pickers
-  const [showStartDatePicker, setShowStartDatePicker] = useState(false);
+  const [showStartDatePicker, setShowStartDatePicker] = useState(true);
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
-  const [flag, setFlag] = useState(true);
+
   const fetchSoilMoistureData = async () => {
     try {
       let startDate, endDate;
       const today = new Date();
       switch (timeRange) {
         case 'day':
-          // Calculate start date as 24 hours ago from now
-          startDate = addHours(new Date(today),-24);
+          startDate = addHours(new Date(today), -24);
           startDate.setMinutes(0);
           endDate = new Date(today);// End date is current time
           endDate.setMinutes(0);
@@ -103,71 +111,91 @@ const SoilMoistureChart = ({ deviceId }) => {
       }
       const formattedStartDate = startDate.toISOString();
       const formattedEndDate = endDate.toISOString();
+      
       // Fetch data from the appropriate endpoint based on time range
       let endpoint = `${API_URL}/sensor_readings/avgsoilmoisture`;
       if (timeRange === 'day') {
         endpoint = `${API_URL}/sensor_readings/allsoilmoisture`;
       }
+      const response = await axios.get(`${endpoint}?deviceId=${deviceId}&startDate=${formattedStartDate}&endDate=${formattedEndDate}`);
   
-      const response = await fetch(
-        `${endpoint}?deviceId=${deviceId}&startDate=${formattedStartDate}&endDate=${formattedEndDate}`
-      );
-  
-      const data = await response.json();
+      const data = response.data;
       const categories = [];
       const soilMoistureData = [];
-      
+      const nullValuesData = [];
+
       if (timeRange === 'day') {
-        // Generate categories representing each hour of the past day
-          data.data.forEach((item) => {
-            if(item.timeRange%3===0){
-              categories.push(item.timeRange+':00');
-            }
-            else{
-              categories.push("");
-            }
-          });
-        
-      } 
-      if(categories.length===0){
         data.data.forEach((item) => {
-          if(item.timeRange%3===0){
-            categories.push(item.timeRange+':00');
-          }
-          else{
+          if (item.timeRange % 3 === 0) {
+            categories.push(item.timeRange + ':00');
+          } else {
             categories.push("");
           }
         });
       }
-      let prevSoilMoisture = null; // Initialize previous soil moisture value
-
-      data.data.forEach((item) => {
-          let currentSoilMoisture = parseFloat(item.soilMoisture);
-          if (currentSoilMoisture === 0 && prevSoilMoisture !== null) {
-            currentSoilMoisture=prevSoilMoisture;
-            soilMoistureData.push (currentSoilMoisture); // Push previous value
+      if (categories.length === 0) {
+        data.data.forEach((item) => {
+          if (item.timeRange % 3 === 0) {
+            categories.push(item.timeRange + ':00');
           } else {
-              soilMoistureData.push(currentSoilMoisture); // Push current value
+            categories.push("");
           }
-          prevSoilMoisture = currentSoilMoisture; // Update previous value
+        });
+      }
+
+      let prevSoilMoisture = 0;
+      let flag=0;
+      let flag2=0;
+      data.data.forEach((item, index) => {
+        const currentSoilMoisture = parseFloat(item.soilMoisture);
+        if (currentSoilMoisture === 0 && prevSoilMoisture) {
+          if (flag===0){
+            flag=1;
+            soilMoistureData.push(prevSoilMoisture);
+          }
+          else{
+            soilMoistureData.push(null); // Push null for 0 values
+            flag2=0;
+          }
+          nullValuesData.push(prevSoilMoisture); // Store the index for null values
+        } else {
+          if (flag2===0){
+            nullValuesData.push(currentSoilMoisture);
+            flag2=1;
+            flag=0;
+            soilMoistureData.push(currentSoilMoisture);
+            prevSoilMoisture=currentSoilMoisture;
+          }
+          else{
+            nullValuesData.push(null);
+            flag=0;
+            soilMoistureData.push(currentSoilMoisture);
+            prevSoilMoisture=currentSoilMoisture;
+          }  
+        }
       });
-      
+
       setState((prevState) => ({
         ...prevState,
         options: {
           ...prevState.options,
           xaxis: {
-
-            title: {
-              text: `Time Range : `+startDate.getDate()+"-"+(startDate.getMonth()+1)+"-"+startDate.getFullYear()+" to "+endDate.getDate()+"-"+(endDate.getMonth()+1)+"-"+endDate.getFullYear()
-            },
+            ...prevState.options.xaxis,
             categories: categories,
+            title: {
+              text: `Time Range : ${startDate.getDate()}-${startDate.getMonth() + 1}-${startDate.getFullYear()} to ${endDate.getDate()}-${endDate.getMonth() + 1}-${endDate.getFullYear()}`,
+            },
           },
+          
         },
         series: [
           {
             name: 'Soil Moisture',
             data: soilMoistureData,
+          },
+          {
+            name: 'Null Values',
+            data: nullValuesData,
           },
         ],
       }));
@@ -175,51 +203,33 @@ const SoilMoistureChart = ({ deviceId }) => {
       console.error('Error fetching data:', error);
     }
   };
-  // Effect to fetch data based on changes in deviceId, timeRange, and dateRange
+
   useEffect(() => {
-    setFlag(false);
     fetchSoilMoistureData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deviceId, timeRange, dateRange, customStartDate]);
 
-  // Event handler for time range buttons 
   const handleTimeRangeButtonClick = (range) => {
-    if(customStartDate!==null & dateRange.endDate!==null ){
-      setCustomRangeLabel("Custom");
-    }
-    else if(customStartDate!==null & dateRange.endDate===null){
-      setCustomRangeLabel("End Date");
-    }
-    else{
-      setCustomRangeLabel("StartDate");
-    }
     setTimeRange(range);
   };
 
   const handleCustomStartDateChange = (date) => {
-    // Set the start time to 00:00:00
-    setCustomRangeLabel("End Date");
     const startDateWithTime = new Date(date);
     startDateWithTime.setHours(0, 0, 0, 0);
-    setFlag(false);
     setCustomStartDate(startDateWithTime);
     setDateRange({ ...dateRange, startDate: startDateWithTime, endDate: null });
     setShowStartDatePicker(false);
     setShowEndDatePicker(true);
-    
   };
-  
+
   const handleCustomEndDateChange = (date) => {
-    // Set the end time to 23:59:59
     const endDateWithTime = new Date(date);
     endDateWithTime.setHours(23, 59, 59, 999);
-  
+
     if (endDateWithTime > customStartDate) {
       setDateRange({ ...dateRange, endDate: endDateWithTime });
       setShowEndDatePicker(false);
-      setShowStartDatePicker(false);
-      setCustomRangeLabel("Custom");
-      setFlag(false);
+      setShowStartDatePicker(true);
     }
   };
   
@@ -248,11 +258,7 @@ const SoilMoistureChart = ({ deviceId }) => {
           </StyledButton>
           <StyledButton
               onClick={() => handleTimeRangeButtonClick('custom')}
-            >
-              <StyledButton
-                onClick={() =>setShowStartDatePicker(true) }
-              >{customRangeLabel}</StyledButton>
-              
+            > 
               <span style={{ marginRight: '5px' }}>
                 {showStartDatePicker && (
                   <DatePicker

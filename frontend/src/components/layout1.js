@@ -3,8 +3,19 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Container from '@mui/material/Container';
 import { Box, Typography, Grid, Button } from '@mui/material';
+import { styled } from '@mui/material/styles';
 
-function Layout1({ headerHeight }) {
+
+const StyledButton = styled(Button)(({ theme }) => ({
+  textTransform: 'none',
+  marginRight: theme.spacing(1),
+  '&.Mui-selected': {
+    backgroundColor: theme.palette.primary.main,
+    color: '#fff',
+  },
+}));
+
+function Layout1({ headerHeight,user }) {
     const layoutStyle = {
         marginTop: `${headerHeight-headerHeight}px`, // Set top margin dynamically based on the header height
         minHeight: `calc(100vh - ${headerHeight}px)` // Use camelCase for minHeight
@@ -27,8 +38,8 @@ function Layout1({ headerHeight }) {
         </Grid>
     </Grid>
     <div className="buttons" style={{ textAlign: 'center' }}>
-              <Link to="/aboutus"><button className="learn-more">Learn More</button></Link>
-              <Link to="/signup"><button className="signup">Sign Up</button></Link>
+              <Link to="/aboutus"><StyledButton className="learn-more">Learn More</StyledButton></Link>
+              {user ? null : <Link to="/signup"><StyledButton variant="contained" className="signup">Sign Up</StyledButton></Link>}
             </div>
         </div>
         <div className="row">

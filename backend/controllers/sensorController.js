@@ -56,7 +56,6 @@ const getAllSensorRecords = async (req, res) => {
 const getLatestSensorRecord = async (req, res) => {
   try {
     const { deviceId } = req.body;
-    console.log("Device Id: " + deviceId);
 
     // Find the latest sensor record for the given deviceId
     const latestRecord = await SensorRecord.findOne({ deviceId })
@@ -167,7 +166,9 @@ const getAverageTemperature = async (req, res) => {
 const getAllSoilMoistureRecords = async (req, res) => {
   try {
     const { deviceId, startDate, endDate } = req.query;
-    const endhour = new Date().getHours();
+    const currentHour = new Date().getHours(); // Get the current hour
+    const endhour = currentHour === 0 ? 23 : currentHour - 1; // Calculate endhour based on current hour
+
     // Construct the query based on parameters
     const query = { deviceId };
     if (startDate && endDate) {
@@ -186,15 +187,17 @@ const getAllSoilMoistureRecords = async (req, res) => {
       hourlyAverages[hour].count += 1;
       hourlyAverages[hour].sum += record.soilMoisture;
     });
+
     // Calculate average soil moisture for each hour
     let formattedHourlyAverages = hourlyAverages.map((hourData, hour) => {
       const average = hourData.count > 0 ? (hourData.sum / hourData.count).toFixed(2) : 0;
-      const timeRange = (hour + endhour) % 24;
+      const timeRange = (hour) % 24;
       return { timeRange, soilMoisture: average };
     });
+
     // Split the formattedHourlyAverages array into two parts
-    const firstPart = formattedHourlyAverages.slice(endhour);
-    const secondPart = formattedHourlyAverages.slice(0, endhour);
+    const firstPart = formattedHourlyAverages.slice(endhour + 1);
+    const secondPart = formattedHourlyAverages.slice(0, endhour + 1);
     // Rearrange the array so that hours from endHour to 23 are at the front
     const rearrangedHourlyAverages = firstPart.concat(secondPart);
     // Respond with the rearranged hourly average soil moisture
@@ -206,14 +209,15 @@ const getAllSoilMoistureRecords = async (req, res) => {
   }
 };
 
+
 // Getting record for past 24 hrs , but can be used for any date
 const getAllTemperatureRecords = async (req, res) => {
   try {
     const { deviceId, startDate, endDate } = req.query;
-    const endhour=new Date().getHours();
-    // Construct the query based on parameters
-    const query = { deviceId };
+    const currentHour = new Date().getHours(); // Get the current hour
+    const endhour = currentHour === 0 ? 23 : currentHour - 1; // Calculate endhour based on current hour
 
+    const query = { deviceId };
     if (startDate && endDate) {
       query.timestamp = { $gte: new Date(startDate), $lte: new Date(endDate) };
     }
@@ -234,12 +238,12 @@ const getAllTemperatureRecords = async (req, res) => {
     // Calculate average temperature for each hour
     const formattedHourlyAverages = hourlyAverages.map((hourData, hour) => {
       const average = hourData.count > 0 ? (hourData.sum / hourData.count).toFixed(2) : 0;
-      const timeRange = (hour+endhour)%24;
+      const timeRange = (hour) % 24;
       return { timeRange, temperature: average };
     });
     // Split the formattedHourlyAverages array into two parts
-    const firstPart = formattedHourlyAverages.slice(endhour);
-    const secondPart = formattedHourlyAverages.slice(0, endhour);
+    const firstPart = formattedHourlyAverages.slice(endhour + 1);
+    const secondPart = formattedHourlyAverages.slice(0, endhour + 1);
     // Rearrange the array so that hours from endHour to 23 are at the front
     const rearrangedHourlyAverages = firstPart.concat(secondPart);
     // Respond with the rearranged hourly average soil moisture
