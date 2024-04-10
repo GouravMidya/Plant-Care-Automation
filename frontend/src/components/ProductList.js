@@ -1,6 +1,6 @@
 // ProductList.js
 import React from 'react';
-import { Grid } from '@mui/material';
+import { Grid, Paper } from '@mui/material';
 import ProductCard from './ProductCard';
 import useProducts from '../hooks/useProducts';
 import CircularProgress from '@mui/material/CircularProgress';

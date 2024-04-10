@@ -5,16 +5,6 @@ import Container from '@mui/material/Container';
 import { Box, Typography, Grid, Button } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
-
-const StyledButton = styled(Button)(({ theme }) => ({
-  textTransform: 'none',
-  marginRight: theme.spacing(1),
-  '&.Mui-selected': {
-    backgroundColor: theme.palette.primary.main,
-    color: '#fff',
-  },
-}));
-
 function Layout1({ headerHeight,user }) {
     const layoutStyle = {
         marginTop: `${headerHeight-headerHeight}px`, // Set top margin dynamically based on the header height
@@ -37,9 +27,9 @@ function Layout1({ headerHeight,user }) {
         <Typography variant="h1" gutterBottom  align="center" sx={{ fontSize: { xs: '0.7rem', md: '1.5rem' }}}>Transform your plant care routine with our cutting-edge monitoring system. Achieve precision with real-time insights, automated watering, and personalized alerts. Embrace a seamless blend of technology and nature for healthier, thriving plants. Elevate your gardening experience today and witness the future of smart, effortless plant care.</Typography>
         </Grid>
     </Grid>
-    <div className="buttons" style={{ textAlign: 'center' }}>
-              <Link to="/aboutus"><StyledButton className="learn-more">Learn More</StyledButton></Link>
-              {user ? null : <Link to="/signup"><StyledButton variant="contained" className="signup">Sign Up</StyledButton></Link>}
+    <div  style={{ textAlign: 'center' }}>
+              <Link to="/aboutus"><Button  variant="outlined" className="learn-more">Learn More</Button></Link>
+              {user ? null : <Link to="/signup"><Button  variant="outlined" className="signup">Sign Up</Button></Link>}
             </div>
         </div>
         <div className="row">

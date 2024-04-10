@@ -56,7 +56,7 @@ const TemperatureChart = ({ deviceId }) => {
           text: 'Temperature' // Label for the Y-axis
         }
       },
-      colors: ['#7d947e', '#b4757a'],
+      colors: ['#80ed99', '#ff4d6d'],
       dataLabels: {
         enabled: false  // Hide the data points
       },

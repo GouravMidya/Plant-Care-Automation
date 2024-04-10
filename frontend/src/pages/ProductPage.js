@@ -7,7 +7,7 @@ const ProductPage = () => {
     <div>
       <br></br>
       <Typography variant="h5" textAlign={'center'}><strong>Shopping Bliss: Elevating Your Plant Care Experience</strong></Typography>
-      <ProductList />
+      <Container xs={{maxWidth:'90%'}} md={{maxWidth:'80%'}}><ProductList /></Container>
     </div>
   );
 };

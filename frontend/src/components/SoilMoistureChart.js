@@ -52,10 +52,10 @@ const SoilMoistureChart = ({ deviceId }) => {
       },
       yaxis: {
         title: {
-          text: 'Soil Moisture',
+          text: 'Soil Moisture (%)',
         },
       },
-      colors: ['#7d947e', '#b4757a'], // Add a different color for null values
+      colors: ['#80ed99', '#ff4d6d'], // Add a different color for null values
       dataLabels: {
         enabled: false,
       },

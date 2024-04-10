@@ -36,8 +36,8 @@ function Homepage({user}) {
             </Typography>
             <Container align="center">
               <div className="buttons" sx={{ marginTop: '1rem' }}>
-                <Link to="/aboutus"><StyledButton variant="contained" className="learn-more">Learn More</StyledButton></Link>
-                {user ? null : <Link to="/signup"><StyledButton variant="contained" className="signup">Sign Up</StyledButton></Link>}
+                <Link to="/aboutus"><Button  variant="outlined" className="learn-more">Learn More</Button></Link>
+                {user ? null : <Link to="/signup"><Button  variant="outlined" className="signup">Sign Up</Button></Link>}
               </div>
             </Container>
           </div>

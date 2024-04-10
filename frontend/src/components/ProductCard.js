@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardMedia, Typography, IconButton, Box, Collapse, useMediaQuery, Container } from '@mui/material';
+import { Card, Paper, CardContent, CardMedia, Typography, IconButton, Box, Collapse, useMediaQuery, Container } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
@@ -44,6 +44,7 @@ const ProductCard = ({ product }) => {
 
   return (
     <Container maxWidth="lg" sx={{ padding: "15px"}}>
+      <Paper elevation={6} sx={{padding:"20px" , width: '100%'}}>
       <Card sx={{ width: '100%' }}>
         <CardMedia
           component="img"
@@ -122,6 +123,7 @@ const ProductCard = ({ product }) => {
           </Box>
         </CardContent>
       </Card>
+      </Paper>
     </Container>
   );
 };

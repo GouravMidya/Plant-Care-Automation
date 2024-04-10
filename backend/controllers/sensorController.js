@@ -106,11 +106,17 @@ const getAverageSoilMoisture = async (req, res) => {
     });
 
     // Calculate average soil moisture for each hour
-    const formattedHourlyAverages = hourlyAverages.map((hourData, hour) => {
-      const average = hourData.count > 0 ? (hourData.sum / hourData.count).toFixed(2) : 0;
-      return { timeRange: timeRanges[hour], soilMoisture: average };
-    });
+    let formattedHourlyAverages = hourlyAverages.map((hourData, hour) => {
+      const average = hourData.count > 0 ? (hourData.sum / hourData.count) : 0;
+      const timeRange = (hour) % 24;
 
+      // Calculate percentage soil moisture
+      const minSoilMoisture = 100;
+      const maxSoilMoisture = 600;
+      const percentage = ((1 - (average - minSoilMoisture) / (maxSoilMoisture - minSoilMoisture)) * 100).toFixed(2);
+
+      return { timeRange, soilMoisture: percentage };
+    });
     // Respond with the hourly average soil moisture
     res.status(200).json({ success: true, data: formattedHourlyAverages });
   } catch (error) {
@@ -190,9 +196,15 @@ const getAllSoilMoistureRecords = async (req, res) => {
 
     // Calculate average soil moisture for each hour
     let formattedHourlyAverages = hourlyAverages.map((hourData, hour) => {
-      const average = hourData.count > 0 ? (hourData.sum / hourData.count).toFixed(2) : 0;
+      const average = hourData.count > 0 ? (hourData.sum / hourData.count) : 0;
       const timeRange = (hour) % 24;
-      return { timeRange, soilMoisture: average };
+
+      // Calculate percentage soil moisture
+      const minSoilMoisture = 0;
+      const maxSoilMoisture = 1024;
+      const percentage = ((1 - (average - minSoilMoisture) / (maxSoilMoisture - minSoilMoisture)) * 100).toFixed(2);
+
+      return { timeRange, soilMoisture: percentage };
     });
 
     // Split the formattedHourlyAverages array into two parts
@@ -208,6 +220,7 @@ const getAllSoilMoistureRecords = async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to fetch and calculate hourly average soil moisture' });
   }
 };
+
 
 
 // Getting record for past 24 hrs , but can be used for any date

@@ -1,5 +1,9 @@
 import React from 'react';
-import { Container, Typography, TextField, Checkbox, Button, Grid } from '@mui/material';
+import { Container, Typography, TextField, Box, Button, Grid } from '@mui/material';
+import EmailIcon from '@mui/icons-material/Email';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import PhoneIcon from '@mui/icons-material/Phone';
+
 import './App.css';
 
 function Contact() {
@@ -19,26 +23,41 @@ function Contact() {
             <input type="checkbox" id="terms" name="terms" />
             <label htmlFor="terms">I accept the terms and conditions</label>
           </div>
-          <button className="button">Submit</button>
+          <Button  variant="outlined" className="button">Submit</Button>
         </Grid>
         <Grid item xs={12} md={6} className="right2" sx={{ marginTop:{xs:'-2rem', md:'-8rem'}}}>
-          <div className="contact-details">
-            <Container sx={{ marginLeft:{xs:'-4rem', md:'0rem'}}}>
-            <div><img src='email.png' alt="Email" className='cont-img' /></div>
-            <div><Typography variant="body1" marginLeft={'5rem'} marginTop={'-3.5rem'}><strong>Email</strong><br/>bloombuddy@admin.com</Typography></div>
-            </Container>
-            <br/>
-            <Container sx={{ marginLeft:{xs:'-4rem', md:'0rem'}}}>
-              <img src='location.png' alt="Location" className='cont-img' />
-              <Typography variant="body1" marginLeft={'5rem'} marginTop={'-3.5rem'}>Bloombuddy, Kasarvadavli<br/> Thane, India</Typography>
-            </Container>
-            <br/>
-            <Container sx={{ marginLeft:{xs:'-4rem', md:'0rem'}}}>
-              <img src='phone.png' alt="Phone" className='cont-img' />
-              <Typography variant="body1" marginLeft={'5rem'} marginTop={'-3.3rem'}>+1234567890</Typography>
-              <br/>
-            </Container>
-          </div>
+        <div className="contact-details">
+          <Container sx={{ marginLeft: { xs: '-4rem', md: '0rem' } }}>
+            <Box display="flex" alignItems="center" marginBottom={2}>
+              <EmailIcon fontSize="large" color="primary"/>
+              <Typography variant="body1" marginLeft={2}>
+                <strong>Email</strong>
+                <br />
+                bloombuddy@admin.com
+              </Typography>
+            </Box>
+          </Container>
+
+          <Container sx={{ marginLeft: { xs: '-4rem', md: '0rem' } }}>
+            <Box display="flex" alignItems="center" marginBottom={2}>
+              <LocationOnIcon fontSize="large" color="primary"/>
+              <Typography variant="body1" marginLeft={2}>
+                Bloombuddy, Kasarvadavli
+                <br />
+                Thane, India
+              </Typography>
+            </Box>
+          </Container>
+
+          <Container sx={{ marginLeft: { xs: '-4rem', md: '0rem' } }}>
+            <Box display="flex" alignItems="center">
+              <PhoneIcon fontSize="large" color="primary"/>
+              <Typography variant="body1" marginLeft={2}>
+                +1234567890
+              </Typography>
+            </Box>
+          </Container>
+      </div>
         </Grid>
       </Grid>
     </Container>
