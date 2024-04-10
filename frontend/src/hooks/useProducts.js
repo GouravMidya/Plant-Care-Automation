@@ -1,6 +1,7 @@
 // hooks/useProducts.js
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { API_URL } from '../utils/apiConfig'
 
 const useProducts = () => {
   const [products, setProducts] = useState([]);
@@ -10,7 +11,7 @@ const useProducts = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('http://localhost:4001/products'); // Assuming your backend API endpoint is '/api/products'
+        const response = await axios.get(`${API_URL}/products`); // Assuming your backend API endpoint is '/api/products'
         setProducts(response.data);
         setIsLoading(false);
       } catch (err) {

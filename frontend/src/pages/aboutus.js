@@ -1,5 +1,4 @@
 import React from "react";
-import Footer from '../components/footer';
 import AboutUsLay1 from "../components/aboutuslay1"; // Capitalized component name
 import AboutUsLay2 from "../components/aboutuslay2";
 import Aboutuslay3 from "../components/aboutuslay3";

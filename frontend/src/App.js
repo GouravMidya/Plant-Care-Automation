@@ -6,7 +6,7 @@ import appTheme from './appTheme';
 import Login from './components/Login';
 import SignUp from './components/SignUp';
 import Navbar from './components/Navbar';
-import Footer from './components/footer';
+import Footer from './components/Footer';
 import Dashboard from './pages/Dashboard';
 import Troubleshoot from './pages/Troubleshoot';
 import Tickets from './pages/Tickets';
@@ -14,6 +14,7 @@ import Home from './pages/Home';
 import Guides from './pages/Guides';
 import ProductPage from './pages/ProductPage';
 import AboutUs from './pages/aboutus';
+import NotFoundPage from './pages/NotFoundPage';
 
 function App() {
   const [user, setUser] = useState(null); // Initialize user state
@@ -34,6 +35,7 @@ function App() {
               <Route path="/guides" element={<Guides />} />
               <Route path="/aboutus" element={<AboutUs />} />
               <Route path="/tickets" element={<ProtectedRoute user={user}><Tickets user={user} /></ProtectedRoute>} />
+              <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </div>
           <Footer />
