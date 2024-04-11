@@ -6,7 +6,7 @@ import appTheme from './appTheme';
 import Login from './components/Login';
 import SignUp from './components/SignUp';
 import Navbar from './components/Navbar';
-import Footer from './components/footer';
+import FooterPage from './components/FooterPage';
 import Dashboard from './pages/Dashboard';
 import Troubleshoot from './pages/Troubleshoot';
 import Tickets from './pages/Tickets';
@@ -77,7 +77,7 @@ function App() {
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </div>
-          <Footer />
+          <FooterPage />
         </div>
       </Router>
     </ThemeProvider>
