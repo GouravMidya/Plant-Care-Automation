@@ -4,8 +4,9 @@ import Chart from 'react-apexcharts'; // Add this import
 import {addWeeks, addMonths, addYears} from 'date-fns';
 import DatePicker from 'react-datepicker'; // Add this import
 import { addHours } from 'date-fns';
-import { Button, Box} from '@mui/material';
+import { Button, Box,Typography} from '@mui/material';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import DateRangeIcon from '@mui/icons-material/DateRange';
 import { styled } from '@mui/material/styles';
 import { API_URL } from '../utils/apiConfig';
 import axios from 'axios';
@@ -78,6 +79,7 @@ const TemperatureChart = ({ deviceId }) => {
   const [customStartDate, setCustomStartDate] = useState(null);
   const [showStartDatePicker, setShowStartDatePicker] = useState(true);
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   // Function to fetch Temperature data
   const fetchTemperatureData = async () => {
@@ -219,6 +221,13 @@ const TemperatureChart = ({ deviceId }) => {
 
   const handleTimeRangeButtonClick = (range) => {
     setTimeRange(range);
+    // Reset custom date picker when another option is selected
+    if (range !== 'custom') {
+      setShowDatePicker(false);
+      setCustomStartDate(null);
+    } else {
+      setShowDatePicker(true);
+    }
   };
 
   const handleCustomStartDateChange = (date) => {
@@ -246,49 +255,57 @@ const TemperatureChart = ({ deviceId }) => {
       {/* Time range buttons and custom date range pickers */}
       <Box sx={{ padding: 2, backgroundColor: 'background.paper', borderRadius: 1 }}>
       <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <StyledButton
+          className={timeRange === 'day' ? 'Mui-selected' : ''}
+          onClick={() => handleTimeRangeButtonClick('day')}
+        >
+          Day
+        </StyledButton>
+        <StyledButton
+          className={timeRange === 'month' ? 'Mui-selected' : ''}
+          onClick={() => handleTimeRangeButtonClick('month')}
+        >
+          Month
+        </StyledButton>
+        <StyledButton
+          className={timeRange === 'year' ? 'Mui-selected' : ''}
+          onClick={() => handleTimeRangeButtonClick('year')}
+        >
+          Year
+        </StyledButton>
+        {!showDatePicker && (
           <StyledButton
-            className={timeRange === 'day' ? 'Mui-selected' : ''}
-            onClick={() => handleTimeRangeButtonClick('day')}
+            onClick={() => handleTimeRangeButtonClick('custom')}
           >
-            Day
+            Custom
           </StyledButton>
-          <StyledButton
-            className={timeRange === 'month' ? 'Mui-selected' : ''}
-            onClick={() => handleTimeRangeButtonClick('month')}
-          >
-            Month
-          </StyledButton>
-          <StyledButton
-            className={timeRange === 'year' ? 'Mui-selected' : ''}
-            onClick={() => handleTimeRangeButtonClick('year')}
-          >
-            Year
-          </StyledButton>
-          <StyledButton
-              onClick={() => handleTimeRangeButtonClick('custom')}
-            > 
-              <span style={{ marginRight: '5px' }}>
-                {showStartDatePicker && (
-                  <DatePicker
-                    selected={customStartDate}
-                    onChange={handleCustomStartDateChange}
-                    customInput={<CalendarTodayIcon />}
-                    style={{ marginLeft: '10px' }}
-                  />
-                )}
-              </span>
-              {showEndDatePicker && dateRange.startDate && (
+        )}
+        {showDatePicker && (
+          <Box sx={{ display: 'flex', alignItems: 'center', ml: 1 }}>
+            <Typography variant="body1" sx={{ mr: 1 }}>
+              Start Date:
+            </Typography>
+            <DatePicker
+              selected={customStartDate}
+              onChange={handleCustomStartDateChange}
+              customInput={<DateRangeIcon />}
+            />
+            {customStartDate && (
+              <>
+                <Typography variant="body1" sx={{ mx: 1 }}>
+                  End Date:
+                </Typography>
                 <DatePicker
                   selected={dateRange.endDate}
                   onChange={handleCustomEndDateChange}
                   minDate={customStartDate}
-                  customInput={<CalendarTodayIcon />}
-                  style={{ marginLeft: '10px' }}
+                  customInput={<DateRangeIcon />}
                 />
-              )}
-      </StyledButton>
-          
-        </Box>
+              </>
+            )}
+          </Box>
+        )}
+      </Box>
       {/* Chart component */}
       <Chart
         options={state.options}

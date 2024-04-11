@@ -127,6 +127,7 @@ const Dashboard = () => {
         deviceName: formData.deviceName,
         checkIntervals: parseInt(formData.checkIntervals, 10),
         pumpDuration: parseInt(formData.pumpDuration, 10),
+        threshold: formData.threshold,
         location: formData.location,
         description: formData.description,
       };

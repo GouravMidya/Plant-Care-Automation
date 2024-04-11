@@ -4,8 +4,9 @@ import Chart from 'react-apexcharts'; // Add this import
 import {addWeeks, addMonths, addYears} from 'date-fns';
 import DatePicker from 'react-datepicker'; // Add this import
 import { addHours } from 'date-fns';
-import { Button, Box} from '@mui/material';
+import { Button, Box,Typography} from '@mui/material';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import DateRangeIcon from '@mui/icons-material/DateRange';
 import { styled } from '@mui/material/styles';
 import { API_URL } from '../utils/apiConfig';
 import axios from 'axios';
@@ -75,8 +76,10 @@ const SoilMoistureChart = ({ deviceId }) => {
 
   const [timeRange, setTimeRange] = useState('day');
   const [customStartDate, setCustomStartDate] = useState(null);
+  const [customEndDate, setCustomEndDate] = useState(null);
   const [showStartDatePicker, setShowStartDatePicker] = useState(true);
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   const fetchSoilMoistureData = async () => {
     try {
@@ -211,6 +214,12 @@ const SoilMoistureChart = ({ deviceId }) => {
 
   const handleTimeRangeButtonClick = (range) => {
     setTimeRange(range);
+    // Reset custom date picker when another option is selected
+    if (range !== 'custom') {
+      setShowDatePicker(false);
+      setCustomStartDate(null);
+      setCustomEndDate(null);
+    }
   };
 
   const handleCustomStartDateChange = (date) => {
@@ -227,6 +236,7 @@ const SoilMoistureChart = ({ deviceId }) => {
     endDateWithTime.setHours(23, 59, 59, 999);
 
     if (endDateWithTime > customStartDate) {
+      setCustomEndDate(endDateWithTime);
       setDateRange({ ...dateRange, endDate: endDateWithTime });
       setShowEndDatePicker(false);
       setShowStartDatePicker(true);
@@ -256,30 +266,42 @@ const SoilMoistureChart = ({ deviceId }) => {
           >
             Year
           </StyledButton>
-          <StyledButton
-              onClick={() => handleTimeRangeButtonClick('custom')}
-            > 
-              <span style={{ marginRight: '5px' }}>
-                {showStartDatePicker && (
+          {!showDatePicker && (
+            <StyledButton
+              onClick={() => {
+                setShowDatePicker(!showDatePicker);
+                handleTimeRangeButtonClick('custom');
+              }}
+            >
+              Custom
+            </StyledButton>
+          )}
+          {showDatePicker && (
+            <Box sx={{ display: 'flex', alignItems: 'center', ml: 1 }}>
+              <Typography variant="body1" sx={{ mr: 1 }}>
+                Start Date:
+              </Typography>
+              
+              <DatePicker
+                selected={customStartDate}
+                onChange={handleCustomStartDateChange}
+                customInput={<DateRangeIcon />}
+              />
+              {customStartDate && (
+                <>
+                  <Typography variant="body1" sx={{ mx: 1 }}>
+                    End Date:
+                  </Typography>
                   <DatePicker
-                    selected={customStartDate}
-                    onChange={handleCustomStartDateChange}
-                    customInput={<CalendarTodayIcon />}
-                    style={{ marginLeft: '10px' }}
+                    selected={customEndDate}
+                    onChange={handleCustomEndDateChange}
+                    minDate={customStartDate}
+                    customInput={<DateRangeIcon />}
                   />
-                )}
-              </span>
-              {showEndDatePicker && dateRange.startDate && (
-                <DatePicker
-                  selected={dateRange.endDate}
-                  onChange={handleCustomEndDateChange}
-                  minDate={customStartDate}
-                  customInput={<CalendarTodayIcon />}
-                  style={{ marginLeft: '10px' }}
-                />
+                </>
               )}
-      </StyledButton>
-          
+            </Box>
+          )}
         </Box>
       {/* Chart component */}
       <Chart
