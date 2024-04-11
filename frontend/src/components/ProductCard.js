@@ -1,51 +1,41 @@
 import React, { useState } from 'react';
-import { Card, Paper, CardContent, CardMedia, Typography, IconButton, Box, Collapse, useMediaQuery, Container } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
+import { Paper, CardContent, CardMedia, Typography, IconButton, Box, Collapse,Container } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product, handleAddToCart, handleIncreaseQuantity, handleDecreaseQuantity }) => {
   const [quantity, setQuantity] = useState(0);
   const [expanded, setExpanded] = useState(false);
-  const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
-  const isMediumScreen = useMediaQuery(theme.breakpoints.between('sm', 'md'));
-  const isLargeScreen = useMediaQuery(theme.breakpoints.up('lg'));
 
-  const handleAddToCart = () => {
+  const handleAddToCartClick = () => {
     setQuantity(1);
-    // Add the product to the cart or list here
-    const cartItem = {
-      product: product,
-      quantity: 1,
-    };
+    handleAddToCart(product);
   };
 
-  const handleIncreaseQuantity = () => {
+  const handleIncreaseQuantityClick = () => {
     setQuantity(quantity + 1);
-    // Update the quantity in the cart or list here
+    handleIncreaseQuantity(product);
   };
 
-  const handleDecreaseQuantity = () => {
+  const handleDecreaseQuantityClick = () => {
     if (quantity > 1) {
       setQuantity(quantity - 1);
-      // Update the quantity in the cart or list here
+      handleDecreaseQuantity(product);
     } else {
       setQuantity(0);
-      // Remove the product from the cart or list here
+      handleDecreaseQuantity(product); // Make sure to call handleDecreaseQuantity with the product
     }
   };
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
-
+  
   return (
-    <Container maxWidth="lg" sx={{ padding: "15px"}}>
-      <Paper elevation={6} sx={{padding:"20px" , width: '100%'}}>
-      <Card sx={{ width: '100%' }}>
+    <Container maxWidth="xl" sx={{ padding: "10px", width: '100%' }}>
+      <Paper elevation={10} sx={{ width: '100%' }}>
         <CardMedia
           component="img"
           height="auto"
@@ -94,7 +84,7 @@ const ProductCard = ({ product }) => {
               <IconButton
                 color="primary"
                 aria-label="add to cart"
-                onClick={handleAddToCart}
+                onClick={handleAddToCartClick}
                 sx={{ backgroundColor: 'primary.main', color: 'primary.contrastText', '&:hover': { backgroundColor: 'primary.dark' } }}
               >
                 <AddIcon />
@@ -104,7 +94,7 @@ const ProductCard = ({ product }) => {
                 <IconButton
                   color="primary"
                   aria-label="decrease quantity"
-                  onClick={handleDecreaseQuantity}
+                  onClick={handleDecreaseQuantityClick}
                 >
                   <RemoveIcon />
                 </IconButton>
@@ -114,7 +104,7 @@ const ProductCard = ({ product }) => {
                 <IconButton
                   color="primary"
                   aria-label="increase quantity"
-                  onClick={handleIncreaseQuantity}
+                  onClick={handleIncreaseQuantityClick}
                 >
                   <AddIcon />
                 </IconButton>
@@ -122,7 +112,6 @@ const ProductCard = ({ product }) => {
             )}
           </Box>
         </CardContent>
-      </Card>
       </Paper>
     </Container>
   );

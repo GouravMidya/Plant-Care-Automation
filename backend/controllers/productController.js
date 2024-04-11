@@ -11,6 +11,7 @@ exports.createProduct = async (req, res) => {
       imageUrl,
       price,
       description,
+      category
     });
 
     await newProduct.save();

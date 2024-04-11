@@ -60,7 +60,7 @@ const SoilMoistureChart = ({ deviceId }) => {
       dataLabels: {
         enabled: false,
       },
-      legend: { show: false }
+      legend: { show: false },
     },
     series: [
       {
@@ -151,7 +151,7 @@ const SoilMoistureChart = ({ deviceId }) => {
       let flag2=0;
       data.data.forEach((item, index) => {
         const currentSoilMoisture = parseFloat(item.soilMoisture);
-        if (currentSoilMoisture === 0 && prevSoilMoisture) {
+        if (currentSoilMoisture === 0) {
           if (flag===0){
             flag=1;
             soilMoistureData.push(prevSoilMoisture);

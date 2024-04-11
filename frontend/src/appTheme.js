@@ -8,6 +8,9 @@ const appTheme = createTheme({
     secondary: {
       main: '#9ef01a', 
     },
+    other:{
+      main: '#ff4d6d'
+    }
   },
 });
 

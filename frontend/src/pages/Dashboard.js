@@ -17,7 +17,7 @@ import {
   useMediaQuery,
   TextField,
 } from '@mui/material';
-import { isAuthenticated, logout } from '../utils/authUtils';
+import { isAuthenticated } from '../utils/authUtils';
 import { API_URL } from '../utils/apiConfig'
 
 
@@ -201,7 +201,7 @@ const Dashboard = () => {
                         border: '2px solid green',
                         fontSize: '1.2rem',
                         fontWeight: 'bold',
-                        color: latestRecords[device.deviceId]?.soilMoisture > 500 ? 'red' : 'green',
+                        color: latestRecords[device.deviceId]?.soilMoisture > device.threshold ? 'red' : 'green',
                       }}
                     >
                       {latestRecords[device.deviceId]?.soilMoisture || '-'}

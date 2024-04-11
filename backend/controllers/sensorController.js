@@ -111,11 +111,17 @@ const getAverageSoilMoisture = async (req, res) => {
       const timeRange = (hour) % 24;
 
       // Calculate percentage soil moisture
-      const minSoilMoisture = 100;
-      const maxSoilMoisture = 600;
-      const percentage = ((1 - (average - minSoilMoisture) / (maxSoilMoisture - minSoilMoisture)) * 100).toFixed(2);
-
-      return { timeRange, soilMoisture: percentage };
+      if(average!=0)
+      {
+        const minSoilMoisture = 0;
+        const maxSoilMoisture = 1024;
+        const percentage = ((1 - (average - minSoilMoisture) / (maxSoilMoisture - minSoilMoisture)) * 100).toFixed(2);
+        return { timeRange, soilMoisture: percentage };
+      }
+      else{
+        const percentage = 0;
+        return { timeRange, soilMoisture: percentage };
+      }
     });
     // Respond with the hourly average soil moisture
     res.status(200).json({ success: true, data: formattedHourlyAverages });
@@ -198,13 +204,18 @@ const getAllSoilMoistureRecords = async (req, res) => {
     let formattedHourlyAverages = hourlyAverages.map((hourData, hour) => {
       const average = hourData.count > 0 ? (hourData.sum / hourData.count) : 0;
       const timeRange = (hour) % 24;
-
       // Calculate percentage soil moisture
-      const minSoilMoisture = 0;
-      const maxSoilMoisture = 1024;
-      const percentage = ((1 - (average - minSoilMoisture) / (maxSoilMoisture - minSoilMoisture)) * 100).toFixed(2);
-
-      return { timeRange, soilMoisture: percentage };
+      if(average!=0)
+      {
+        const minSoilMoisture = 0;
+        const maxSoilMoisture = 1024;
+        const percentage = ((1 - (average - minSoilMoisture) / (maxSoilMoisture - minSoilMoisture)) * 100).toFixed(2);
+        return { timeRange, soilMoisture: percentage };
+      }
+      else{
+        const percentage = 0;
+        return { timeRange, soilMoisture: percentage };
+      }
     });
 
     // Split the formattedHourlyAverages array into two parts
@@ -213,6 +224,7 @@ const getAllSoilMoistureRecords = async (req, res) => {
     // Rearrange the array so that hours from endHour to 23 are at the front
     const rearrangedHourlyAverages = firstPart.concat(secondPart);
     // Respond with the rearranged hourly average soil moisture
+    console.log(rearrangedHourlyAverages);
     res.status(200).json({ success: true, data: rearrangedHourlyAverages });
   } catch (error) {
     // Handle any errors

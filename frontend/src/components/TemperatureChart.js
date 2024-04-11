@@ -158,7 +158,7 @@ const TemperatureChart = ({ deviceId }) => {
       
       data.data.forEach((item, index) => {
         const currentTemperature = parseFloat(item.temperature);
-        if (currentTemperature === 0 && prevTemperature) {
+        if (currentTemperature === 0 ) {
           if (flag===0){
             flag=1;
             temperatureData.push(prevTemperature);
