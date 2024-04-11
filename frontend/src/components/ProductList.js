@@ -24,10 +24,15 @@ const ProductList = ({ cartItems, handleAddToCart, handleIncreaseQuantity, handl
     );
     setFilteredProducts(filtered);
   };
-
   if (isLoading) {
     return (
-      <Container>
+      <Container
+        style={{
+          display: 'grid',
+          placeItems: 'center',
+          height: '100vh', // Adjust this if you want the CircularProgress to cover a different height
+        }}
+      >
         <CircularProgress />
       </Container>
     );
@@ -91,7 +96,7 @@ const ProductList = ({ cartItems, handleAddToCart, handleIncreaseQuantity, handl
 
 
       </Container>
-      <Container maxWidth="xl">
+      <Container maxWidth="xl" >
         {((searchTerm !== '' ? filteredProducts.filter((product) => product.category === 'main') : mainProducts).length > 0) && (
           <>
             <Typography variant="h5" gutterBottom sx={{ fontFamily: 'Arial, cursive' }}>
@@ -100,7 +105,7 @@ const ProductList = ({ cartItems, handleAddToCart, handleIncreaseQuantity, handl
             <Grid container spacing={1}>
               {(searchTerm !== '' ? filteredProducts.filter((product) => product.category === 'main') : mainProducts).map(
                 (product) => (
-                  <Grid item key={product._id} xs={12} sm={12} md={6} lg={3}>
+                  <Grid item key={product._id} xs={12} sm={6} md={6} lg={3}>
                     <ProductCard
                       product={product}
                       cartItems={cartItems}
@@ -116,7 +121,7 @@ const ProductList = ({ cartItems, handleAddToCart, handleIncreaseQuantity, handl
         )}
       </Container>
       <br></br>
-      <Container maxWidth="xl">
+      <Container maxWidth="xl" >
         {((searchTerm !== '' ? filteredProducts.filter((product) => product.category === 'addon') : extraProducts).length > 0) && (
           <>
             <Typography variant="h5" gutterBottom sx={{ fontFamily: 'Arial, cursive' }}>
@@ -125,7 +130,7 @@ const ProductList = ({ cartItems, handleAddToCart, handleIncreaseQuantity, handl
             <Grid container spacing={1}>
               {(searchTerm !== '' ? filteredProducts.filter((product) => product.category === 'addon') : extraProducts).map(
                 (product) => (
-                  <Grid item key={product._id} xs={12} sm={12} md={6} lg={3}>
+                  <Grid item key={product._id} xs={12} sm={6} md={6} lg={3}>
                     <ProductCard
                       product={product}
                       cartItems={cartItems}

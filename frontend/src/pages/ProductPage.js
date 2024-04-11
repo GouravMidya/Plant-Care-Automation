@@ -1,67 +1,45 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Typography, IconButton, Container } from '@mui/material';
 import ShoppingBagRoundedIcon from '@mui/icons-material/ShoppingBagRounded';
-import { useNavigate, Route, Routes } from 'react-router-dom'; // Import the useNavigate hook
-import CheckOutPage from '../components/CheckOutPage'; // Import the CheckoutPage component
+import { useNavigate } from 'react-router-dom';
 import ProductList from '../components/ProductList';
+import { useCart } from '../hooks/CartContext';
 
 const ProductPage = () => {
-  const [cartItems, setCartItems] = useState([]);
+  const { cartItems, addToCart, decreaseQuantity, increaseQuantity } = useCart(); // Use useCart hook to access cartItems state, addToCart, and decreaseQuantity functions
   const navigate = useNavigate();
- 
-  const handleAddToCart = (product) => {
-    const existingItemIndex = cartItems.findIndex(item => item.product._id === product._id);
-    if (existingItemIndex !== -1) {
-      const updatedCartItems = [...cartItems];
-      updatedCartItems[existingItemIndex].quantity += 1;
-      setCartItems(updatedCartItems);
-    } else {
-      const updatedCartItems = [...cartItems, { product: product, quantity: 1 }];
-      setCartItems(updatedCartItems);
-    }
-  };
- 
-  const handleIncreaseQuantity = (product) => {
-    const updatedCartItems = cartItems.map(item => {
-      if (item.product._id === product._id) {
-        return { ...item, quantity: item.quantity + 1 };
-      }
-      return item;
-    });
-    setCartItems(updatedCartItems);
-    console.log(updatedCartItems);
-  };
- 
-  const handleDecreaseQuantity = (product) => {
-    const existingItemIndex = cartItems.findIndex((item) => item.product._id === product._id);
-    if (existingItemIndex !== -1) {
-      const updatedCartItems = [...cartItems];
-      if (updatedCartItems[existingItemIndex].quantity > 1) {
-        updatedCartItems[existingItemIndex].quantity -= 1;
-      } else {
-        updatedCartItems.splice(existingItemIndex, 1); // Remove the item from the cart
-      }
-      setCartItems(updatedCartItems);
-    }
-  };
  
   const handleCheckoutClick = () => {
     navigate('/checkout');
+  };
+
+  // Define handleAddToCart function
+  const handleAddToCart = (product) => {
+    addToCart(product); // Call the addToCart function from useCart hook
+  };
+
+  const handleIncreaseQuantity = (product) => {
+    increaseQuantity(product); // Call the decreaseQuantity function from useCart hook
+  };
+
+  // Define handleDecreaseQuantity function
+  const handleDecreaseQuantity = (product) => {
+    decreaseQuantity(product); // Call the decreaseQuantity function from useCart hook
   };
  
   return (
     <div>
       <br />
-      <Container>
+      <Container >
         <Typography variant="h4" textAlign={'center'} sx={{ fontFamily: 'Pacifico, cursive' }}>
           <strong>BloomBuddy Emporium!</strong>
         </Typography>
       </Container>
       <ProductList
         cartItems={cartItems}
-        handleAddToCart={handleAddToCart}
+        handleAddToCart={handleAddToCart} // Pass handleAddToCart function to ProductList component
+        handleDecreaseQuantity={handleDecreaseQuantity} // Pass handleDecreaseQuantity function to ProductList component
         handleIncreaseQuantity={handleIncreaseQuantity}
-        handleDecreaseQuantity={handleDecreaseQuantity}
       />
       <IconButton
         sx={{
@@ -78,7 +56,7 @@ const ProductPage = () => {
         onClick={handleCheckoutClick}
       >
         <ShoppingBagRoundedIcon color="primary" fontSize="large" />
-        {cartItems.length > 0 && (
+        {cartItems && cartItems.length > 0 && (
           <span
             style={{
               position: 'absolute',
@@ -99,18 +77,8 @@ const ProductPage = () => {
           </span>
         )}
       </IconButton>
- 
-      {/* Render the CheckoutPage component when navigated to /checkout */}
-      <Routes>
-        <Route
-          path="/checkout"
-          element={
-            <CheckOutPage cartItems={cartItems} handleDecreaseQuantity={handleDecreaseQuantity} handleIncreaseQuantity={handleIncreaseQuantity} />
-          }
-        />
-      </Routes>
     </div>
   );
- };
+};
  
- export default ProductPage;
+export default ProductPage;

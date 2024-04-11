@@ -16,70 +16,36 @@ import ProductPage from './pages/ProductPage';
 import AboutUs from './pages/aboutus';
 import NotFoundPage from './pages/NotFoundPage';
 import CheckOutPage from './components/CheckOutPage';
+import { CartProvider } from './hooks/CartContext';
 
 function App() {
   const [user, setUser] = useState(null); // Initialize user state
-  const [cartItems, setCartItems] = useState([]); // Initialize cartItems state
-
-  const handleAddToCart = (product) => {
-    const existingItemIndex = cartItems.findIndex(item => item.product._id === product._id);
-    if (existingItemIndex !== -1) {
-      const updatedCartItems = [...cartItems];
-      updatedCartItems[existingItemIndex].quantity += 1;
-      setCartItems(updatedCartItems);
-    } else {
-      const updatedCartItems = [...cartItems, { product: product, quantity: 1 }];
-      setCartItems(updatedCartItems);
-    }
-  };
-
-  const handleIncreaseQuantity = (product) => {
-    const updatedCartItems = cartItems.map(item => {
-      if (item.product._id === product._id) {
-        return { ...item, quantity: item.quantity + 1 };
-      }
-      return item;
-    });
-    setCartItems(updatedCartItems);
-  };
-
-  const handleDecreaseQuantity = (product) => {
-    const existingItemIndex = cartItems.findIndex((item) => item.product._id === product._id);
-    if (existingItemIndex !== -1) {
-      const updatedCartItems = [...cartItems];
-      if (updatedCartItems[existingItemIndex].quantity > 1) {
-        updatedCartItems[existingItemIndex].quantity -= 1;
-      } else {
-        updatedCartItems.splice(existingItemIndex, 1); // Remove the item from the cart
-      }
-      setCartItems(updatedCartItems);
-    }
-  };
 
   return (
     <ThemeProvider theme={appTheme}>
-      <Router>
-        <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-          <div style={{ flex: 1 }}>
-            <Navbar user={user} setUser={setUser} />
-            <Routes>
-              <Route path="/" element={<Home user={user} />} />
-              <Route path="/login" element={<Login setUser={setUser} />} />
-              <Route path="/signup" element={<SignUp />} />
-              <Route path="/dashboard" element={<ProtectedRoute user={user}><Dashboard /></ProtectedRoute>} />
-              <Route path="/products" element={<ProductPage cartItems={cartItems} handleAddToCart={handleAddToCart} handleIncreaseQuantity={handleIncreaseQuantity} handleDecreaseQuantity={handleDecreaseQuantity} />} />
-              <Route path="/checkout" element={<ProtectedRoute user={user}><CheckOutPage cartItems={cartItems} handleDecreaseQuantity={handleDecreaseQuantity} handleIncreaseQuantity={handleIncreaseQuantity} /></ProtectedRoute>} />
-              <Route path="/guides" element={<Guides />} />
-              <Route path="/aboutus" element={<AboutUs />} />
-              <Route path="/troubleshoot" element={<Troubleshoot />} />
-              <Route path="/tickets" element={<ProtectedRoute user={user}><Tickets user={user} /></ProtectedRoute>} />
-              <Route path="/checkout" element={<ProtectedRoute user={user}><CheckOutPage /></ProtectedRoute>} />
-              <Route path="*" element={<NotFoundPage />} />
-            </Routes>
+      <CartProvider> {/* Wrap your app with CartProvider */}
+        <Router>
+          <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+            <div style={{ flex: 1 }}>
+              <Navbar user={user} setUser={setUser} />
+              <Routes>
+                <Route path="/" element={<Home user={user} />} />
+                <Route path="/login" element={<Login setUser={setUser} />} />
+                <Route path="/signup" element={<SignUp />} />
+                <Route path="/dashboard" element={<ProtectedRoute user={user}><Dashboard /></ProtectedRoute>} />
+                <Route path="/products" element={<ProductPage />} />
+                <Route path="/guides" element={<Guides />} />
+                <Route path="/aboutus" element={<AboutUs />} />
+                <Route path="/troubleshoot" element={<Troubleshoot />} />
+                <Route path="/tickets" element={<ProtectedRoute user={user}><Tickets user={user} /></ProtectedRoute>} />
+                <Route path="/checkout" element={<ProtectedRoute user={user}><CheckOutPage /></ProtectedRoute>} />
+                <Route path="*" element={<NotFoundPage />} />
+              </Routes>
+            </div>
+            <FooterPage />
           </div>
-          <FooterPage />
-        </div>
-      </Router>
+        </Router>
+      </CartProvider>
     </ThemeProvider>
   );
 }

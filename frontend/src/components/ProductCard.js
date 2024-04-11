@@ -1,16 +1,27 @@
-import React, { useState } from 'react';
-import { Paper, CardContent, CardMedia, Typography, IconButton, Box, Collapse,Container } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Paper, CardContent, CardMedia, Typography, IconButton, Box, Collapse, Container } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
+import { useCart } from '../hooks/CartContext';
 
 const ProductCard = ({ product, handleAddToCart, handleIncreaseQuantity, handleDecreaseQuantity }) => {
   const [quantity, setQuantity] = useState(0);
   const [expanded, setExpanded] = useState(false);
+  const { cartItems } = useCart();
+
+  useEffect(() => {
+    const item = cartItems.find(item => item.product._id === product._id);
+    if (item) {
+      setQuantity(item.quantity);
+    } else {
+      setQuantity(0);
+    }
+  }, [cartItems, product]);
 
   const handleAddToCartClick = () => {
-    setQuantity(1);
+    setQuantity(quantity + 1);
     handleAddToCart(product);
   };
 
@@ -32,9 +43,9 @@ const ProductCard = ({ product, handleAddToCart, handleIncreaseQuantity, handleD
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
-  
+
   return (
-    <Container maxWidth="xl" sx={{ padding: "10px", width: '100%' }}>
+    <Container maxWidth="xl" sx={{ padding: "10px", width: '100%' }} >
       <Paper elevation={10} sx={{ width: '100%' }}>
         <CardMedia
           component="img"
