@@ -1,5 +1,5 @@
 // Footer component
-const Footer = () => {
+const FooterPage = () => {
     return (
       <footer style={{ backgroundColor: 'green', color: 'white', textAlign: 'center',padding: "15px" }}>
         Made with love by Bloombuddy
@@ -7,4 +7,4 @@ const Footer = () => {
     );
   };
 
-export default Footer;
+export default FooterPage;
