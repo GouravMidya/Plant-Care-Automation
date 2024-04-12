@@ -1,16 +1,20 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Box, Typography, Grid, Button } from '@mui/material';
+import { Typography, Grid, Button } from '@mui/material';
 import Container from '@mui/material/Container';
 import { styled } from '@mui/material/styles';
 
 const StyledButton = styled(Button)(({ theme }) => ({
   textTransform: 'none',
+  color: 'white',
+  backgroundColor: '#2e7d32',
+  fontSize: '1.1rem',
+  marginTop: '1.5rem',
   marginRight: theme.spacing(1),
-  '&.Mui-selected': {
-    backgroundColor: theme.palette.primary.main,
-    color: '#fff',
+  '&:hover': {
+    backgroundColor: '#f7faf6', // Change background color on hover
+    color: '#2e7d32', // Change text color on hover
   },
 }));
 
@@ -22,9 +26,7 @@ function Homepage({user}) {
           <div className="aboutl1">
             <Grid item lg={12}>
               <Typography variant="h2" align="center" sx={{ fontSize: { xs: '2rem', md: '4rem' },margin:{ xs:'1rem'}}}>
-                <strong>Revolutionize your plant care
-                <br />
-                with our smart monitoring system</strong>
+                <strong>Revolutionize your plant care with our smart monitoring system</strong>
               </Typography>
               
             </Grid>
@@ -35,9 +37,9 @@ function Homepage({user}) {
               </strong>
             </Typography>
             <Container align="center">
-              <div className="buttons" sx={{ marginTop: '1rem' }}>
-                <Link to="/aboutus"><Button  variant="outlined" className="learn-more">Learn More</Button></Link>
-                {user ? null : <Link to="/signup"><Button  variant="outlined" className="signup">Sign Up</Button></Link>}
+              <div sx={{ marginTop: '1rem' }}>
+                <Link to="/aboutus"><StyledButton variant="outlined"  >Learn More</StyledButton></Link>
+                {user ? null : <Link to="/signup"><StyledButton  variant="outlined" className="signup">Sign Up</StyledButton></Link>}
               </div>
             </Container>
           </div>
