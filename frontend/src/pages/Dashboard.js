@@ -16,9 +16,12 @@ import {
   Container,
   useMediaQuery,
   TextField,
+  CircularProgress,
+  Fab,
 } from '@mui/material';
 import { isAuthenticated } from '../utils/authUtils';
-import { API_URL } from '../utils/apiConfig'
+import { API_URL } from '../utils/apiConfig';
+import AddIcon from '@mui/icons-material/Add';
 
 
 const Dashboard = () => {
@@ -28,6 +31,7 @@ const Dashboard = () => {
   const [expandedDeviceId, setExpandedDeviceId] = useState(null);
   const [editingDeviceId, setEditingDeviceId] = useState(null);
   const [formData, setFormData] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const isLargeScreen = useMediaQuery('(min-width:600px)');
 
@@ -45,8 +49,10 @@ const Dashboard = () => {
     try {
       const response = await axios.get(`${API_URL}/api/user_devices?userId=${userId}`);
       await setDevices(response.data.data);
+      setIsLoading(false);
     } catch (err) {
       console.error(err); 
+      setIsLoading(false);
     }
   };
 
@@ -157,9 +163,53 @@ const Dashboard = () => {
     }
   };
 
+  const handleAddDevice = () => {
+    navigate('/dashboard/addDevice');
+  };
+
 
   return (
     <Container maxWidth="lg" sx={{padding:"20px"}}>
+      {isLoading ? (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="50vh"
+          flexDirection="column"
+        >
+          <CircularProgress size={80} />
+          <Typography variant="h5" mt={2}>
+            Please wait while we fetch your devices
+          </Typography>
+        </Box>
+      ) : devices.length === 0 ? (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="50vh"
+          flexDirection="column"
+        >
+          <Typography variant="h5" textAlign="center">
+            Looks empty here, Consider buying our product and if you have already bought one then tap on add device
+          </Typography>
+          <Fab
+            color="primary"
+            aria-label="add"
+            onClick={handleAddDevice}
+            sx={{ marginTop: '1rem' }}
+          >
+            <AddIcon />
+          </Fab>
+        </Box>
+      ) : (
+        <>
+          <Box display="flex" justifyContent="flex-end" mb={2}>
+            <Fab color="primary" aria-label="add" onClick={handleAddDevice}>
+              <AddIcon />
+            </Fab>
+          </Box>
       <Grid container spacing={isLargeScreen ? 4 : 2}>
         {devices.map((device) => (
           <Grid item xs={12} md={6} key={device.deviceId}
@@ -476,6 +526,8 @@ const Dashboard = () => {
           </Grid>
         ))}
       </Grid>
+      </>
+      )}
     </Container>
   );
 };
