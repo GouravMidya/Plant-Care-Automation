@@ -178,8 +178,8 @@ const getAverageTemperature = async (req, res) => {
 const getAllSoilMoistureRecords = async (req, res) => {
   try {
     const { deviceId, startDate, endDate } = req.query;
-    const currentHour = new Date().getHours(); // Get the current hour
-    const endhour = currentHour === 0 ? 23 : currentHour - 1; // Calculate endhour based on current hour
+    const currentHour = new Date().getHours()+5; // Get the current hour
+    const endhour = currentHour === 0 ? 23+5 : currentHour - 1+5; // Calculate endhour based on current hour
 
     // Construct the query based on parameters
     const query = { deviceId };
@@ -226,6 +226,7 @@ const getAllSoilMoistureRecords = async (req, res) => {
     // Respond with the rearranged hourly average soil moisture
     console.log(rearrangedHourlyAverages);
     res.status(200).json({ success: true, data: rearrangedHourlyAverages });
+
   } catch (error) {
     // Handle any errors
     console.error('Error fetching and calculating hourly average soil moisture:', error);
@@ -239,8 +240,8 @@ const getAllSoilMoistureRecords = async (req, res) => {
 const getAllTemperatureRecords = async (req, res) => {
   try {
     const { deviceId, startDate, endDate } = req.query;
-    const currentHour = new Date().getHours(); // Get the current hour
-    const endhour = currentHour === 0 ? 23 : currentHour - 1; // Calculate endhour based on current hour
+    const currentHour = new Date().getHours()+5; // Get the current hour
+    const endhour = currentHour === 0 ? 23+5 : currentHour - 1+5; // Calculate endhour based on current hour
 
     const query = { deviceId };
     if (startDate && endDate) {
