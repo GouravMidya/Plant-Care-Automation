@@ -25,7 +25,7 @@ const authRoutes = require('./routes/authRoutes');
 const ticketRoutes = require('./routes/ticketRoutes');
 const productRoutes = require('./routes/productRoutes');
 const contactRoutes = require('./routes/contactRoutes');
-
+const orderRoutes = require('./routes/orderRoutes');
 
 app.use((req,res,next) =>{
     // Get the current date and time
@@ -46,7 +46,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/tickets', ticketRoutes);
 app.use('/products',productRoutes);
 app.use('/contact',contactRoutes);
-
+app.use('/orders',orderRoutes);
 //mongodb
 mongoose.connect(process.env.MONG_URI)
     .then(() =>{

@@ -18,7 +18,7 @@ import NotFoundPage from './pages/NotFoundPage';
 import CheckOutPage from './components/CheckOutPage';
 import AddDevice from './pages/AddDevice';
 import { CartProvider } from './hooks/CartContext';
-
+import OrderConfirmed from './components/OrderConfirmed';
 function App() {
   const [user, setUser] = useState(null); // Initialize user state
 
@@ -40,6 +40,7 @@ function App() {
                 <Route path="/aboutus" element={<AboutUs />} />
                 <Route path="/troubleshoot" element={<Troubleshoot />} />
                 <Route path="/tickets" element={<ProtectedRoute user={user}><Tickets user={user} /></ProtectedRoute>} />
+                <Route path="/order-confirmed" element={<ProtectedRoute user={user}><OrderConfirmed /></ProtectedRoute>} />
                 <Route path="/checkout" element={<ProtectedRoute user={user}><CheckOutPage /></ProtectedRoute>} />
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>

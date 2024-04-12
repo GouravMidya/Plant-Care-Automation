@@ -4,8 +4,7 @@ import Chart from 'react-apexcharts'; // Add this import
 import {addWeeks, addMonths, addYears} from 'date-fns';
 import DatePicker from 'react-datepicker'; // Add this import
 import { addHours } from 'date-fns';
-import { Button, Box,Typography} from '@mui/material';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import { Button, Box, Grid, Typography, useTheme, useMediaQuery } from '@mui/material';
 import DateRangeIcon from '@mui/icons-material/DateRange';
 import { styled } from '@mui/material/styles';
 import { API_URL } from '../utils/apiConfig';
@@ -26,6 +25,10 @@ const SoilMoistureChart = ({ deviceId }) => {
     startDate: new Date(),
     endDate: new Date(),
   });
+
+  const theme = useTheme();
+  const isXSmallScreen = useMediaQuery(theme.breakpoints.down('xs'));
+  const isMediumScreen = useMediaQuery(theme.breakpoints.only('md'));
 
   const [state, setState] = useState({
     options: {
@@ -242,78 +245,92 @@ const SoilMoistureChart = ({ deviceId }) => {
       setShowStartDatePicker(true);
     }
   };
-  
+
   return (
     <div>
-      {/* Time range buttons and custom date range pickers */}
-      <Box sx={{ padding: 2, backgroundColor: 'background.paper', borderRadius: 1 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <StyledButton
-            className={timeRange === 'day' ? 'Mui-selected' : ''}
-            onClick={() => handleTimeRangeButtonClick('day')}
-          >
-            Day
-          </StyledButton>
-          <StyledButton
-            className={timeRange === 'month' ? 'Mui-selected' : ''}
-            onClick={() => handleTimeRangeButtonClick('month')}
-          >
-            Month
-          </StyledButton>
-          <StyledButton
-            className={timeRange === 'year' ? 'Mui-selected' : ''}
-            onClick={() => handleTimeRangeButtonClick('year')}
-          >
-            Year
-          </StyledButton>
-          {!showDatePicker && (
-            <StyledButton
-              onClick={() => {
-                setShowDatePicker(!showDatePicker);
-                handleTimeRangeButtonClick('custom');
-              }}
-            >
-              Custom
-            </StyledButton>
-          )}
-          {showDatePicker && (
-            <Box sx={{ display: 'flex', alignItems: 'center', ml: 1 }}>
-              <Typography variant="body1" sx={{ mr: 1 }}>
-                Start Date:
-              </Typography>
-              
-              <DatePicker
-                selected={customStartDate}
-                onChange={handleCustomStartDateChange}
-                customInput={<DateRangeIcon />}
-              />
-              {customStartDate && (
-                <>
-                  <Typography variant="body1" sx={{ mx: 1 }}>
-                    End Date:
-                  </Typography>
-                  <DatePicker
-                    selected={customEndDate}
-                    onChange={handleCustomEndDateChange}
-                    minDate={customStartDate}
-                    customInput={<DateRangeIcon />}
-                  />
-                </>
-              )}
-            </Box>
-          )}
-        </Box>
-      {/* Chart component */}
-      <Chart
-        options={state.options}
-        series={state.series}
-        type="area"
-      />
-      </Box>
+    <Box sx={{ padding: 2, backgroundColor: 'background.paper', borderRadius: 1 }}>
+    <Grid sx={{ padding: 1 }}container alignItems="center" spacing={2}>
+    <Grid item>
+    <Box >
+    <StyledButton
+    className={timeRange === 'day' ? 'Mui-selected' : ''}
+    onClick={() => handleTimeRangeButtonClick('day')}
+    >
+    Day
+    </StyledButton>
+    <StyledButton
+    className={timeRange === 'month' ? 'Mui-selected' : ''}
+    onClick={() => handleTimeRangeButtonClick('month')}
+    >
+    Month
+    </StyledButton>
+    <StyledButton
+    className={timeRange === 'year' ? 'Mui-selected' : ''}
+    onClick={() => handleTimeRangeButtonClick('year')}
+    >
+    Year
+    </StyledButton>
+    {!showDatePicker && (
+    <StyledButton
+    onClick={() => {
+    setShowDatePicker(!showDatePicker);
+    handleTimeRangeButtonClick('custom');
+    }}
+    >
+    Custom
+    </StyledButton>
+    )}
+    </Box>
+    </Grid>
+    {showDatePicker && (
+    <Grid item>
+    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+    <Typography
+    padding="0.1rem"
+    variant="body1"
+
+    sx={{
+        mx: 1,
+        fontSize:'0.9rem',
+    }}
+>
+    Start Date:
+</Typography>
+
+    <DatePicker
+    selected={customStartDate}
+    onChange={handleCustomStartDateChange}
+    customInput={<DateRangeIcon />}
+    />
+    {customStartDate && (
+    <>
+    <Typography padding="0.3rem" variant="body1" sx={{
+        mx: 1,
+        fontSize:'0.9rem',
+    }}>
+    End Date:
+    </Typography>
+    <DatePicker
+    selected={customEndDate}
+    onChange={handleCustomEndDateChange}
+    minDate={customStartDate}
+    customInput={<DateRangeIcon />}
+    />
+    </>
+    )}
+    </Box>
+    </Grid>
+    )}
+    </Grid>
+    <Chart
+           options={state.options}
+           series={state.series}
+           type="area"
+         />
+    </Box>
     </div>
+    );
+    };
     
-  );
-  
-};
 
 export default SoilMoistureChart;
