@@ -20,7 +20,7 @@ const StyledButton = styled(Button)(({ theme }) => ({
 
 function Homepage({user}) {
   return (
-    <div className="header" >
+    <div className="header" style={{ backgroundImage: 'url(grassbg.png)', backgroundSize: 'cover' }}>
       <Container disableGutters>
         
           <div className="aboutl1">

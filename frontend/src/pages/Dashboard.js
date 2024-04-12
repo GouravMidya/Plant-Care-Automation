@@ -201,10 +201,10 @@ const Dashboard = () => {
                         border: '2px solid green',
                         fontSize: '1.2rem',
                         fontWeight: 'bold',
-                        color: latestRecords[device.deviceId]?.soilMoisture > device.threshold ? 'red' : 'green',
+                        color: latestRecords[device.deviceId]?.soilMoisture > (1024-((device.threshold*1024)/100)) ? 'red' : 'green',
                       }}
                     >
-                      {latestRecords[device.deviceId]?.soilMoisture || '-'}
+                          {((1-(latestRecords[device.deviceId]?.soilMoisture )/1024)*100).toFixed(2)+'%'|| '-'}
                     </Box>
                   </Grid>
                   <Grid item xs={4}>
@@ -306,7 +306,7 @@ const Dashboard = () => {
                     {editingDeviceId === device.deviceId ? (
                         <TextField
                         name="threshold"
-                        label="Watering Threshold"
+                        label="Watering Threshold (%)"
                         value={formData.threshold}
                         onChange={handleChange}
                         fullWidth
@@ -314,7 +314,7 @@ const Dashboard = () => {
                         />
                         ) : (
                           <Box>
-                          <Typography variant="body2">Watering threshold</Typography>
+                          <Typography variant="body2">Watering threshold (%)</Typography>
                           <Box
                             sx={{
                               height: 50,
@@ -324,7 +324,7 @@ const Dashboard = () => {
                               justifyContent: 'center',
                             }}
                           >
-                            {device.threshold}
+                            {device.threshold}%
                           </Box>
                         </Box>
                       )}
