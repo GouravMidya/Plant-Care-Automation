@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import Chart from 'react-apexcharts'; // Add this import
-import {addWeeks, addMonths, addYears} from 'date-fns';
+import {addWeeks, addMonths, addYears, addMinutes} from 'date-fns';
 import DatePicker from 'react-datepicker'; // Add this import
 import { addHours } from 'date-fns';
-import { Button, Box, Grid, Typography, useTheme, useMediaQuery } from '@mui/material';
+import { Button, Box, Grid, Typography } from '@mui/material';
 import DateRangeIcon from '@mui/icons-material/DateRange';
 import { styled } from '@mui/material/styles';
 import { API_URL } from '../utils/apiConfig';
@@ -25,10 +25,6 @@ const SoilMoistureChart = ({ deviceId }) => {
     startDate: new Date(),
     endDate: new Date(),
   });
-
-  const theme = useTheme();
-  const isXSmallScreen = useMediaQuery(theme.breakpoints.down('xs'));
-  const isMediumScreen = useMediaQuery(theme.breakpoints.only('md'));
 
   const [state, setState] = useState({
     options: {
@@ -80,44 +76,48 @@ const SoilMoistureChart = ({ deviceId }) => {
   const [timeRange, setTimeRange] = useState('day');
   const [customStartDate, setCustomStartDate] = useState(null);
   const [customEndDate, setCustomEndDate] = useState(null);
-  const [showStartDatePicker, setShowStartDatePicker] = useState(true);
-  const [showEndDatePicker, setShowEndDatePicker] = useState(false);
+  const [setShowStartDatePicker] = useState(true);
+  const [setShowEndDatePicker] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   const fetchSoilMoistureData = async () => {
     try {
       let startDate, endDate;
-      const today = new Date();
+      const todayUTC = new Date(); // Get current UTC date
+      const todayIST1 = addHours(todayUTC, 5); // Convert to IST (UTC+5)
+      const todayIST=addMinutes(todayIST1,30);
       switch (timeRange) {
         case 'day':
-          startDate = addHours(new Date(today), -24);
+          startDate = addHours(todayIST, -24); // Subtract 24 hours in IST
           startDate.setMinutes(0);
-          endDate = new Date(today);// End date is current time
+          endDate = todayIST; // End date is current time in IST
           endDate.setMinutes(0);
           break;
         case 'week':
-          startDate = addWeeks(today, -1);
-          endDate = new Date();
+          startDate = addWeeks(todayIST, -1); // Subtract 1 week in IST
+          endDate = todayIST;
           break;
         case 'month':
-          startDate = addMonths(today, -1);
-          endDate = new Date();
+          startDate = addMonths(todayIST, -1); // Subtract 1 month in IST
+          endDate = todayIST;
           break;
         case 'year':
-          startDate = addYears(today, -1);
-          endDate = new Date();
+          startDate = addYears(todayIST, -1); // Subtract 1 year in IST
+          endDate = todayIST;
           break;
         case 'custom':
-          startDate = customStartDate ? customStartDate : new Date();
+          startDate = customStartDate ? customStartDate : todayIST; // Use custom start date or current IST time
           endDate = dateRange.endDate;
           break;
         default:
-          startDate = addMonths(today, -1);
-          endDate = new Date();
+          startDate = addMonths(todayIST, -1); // Default to 1 month ago in IST
+          endDate = todayIST;
       }
-      const formattedStartDate = startDate.toISOString();
-      const formattedEndDate = endDate.toISOString();
-      
+
+      // Convert IST dates to UTC for API request
+    const formattedStartDate = startDate.toISOString();
+    const formattedEndDate = endDate.toISOString();
+    
       // Fetch data from the appropriate endpoint based on time range
       let endpoint = `${API_URL}/sensor_readings/avgsoilmoisture`;
       if (timeRange === 'day') {
