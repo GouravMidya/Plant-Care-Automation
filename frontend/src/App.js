@@ -16,6 +16,7 @@ import ProductPage from './pages/ProductPage';
 import AboutUs from './pages/aboutus';
 import NotFoundPage from './pages/NotFoundPage';
 import CheckOutPage from './components/CheckOutPage';
+import AddDevice from './pages/AddDevice';
 import { CartProvider } from './hooks/CartContext';
 
 function App() {
@@ -33,6 +34,7 @@ function App() {
                 <Route path="/login" element={<Login setUser={setUser} />} />
                 <Route path="/signup" element={<SignUp />} />
                 <Route path="/dashboard" element={<ProtectedRoute user={user}><Dashboard /></ProtectedRoute>} />
+                <Route path="/dashboard/addDevice" element={<ProtectedRoute user={user}><AddDevice /></ProtectedRoute>} />
                 <Route path="/products" element={<ProductPage />} />
                 <Route path="/guides" element={<Guides />} />
                 <Route path="/aboutus" element={<AboutUs />} />

@@ -8,11 +8,16 @@ const ticketSchema = new mongoose.Schema({
   contactDetails: { type: String, required: true },
   deviceId: { type: String, required: true },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  status: { type: String, default: 'Open' },
+  status: [
+    {
+      status: { type: String, required: true },
+      remarks: { type: String },
+      updatedAt: { type: Date, default: Date.now },
+    },
+  ],
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
 
 const Ticket = mongoose.model('Ticket', ticketSchema);
-
 module.exports = Ticket;

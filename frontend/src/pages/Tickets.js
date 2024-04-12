@@ -14,9 +14,13 @@ import {
   DialogContent,
   DialogActions,
   TextField,
+  IconButton,
+  Collapse,
 } from '@mui/material';
-import { API_URL } from '../utils/apiConfig'
-
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { API_URL } from '../utils/apiConfig';
 
 const Tickets = ({ user }) => {
   const [currentTickets, setCurrentTickets] = useState([]);
@@ -29,6 +33,7 @@ const Tickets = ({ user }) => {
     contactDetails: '',
     deviceId: '',
   });
+  const [expanded, setExpanded] = useState({});
   const location = useLocation();
 
   useEffect(() => {
@@ -44,7 +49,6 @@ const Tickets = ({ user }) => {
 
   const fetchTickets = async () => {
     try {
-      console.log(API_URL)
       const response = await axios.get(`${API_URL}/api/tickets?userId=${user.id}`);
       const { currentTickets, ticketHistory } = response.data;
       setCurrentTickets(currentTickets);
@@ -88,6 +92,13 @@ const Tickets = ({ user }) => {
     }
   };
 
+  const handleExpandClick = (ticketId) => {
+    setExpanded((prevExpanded) => ({
+      ...prevExpanded,
+      [ticketId]: !prevExpanded[ticketId],
+    }));
+  };
+
   return (
     <Box sx={{ padding: '20px' }}>
       <Typography variant="h4" gutterBottom>
@@ -97,53 +108,118 @@ const Tickets = ({ user }) => {
       <Box sx={{ marginBottom: '20px' }}>
         <Typography variant="h5">Current Tickets</Typography>
         <Grid container spacing={2}>
-            {currentTickets.length > 0 ? (
-                currentTickets.map((ticket) => (
-                <Grid item xs={12} sm={6} md={4} key={ticket._id}>
-                    <Card>
-                    <CardContent>
-                        <Typography variant="h6">{ticket.title}</Typography>
-                        <Typography variant="body2">{ticket.description}</Typography>
-                        <Typography variant="body2">Device ID: {ticket.deviceId}</Typography>
-                        <Typography variant="body2">Status: {ticket.status}</Typography>
-                    </CardContent>
-                    </Card>
-                </Grid>
-                ))
-            ) : (
-                <Grid item xs={12} justifyContent="center" textAlign="center">
-                    <Box height="200px" display="flex" alignItems="center" justifyContent="center">
-                        <Typography variant="body1">No Current Open Tickets.</Typography>
-                    </Box>
-                </Grid>
-            )}
+          {currentTickets.length > 0 ? (
+            currentTickets.map((ticket) => (
+              <Grid item xs={12} sm={6} key={ticket._id}>
+                <Card>
+                  <CardContent>
+                    <Typography variant="h6">{ticket.title}</Typography>
+                    <Typography variant="body2">{ticket.description}</Typography>
+                    <Typography variant="body2">Device ID: {ticket.deviceId}</Typography>
+                    <Typography variant="body2">
+                      Current Status: {ticket.status[ticket.status.length - 1].status}
+                    </Typography>
+                    <IconButton
+                      onClick={() => handleExpandClick(ticket._id)}
+                      aria-expanded={expanded[ticket._id]}
+                      aria-label="show more"
+                    >
+                      <ExpandMoreIcon />
+                    </IconButton>
+                    <Collapse in={expanded[ticket._id]} timeout="auto" unmountOnExit>
+                      {ticket.status.map((statusObj, index) => (
+                        <Card
+                          key={index}
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            marginBottom: 1,
+                            padding: 1,
+                            backgroundColor: index === ticket.status.length - 1 ? '#f5f5f5' : 'white',
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              flexGrow: 1,
+                            }}
+                          >
+                            {index === ticket.status.length - 1 ? (
+                              <AccessTimeIcon sx={{ marginRight: 1 }} />
+                            ) : (
+                              <CheckCircleIcon sx={{ marginRight: 1, color: 'green' }} />
+                            )}
+                            <Typography variant="body2">
+                              {statusObj.status}
+                              {statusObj.remarks && ` - Remarks: ${statusObj.remarks}`}
+                            </Typography>
+                          </Box>
+                          <Typography variant="body2">
+                            Updated At: {new Date(statusObj.updatedAt).toLocaleString()}
+                          </Typography>
+                        </Card>
+                      ))}
+                    </Collapse>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))
+          ) : (
+            <Grid item xs={12} justifyContent="center" textAlign="center">
+              <Box height="200px" display="flex" alignItems="center" justifyContent="center">
+                <Typography variant="body1">No Current Open Tickets.</Typography>
+              </Box>
+            </Grid>
+          )}
         </Grid>
       </Box>
 
       <Box sx={{ marginBottom: '20px' }}>
         <Typography variant="h5">Ticket History</Typography>
         <Grid container spacing={2}>
-            {ticketHistory.length > 0 ? (
-                ticketHistory.map((ticket) => (
-                <Grid item xs={12} sm={6} md={4} key={ticket._id}>
-                    <Card>
-                    <CardContent>
-                        <Typography variant="h6">{ticket.title}</Typography>
-                        <Typography variant="body2">{ticket.description}</Typography>
-                        <Typography variant="body2">Device ID: {ticket.deviceId}</Typography>
-                        <Typography variant="body2">Status: {ticket.status}</Typography>
-                    </CardContent>
-                    </Card>
-                </Grid>
-                ))
-            ) : (
-                <Grid item xs={12} justifyContent="center" textAlign="center">
-                    <Box height="200px" display="flex" alignItems="center" justifyContent="center">
-                        <Typography variant="body1">No ticket history.</Typography>
-                    </Box>
-                </Grid>
-
-            )}
+          {ticketHistory.length > 0 ? (
+            ticketHistory.map((ticket) => (
+              <Grid item xs={12} sm={6} md={4} key={ticket._id}>
+                <Card>
+                  <CardContent>
+                    <Typography variant="h6">{ticket.title}</Typography>
+                    <Typography variant="body2">{ticket.description}</Typography>
+                    <Typography variant="body2">Device ID: {ticket.deviceId}</Typography>
+                    <Typography variant="body2">
+                      Current Status: {ticket.status[ticket.status.length - 1].status}
+                    </Typography>
+                    <IconButton
+                      onClick={() => handleExpandClick(ticket._id)}
+                      aria-expanded={expanded[ticket._id]}
+                      aria-label="show more"
+                    >
+                      <ExpandMoreIcon />
+                    </IconButton>
+                    <Collapse in={expanded[ticket._id]} timeout="auto" unmountOnExit>
+                      {ticket.status.map((statusObj, index) => (
+                        <Box key={index}>
+                          <Typography variant="body2">
+                            Status: {statusObj.status}
+                            {statusObj.remarks && ` - Remarks: ${statusObj.remarks}`}
+                          </Typography>
+                          <Typography variant="body2">
+                            Updated At: {new Date(statusObj.updatedAt).toLocaleString()}
+                          </Typography>
+                        </Box>
+                      ))}
+                    </Collapse>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))
+          ) : (
+            <Grid item xs={12} justifyContent="center" textAlign="center">
+              <Box height="200px" display="flex" alignItems="center" justifyContent="center">
+                <Typography variant="body1">No ticket history.</Typography>
+              </Box>
+            </Grid>
+          )}
         </Grid>
       </Box>
 
@@ -175,7 +251,7 @@ const Tickets = ({ user }) => {
             onChange={handleFormChange}
             fullWidth
             margin="normal"
-          />
+            />
           <TextField
             name="contactDetails"
             label="Contact Details"
@@ -193,5 +269,5 @@ const Tickets = ({ user }) => {
     </Box>
   );
 };
-
+            
 export default Tickets;
