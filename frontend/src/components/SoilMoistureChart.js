@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
-import Chart from 'react-apexcharts'; // Add this import
-import {addWeeks, addMonths, addYears, addMinutes} from 'date-fns';
-import DatePicker from 'react-datepicker'; // Add this import
-import { addHours } from 'date-fns';
-import { Button, Box, Grid, Typography } from '@mui/material';
+import Chart from 'react-apexcharts';
+import { addWeeks, addMonths, addYears, addHours } from 'date-fns';
+import DatePicker from 'react-datepicker';
+import { Box, Grid, Button,Typography } from '@mui/material';
 import DateRangeIcon from '@mui/icons-material/DateRange';
 import { styled } from '@mui/material/styles';
 import { API_URL } from '../utils/apiConfig';
 import axios from 'axios';
-
 
 const StyledButton = styled(Button)(({ theme }) => ({
   textTransform: 'none',
@@ -31,10 +29,10 @@ const SoilMoistureChart = ({ deviceId }) => {
       chart: {
         toolbar: {
           tools: {
-            download: true, 
+            download: true,
             selection: false,
             zoom: false,
-            zoomin: true ,
+            zoomin: true,
             zoomout: true,
             pan: true,
             reset: true | '<img src="/static/icons/reset.png" width="40">',
@@ -46,16 +44,16 @@ const SoilMoistureChart = ({ deviceId }) => {
         categories: [],
       },
       stroke: {
-        width: [3,3],
+        width: [3, 3],
         curve: 'smooth',
-        dashArray: [['straight'],[7]]
+        dashArray: [['straight'], [7]]
       },
       yaxis: {
         title: {
           text: 'Soil Moisture (%)',
         },
       },
-      colors: ['#80ed99', '#ff4d6d'], // Add a different color for null values
+      colors: ['#80ed99', '#ff4d6d'],
       dataLabels: {
         enabled: false,
       },
@@ -67,7 +65,7 @@ const SoilMoistureChart = ({ deviceId }) => {
         data: [],
       },
       {
-        name: "Null Values", // Add a new series for null values
+        name: "Null Values",
         data: [],
       },
     ],
@@ -84,47 +82,43 @@ const SoilMoistureChart = ({ deviceId }) => {
     try {
       let startDate, endDate;
       const todayUTC = new Date(); // Get current UTC date
-      const todayIST1 = addHours(todayUTC, 5); // Convert to IST (UTC+5)
-      const todayIST=addMinutes(todayIST1,30);
       switch (timeRange) {
         case 'day':
-          startDate = addHours(todayIST, -24); // Subtract 24 hours in IST
+          startDate = addHours(todayUTC, -24); // Subtract 24 hours in UTC
           startDate.setMinutes(0);
-          endDate = todayIST; // End date is current time in IST
+          endDate = todayUTC; // End date is current time in UTC
           endDate.setMinutes(0);
           break;
         case 'week':
-          startDate = addWeeks(todayIST, -1); // Subtract 1 week in IST
-          endDate = todayIST;
+          startDate = addWeeks(todayUTC, -1); // Subtract 1 week in UTC
+          endDate = todayUTC;
           break;
         case 'month':
-          startDate = addMonths(todayIST, -1); // Subtract 1 month in IST
-          endDate = todayIST;
+          startDate = addMonths(todayUTC, -1); // Subtract 1 month in UTC
+          endDate = todayUTC;
           break;
         case 'year':
-          startDate = addYears(todayIST, -1); // Subtract 1 year in IST
-          endDate = todayIST;
+          startDate = addYears(todayUTC, -1); // Subtract 1 year in UTC
+          endDate = todayUTC;
           break;
         case 'custom':
-          startDate = customStartDate ? customStartDate : todayIST; // Use custom start date or current IST time
-          endDate = dateRange.endDate;
+          startDate = customStartDate ? customStartDate : todayUTC; // Use custom start date or current UTC time
+          endDate = customEndDate ? customEndDate : todayUTC;
           break;
         default:
-          startDate = addMonths(todayIST, -1); // Default to 1 month ago in IST
-          endDate = todayIST;
+          startDate = addMonths(todayUTC, -1); // Default to 1 month ago in UTC
+          endDate = todayUTC;
       }
 
-      // Convert IST dates to UTC for API request
-    const formattedStartDate = startDate.toISOString();
-    const formattedEndDate = endDate.toISOString();
-    
-      // Fetch data from the appropriate endpoint based on time range
+      const formattedStartDate = startDate.toISOString();
+      const formattedEndDate = endDate.toISOString();
+
       let endpoint = `${API_URL}/sensor_readings/avgsoilmoisture`;
       if (timeRange === 'day') {
         endpoint = `${API_URL}/sensor_readings/allsoilmoisture`;
       }
       const response = await axios.get(`${endpoint}?deviceId=${deviceId}&startDate=${formattedStartDate}&endDate=${formattedEndDate}`);
-  
+      console.log(`${endpoint}?deviceId=${deviceId}&startDate=${formattedStartDate}&endDate=${formattedEndDate}`);
       const data = response.data;
       const categories = [];
       const soilMoistureData = [];
@@ -132,7 +126,8 @@ const SoilMoistureChart = ({ deviceId }) => {
 
       if (timeRange === 'day') {
         data.data.forEach((item) => {
-          if (item.timeRange % 3 === 0) {
+          item.timeRange+=5;
+          if ((item.timeRange) % 3 === 0) {
             categories.push(item.timeRange + ':00');
           } else {
             categories.push("");
@@ -150,34 +145,32 @@ const SoilMoistureChart = ({ deviceId }) => {
       }
 
       let prevSoilMoisture = 0;
-      let flag=0;
-      let flag2=0;
-      data.data.forEach((item, index) => {
+      let flag = 0;
+      let flag2 = 0;
+      data.data.forEach((item) => {
         const currentSoilMoisture = parseFloat(item.soilMoisture);
         if (currentSoilMoisture === 0) {
-          if (flag===0){
-            flag=1;
+          if (flag === 0) {
+            flag = 1;
             soilMoistureData.push(prevSoilMoisture);
+          } else {
+            soilMoistureData.push(null);
+            flag2 = 0;
           }
-          else{
-            soilMoistureData.push(null); // Push null for 0 values
-            flag2=0;
-          }
-          nullValuesData.push(prevSoilMoisture); // Store the index for null values
+          nullValuesData.push(prevSoilMoisture);
         } else {
-          if (flag2===0){
+          if (flag2 === 0) {
             nullValuesData.push(currentSoilMoisture);
-            flag2=1;
-            flag=0;
+            flag2 = 1;
+            flag = 0;
             soilMoistureData.push(currentSoilMoisture);
-            prevSoilMoisture=currentSoilMoisture;
-          }
-          else{
+            prevSoilMoisture = currentSoilMoisture;
+          } else {
             nullValuesData.push(null);
-            flag=0;
+            flag = 0;
             soilMoistureData.push(currentSoilMoisture);
-            prevSoilMoisture=currentSoilMoisture;
-          }  
+            prevSoilMoisture = currentSoilMoisture;
+          }
         }
       });
 
@@ -192,7 +185,6 @@ const SoilMoistureChart = ({ deviceId }) => {
               text: `Time Range : ${startDate.getDate()}-${startDate.getMonth() + 1}-${startDate.getFullYear()} to ${endDate.getDate()}-${endDate.getMonth() + 1}-${endDate.getFullYear()}`,
             },
           },
-          
         },
         series: [
           {
@@ -213,11 +205,10 @@ const SoilMoistureChart = ({ deviceId }) => {
   useEffect(() => {
     fetchSoilMoistureData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [deviceId, timeRange, dateRange, customStartDate]);
+  }, [deviceId, timeRange, customStartDate, customEndDate]);
 
   const handleTimeRangeButtonClick = (range) => {
     setTimeRange(range);
-    // Reset custom date picker when another option is selected
     if (range !== 'custom') {
       setShowDatePicker(false);
       setCustomStartDate(null);
@@ -232,12 +223,11 @@ const SoilMoistureChart = ({ deviceId }) => {
     setDateRange({ ...dateRange, startDate: startDateWithTime, endDate: null });
     setShowStartDatePicker(false);
     setShowEndDatePicker(true);
-  };
-
-  const handleCustomEndDateChange = (date) => {
+    };
+    
+    const handleCustomEndDateChange = (date) => {
     const endDateWithTime = new Date(date);
     endDateWithTime.setHours(23, 59, 59, 999);
-
     if (endDateWithTime > customStartDate) {
       setCustomEndDate(endDateWithTime);
       setDateRange({ ...dateRange, endDate: endDateWithTime });
@@ -247,90 +237,87 @@ const SoilMoistureChart = ({ deviceId }) => {
   };
 
   return (
-    <div>
-    <Box sx={{ padding: 2, backgroundColor: 'background.paper', borderRadius: 1 }}>
-    <Grid sx={{ padding: 1 }}container alignItems="center" spacing={2}>
-    <Grid item>
-    <Box >
-    <StyledButton
-    className={timeRange === 'day' ? 'Mui-selected' : ''}
-    onClick={() => handleTimeRangeButtonClick('day')}
-    >
-    Day
-    </StyledButton>
-    <StyledButton
-    className={timeRange === 'month' ? 'Mui-selected' : ''}
-    onClick={() => handleTimeRangeButtonClick('month')}
-    >
-    Month
-    </StyledButton>
-    <StyledButton
-    className={timeRange === 'year' ? 'Mui-selected' : ''}
-    onClick={() => handleTimeRangeButtonClick('year')}
-    >
-    Year
-    </StyledButton>
-    {!showDatePicker && (
-    <StyledButton
-    onClick={() => {
-    setShowDatePicker(!showDatePicker);
-    handleTimeRangeButtonClick('custom');
-    }}
-    >
-    Custom
-    </StyledButton>
-    )}
-    </Box>
-    </Grid>
-    {showDatePicker && (
-    <Grid item>
-    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-    <Typography
-    padding="0.1rem"
-    variant="body1"
-
-    sx={{
-        mx: 1,
-        fontSize:'0.9rem',
-    }}
->
-    Start Date:
-</Typography>
-
-    <DatePicker
-    selected={customStartDate}
-    onChange={handleCustomStartDateChange}
-    customInput={<DateRangeIcon />}
-    />
-    {customStartDate && (
-    <>
-    <Typography padding="0.3rem" variant="body1" sx={{
-        mx: 1,
-        fontSize:'0.9rem',
-    }}>
-    End Date:
-    </Typography>
-    <DatePicker
-    selected={customEndDate}
-    onChange={handleCustomEndDateChange}
-    minDate={customStartDate}
-    customInput={<DateRangeIcon />}
-    />
-    </>
-    )}
-    </Box>
-    </Grid>
-    )}
+  <div>
+  <Box sx={{ padding: 2, backgroundColor: 'background.paper', borderRadius: 1 }}>
+  <Grid sx={{ padding: 1 }} container alignItems="center" spacing={2}>
+  <Grid item>
+  <Box>
+  <StyledButton
+  className={timeRange === 'day' ? 'Mui-selected' : ''}
+  onClick={() => handleTimeRangeButtonClick('day')}
+  >
+  Day
+  </StyledButton>
+  <StyledButton
+  className={timeRange === 'month' ? 'Mui-selected' : ''}
+  onClick={() => handleTimeRangeButtonClick('month')}
+  >
+  Month
+  </StyledButton>
+  <StyledButton
+  className={timeRange === 'year' ? 'Mui-selected' : ''}
+  onClick={() => handleTimeRangeButtonClick('year')}
+  >
+  Year
+  </StyledButton>
+  {!showDatePicker && (
+  <StyledButton
+  onClick={() => {
+  setShowDatePicker(!showDatePicker);
+  handleTimeRangeButtonClick('custom');
+  }}
+  >
+  Custom
+  </StyledButton>
+  )}
+  </Box>
+  </Grid>
+  {showDatePicker && (
+  <Grid item>
+  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+  <Typography
+  padding="0.1rem"
+  variant="body1"
+  sx={{
+  mx: 1,
+  fontSize: '0.9rem',
+  }}
+  >
+  Start Date:
+  </Typography>
+  <DatePicker
+              selected={customStartDate}
+              onChange={handleCustomStartDateChange}
+              customInput={<DateRangeIcon />}
+            />
+            {customStartDate && (
+              <>
+                <Typography padding="0.3rem" variant="body1" sx={{
+                  mx: 1,
+                  fontSize: '0.9rem',
+                }}>
+                  End Date:
+                </Typography>
+                <DatePicker
+                  selected={customEndDate}
+                  onChange={handleCustomEndDateChange}
+                  minDate={customStartDate}
+                  customInput={<DateRangeIcon />}
+                />
+              </>
+            )}
+          </Box>
+        </Grid>
+      )}
     </Grid>
     <Chart
-           options={state.options}
-           series={state.series}
-           type="area"
-         />
-    </Box>
-    </div>
-    );
-    };
-    
+      options={state.options}
+      series={state.series}
+      type="area"
+    />
+  </Box>
+</div>
+);
+};
 
 export default SoilMoistureChart;

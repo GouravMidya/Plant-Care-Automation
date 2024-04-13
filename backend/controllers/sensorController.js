@@ -11,7 +11,8 @@ const insertSensorRecord = async (req, res) => {
       deviceId,
       soilMoisture,
       humidity,
-      temperature
+      temperature,
+      timestamp: new Date(), // Set the timestamp to the current UTC time
     });
 
     // Save the new sensor record to the database
@@ -94,21 +95,21 @@ const getAverageSoilMoisture = async (req, res) => {
 
     // Calculate hourly averages
     sensorRecords.forEach((record) => {
-      const hour = new Date(record.timestamp).getHours();
+      const hour = new Date(record.timestamp).getUTCHours();
       hourlyAverages[hour].count += 1;
       hourlyAverages[hour].sum += record.soilMoisture;
     });
 
     // Define the time ranges
     const timeRanges = Array.from({ length: 24 }, (_, index) => {
-      const endHour = (index ).toString().padStart(2, '0');
+      const endHour = index.toString().padStart(2, '0');
       return `${endHour}`;
     });
 
     // Calculate average soil moisture for each hour
     let formattedHourlyAverages = hourlyAverages.map((hourData, hour) => {
       const average = hourData.count > 0 ? (hourData.sum / hourData.count) : 0;
-      const timeRange = (hour) % 24;
+      const timeRange = hour;
 
       // Calculate percentage soil moisture
       if(average!=0)
@@ -149,7 +150,7 @@ const getAverageTemperature = async (req, res) => {
     const hourlyAverages = Array.from({ length: 24 }, () => ({ count: 0, sum: 0 }));
     // Calculate hourly averages
     sensorRecords.forEach((record) => {
-      const hour = new Date(record.timestamp).getHours();
+      const hour = new Date(record.timestamp).getUTCHours();
       hourlyAverages[hour].count += 1;
       hourlyAverages[hour].sum += record.temperature;
     });
@@ -178,109 +179,103 @@ const getAverageTemperature = async (req, res) => {
 const getAllSoilMoistureRecords = async (req, res) => {
   try {
     const { deviceId, startDate, endDate } = req.query;
-    const currentHour = new Date().getHours(); // Get the current hour
-    const endhour = currentHour === 0 ? 23 : currentHour - 1; // Calculate endhour based on current hour
-
+    const currentHour = new Date().getUTCHours(); // Get the current hour in UTC
+    const endhour = currentHour === 0 ? 23 : currentHour; // Calculate endhour based on current hour in UTC
     // Construct the query based on parameters
     const query = { deviceId };
-    if (startDate && endDate) {
-      query.timestamp = { $gte: new Date(startDate), $lte: new Date(endDate) };
-    }
+if (startDate && endDate) {
+  query.timestamp = { $gte: new Date(startDate), $lte: new Date(endDate) };
+}
+// Fetch sensor records from the database
+const sensorRecords = await SensorRecord.find(query);
 
-    // Fetch sensor records from the database
-    const sensorRecords = await SensorRecord.find(query);
+// Initialize an array to store hourly average soil moisture
+const hourlyAverages = Array.from({ length: 24 }, () => ({ count: 0, sum: 0 }));
 
-    // Initialize an array to store hourly average soil moisture
-    const hourlyAverages = Array.from({ length: 24 }, () => ({ count: 0, sum: 0 }));
+// Calculate hourly averages
+sensorRecords.forEach((record) => {
+  const hour = new Date(record.timestamp).getUTCHours();
+  hourlyAverages[hour].count += 1;
+  hourlyAverages[hour].sum += record.soilMoisture;
+});
 
-    // Calculate hourly averages
-    sensorRecords.forEach((record) => {
-      const hour = new Date(record.timestamp).getHours();
-      hourlyAverages[hour].count += 1;
-      hourlyAverages[hour].sum += record.soilMoisture;
-    });
-
-    // Calculate average soil moisture for each hour
-    let formattedHourlyAverages = hourlyAverages.map((hourData, hour) => {
-      const average = hourData.count > 0 ? (hourData.sum / hourData.count) : 0;
-      const timeRange = (hour) % 24;
-      // Calculate percentage soil moisture
-      if(average!=0)
-      {
-        const minSoilMoisture = 0;
-        const maxSoilMoisture = 1024;
-        const percentage = ((1 - (average - minSoilMoisture) / (maxSoilMoisture - minSoilMoisture)) * 100).toFixed(2);
-        return { timeRange, soilMoisture: percentage };
-      }
-      else{
-        const percentage = 0;
-        return { timeRange, soilMoisture: percentage };
-      }
-    });
-
-    // Split the formattedHourlyAverages array into two parts
-    const firstPart = formattedHourlyAverages.slice(endhour + 1);
-    const secondPart = formattedHourlyAverages.slice(0, endhour + 1);
-    // Rearrange the array so that hours from endHour to 23 are at the front
-    const rearrangedHourlyAverages = firstPart.concat(secondPart);
-    // Respond with the rearranged hourly average soil moisture
-    console.log(rearrangedHourlyAverages);
-    res.status(200).json({ success: true, data: rearrangedHourlyAverages });
-
-  } catch (error) {
-    // Handle any errors
-    console.error('Error fetching and calculating hourly average soil moisture:', error);
-    res.status(500).json({ success: false, message: 'Failed to fetch and calculate hourly average soil moisture' });
+// Calculate average soil moisture for each hour
+let formattedHourlyAverages = hourlyAverages.map((hourData, hour) => {
+  const average = hourData.count > 0 ? (hourData.sum / hourData.count) : 0;
+  const timeRange = hour;
+  // Calculate percentage soil moisture
+  if(average!=0)
+  {
+    const minSoilMoisture = 0;
+    const maxSoilMoisture = 1024;
+    const percentage = ((1 - (average - minSoilMoisture) / (maxSoilMoisture - minSoilMoisture)) * 100).toFixed(2);
+    return { timeRange, soilMoisture: percentage };
   }
+  else{
+    const percentage = 0;
+    return { timeRange, soilMoisture: percentage };
+  }
+});
+
+// Split the formattedHourlyAverages array into two parts
+const firstPart = formattedHourlyAverages.slice(endhour + 1);
+const secondPart = formattedHourlyAverages.slice(0, endhour + 1);
+// Rearrange the array so that hours from endHour to 23 are at the front
+const rearrangedHourlyAverages = firstPart.concat(secondPart);
+// Respond with the rearranged hourly average soil moisture
+res.status(200).json({ success: true, data: rearrangedHourlyAverages });
+
+} catch (error) {
+  // Handle any errors
+  console.error('Error fetching and calculating hourly average soil moisture:', error);
+  res.status(500).json({ success: false, message: 'Failed to fetch and calculate hourly average soil moisture' });
+}
 };
-
-
 
 // Getting record for past 24 hrs , but can be used for any date
 const getAllTemperatureRecords = async (req, res) => {
-  try {
-    const { deviceId, startDate, endDate } = req.query;
-    const currentHour = new Date().getHours(); // Get the current hour
-    const endhour = currentHour === 0 ? 23 : currentHour - 1; // Calculate endhour based on current hour
+try {
+  const { deviceId, startDate, endDate } = req.query;
+  const currentHour = new Date().getUTCHours(); // Get the current hour in UTC
+  const endhour = currentHour === 0 ? 23 : currentHour ; // Calculate endhour based on current hour in UTC
 
-    const query = { deviceId };
-    if (startDate && endDate) {
-      query.timestamp = { $gte: new Date(startDate), $lte: new Date(endDate) };
-    }
-
-    // Fetch sensor records from the database
-    const sensorRecords = await SensorRecord.find(query);
-    
-    // Initialize an array to store hourly average temperature
-    const hourlyAverages = Array.from({ length: 24 }, () => ({ count: 0, sum: 0 }));
-
-    // Calculate hourly averages
-    sensorRecords.forEach((record) => {
-      const hour = new Date(record.timestamp).getHours();
-      hourlyAverages[hour].count += 1;
-      hourlyAverages[hour].sum += record.temperature;
-    });
-
-    // Calculate average temperature for each hour
-    const formattedHourlyAverages = hourlyAverages.map((hourData, hour) => {
-      const average = hourData.count > 0 ? (hourData.sum / hourData.count).toFixed(2) : 0;
-      const timeRange = (hour) % 24;
-      return { timeRange, temperature: average };
-    });
-    // Split the formattedHourlyAverages array into two parts
-    const firstPart = formattedHourlyAverages.slice(endhour + 1);
-    const secondPart = formattedHourlyAverages.slice(0, endhour + 1);
-    // Rearrange the array so that hours from endHour to 23 are at the front
-    const rearrangedHourlyAverages = firstPart.concat(secondPart);
-    // Respond with the rearranged hourly average soil moisture
-    res.status(200).json({ success: true, data: rearrangedHourlyAverages });
-      } catch (error) {
-        // Handle any errors
-        console.error('Error fetching and calculating hourly average temperature:', error);
-        res.status(500).json({ success: false, message: 'Failed to fetch and calculate hourly average temperature' });
+  const query = { deviceId };
+  if (startDate && endDate) {
+    query.timestamp = { $gte: new Date(startDate), $lte: new Date(endDate) };
   }
-};
 
+  // Fetch sensor records from the database
+  const sensorRecords = await SensorRecord.find(query);
+  
+  // Initialize an array to store hourly average temperature
+  const hourlyAverages = Array.from({ length: 24 }, () => ({ count: 0, sum: 0 }));
+
+  // Calculate hourly averages
+  sensorRecords.forEach((record) => {
+    const hour = new Date(record.timestamp).getUTCHours();
+    hourlyAverages[hour].count += 1;
+    hourlyAverages[hour].sum += record.temperature;
+  });
+
+  // Calculate average temperature for each hour
+  const formattedHourlyAverages = hourlyAverages.map((hourData, hour) => {
+    const average = hourData.count > 0 ? (hourData.sum / hourData.count).toFixed(2) : 0;
+    const timeRange = hour;
+    return { timeRange, temperature: average };
+  });
+  // Split the formattedHourlyAverages array into two parts
+  const firstPart = formattedHourlyAverages.slice(endhour + 1);
+  const secondPart = formattedHourlyAverages.slice(0, endhour + 1);
+  // Rearrange the array so that hours from endHour to 23 are at the front
+  const rearrangedHourlyAverages = firstPart.concat(secondPart);
+  // Respond with the rearranged hourly average soil moisture
+  res.status(200).json({ success: true, data: rearrangedHourlyAverages });
+    } catch (error) {
+      // Handle any errors
+      console.error('Error fetching and calculating hourly average temperature:', error);
+      res.status(500).json({ success: false, message: 'Failed to fetch and calculate hourly average temperature' });
+}
+};
 
 module.exports = {
   insertSensorRecord,

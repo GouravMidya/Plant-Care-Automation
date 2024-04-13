@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import Chart from 'react-apexcharts'; // Add this import
-import {addWeeks, addMonths, addYears} from 'date-fns';
+import {addWeeks, addMonths, addYears,addHours} from 'date-fns';
 import DatePicker from 'react-datepicker'; // Add this import
-import { addHours } from 'date-fns';
 import { Button, Box,Typography, Grid} from '@mui/material';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import DateRangeIcon from '@mui/icons-material/DateRange';
 import { styled } from '@mui/material/styles';
 import { API_URL } from '../utils/apiConfig';
@@ -77,53 +75,53 @@ const TemperatureChart = ({ deviceId }) => {
 
   const [timeRange, setTimeRange] = useState('day');
   const [customStartDate, setCustomStartDate] = useState(null);
-  const [showStartDatePicker, setShowStartDatePicker] = useState(true);
-  const [showEndDatePicker, setShowEndDatePicker] = useState(false);
+  const [ setShowStartDatePicker] = useState(true);
+  const [setShowEndDatePicker] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [customEndDate, setCustomEndDate] = useState(null);
+  const [customEndDate] = useState(null);
   // Function to fetch Temperature data
   const fetchTemperatureData = async () => {
     try {
       let startDate, endDate;
-      const today = new Date();
+      const todayUTC = new Date(); // Get current UTC date
       switch (timeRange) {
         case 'day':
-          startDate = addHours(new Date(today),-24);
+          startDate = addHours(todayUTC, -24); // Subtract 24 hours in UTC
           startDate.setMinutes(0);
-          endDate = new Date(today);// End date is current time
+          endDate = todayUTC; // End date is current time in UTC
           endDate.setMinutes(0);
           break;
         case 'week':
-          startDate = addWeeks(today, -1);
-          endDate = new Date();
+          startDate = addWeeks(todayUTC, -1); // Subtract 1 week in UTC
+          endDate = todayUTC;
           break;
         case 'month':
-          startDate = addMonths(today, -1);
-          endDate = new Date();
+          startDate = addMonths(todayUTC, -1); // Subtract 1 month in UTC
+          endDate = todayUTC;
           break;
         case 'year':
-          startDate = addYears(today, -1);
-          endDate = new Date();
+          startDate = addYears(todayUTC, -1); // Subtract 1 year in UTC
+          endDate = todayUTC;
           break;
         case 'custom':
-          startDate = customStartDate ? customStartDate : new Date();
-          endDate = dateRange.endDate;
+          startDate = customStartDate ? customStartDate : todayUTC; // Use custom start date or current UTC time
+          endDate = customEndDate ? customEndDate : todayUTC;
           break;
         default:
-          startDate = addMonths(today, -1);
-          endDate = new Date();
+          startDate = addMonths(todayUTC, -1); // Default to 1 month ago in UTC
+          endDate = todayUTC;
       }
 
-      // Format dates for API request
       const formattedStartDate = startDate.toISOString();
       const formattedEndDate = endDate.toISOString();
-      
+
       let endpoint = `${API_URL}/sensor_readings/avgtemp`;
       if (timeRange === 'day') {
         endpoint = `${API_URL}/sensor_readings/alltemp`;
       }
       const response = await axios.get(`${endpoint}?deviceId=${deviceId}&startDate=${formattedStartDate}&endDate=${formattedEndDate}`);
-  
+      console.log(`${endpoint}?deviceId=${deviceId}&startDate=${formattedStartDate}&endDate=${formattedEndDate}`);
+      
       const data = response.data;
       const categories = [];
       const temperatureData = [];
@@ -132,6 +130,7 @@ const TemperatureChart = ({ deviceId }) => {
       if (timeRange === 'day') {
         // Generate categories representing each hour of the past day
           data.data.forEach((item) => {
+            item.timeRange+=5;
             if(item.timeRange%3===0){
               categories.push(item.timeRange+':00');
             }
