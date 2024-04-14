@@ -37,38 +37,37 @@ const Troubleshoot = () => {
   const troubleshootingGuides = [
     {
       id: 1,
-      title: 'Check Sensor Connections',
+      title: 'Sensor readings are inconsistent or not updating',
       steps: [
-        'Ensure that the sensor cables are properly connected to the device.',
-        'Check for any loose or damaged connections.',
-        'If necessary, reconnect or replace the cables.',
+        'Check sensor connections to ensure they are securely attached to the central control unit.',
+        'Verify that sensors are properly calibrated according to manufacturer instructions.',
+        'Clean sensors regularly to remove any dirt or debris that may interfere with readings.',
+        'Replace sensors if they are damaged or faulty.'
       ],
     },
     {
       id: 2,
-      title: 'Restart the Device',
+      title: 'Network Issues (Red light on device is on)',
       steps: [
-        'Turn off the device and unplug it from the power source.',
-        'Wait for a few seconds, then plug it back in and turn it on.',
-        'Check if the device is working correctly after restarting.',
+        'Ensure that the central control unit is powered on and connected to the internet.',
+        'Check network connectivity and Wi-Fi signal strength.',
+        'Restart the central control unit and/or router to refresh connections.',
       ],
     },
     {
       id: 3,
-      title: 'Check Power Supply',
+      title: 'Incorrect Watering Patterns:',
       steps: [
-        'Ensure that the device is receiving proper power supply.',
-        'Check the power cable and connections.',
-        'If necessary, replace the power cable or power source.',
-      ],
+        'Review and adjust watering parameters in the system settings to better match plant requirements.',
+        'Verify that sensors are accurately measuring soil moisture levels and other environmental factors.',
+        'Inspect the irrigation system for any leaks or blockages that may be affecting water distribution.'],
     },
     {
       id: 4,
-      title: 'Software Update',
+      title: 'Power Interruptions',
       steps: [
-        'Check if there are any software updates available for the device.',
-        'Follow the instructions to update the device software.',
-        'After updating, check if the issue is resolved.',
+        'Check power connections to ensure they are secure and free from damage.',
+        'Install a backup power source (e.g., battery backup) to prevent interruptions during power outages.',
       ],
     },
   ];

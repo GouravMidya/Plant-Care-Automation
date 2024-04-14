@@ -126,7 +126,7 @@ const SoilMoistureChart = ({ deviceId }) => {
 
       if (timeRange === 'day') {
         data.data.forEach((item) => {
-          item.timeRange+=5;
+          item.timeRange=(item.timeRange+6)%24;
           if ((item.timeRange) % 3 === 0) {
             categories.push(item.timeRange + ':00');
           } else {

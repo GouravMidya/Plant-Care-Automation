@@ -8,20 +8,20 @@
 #include <ESP8266WebServer.h>
 #include <WiFiManager.h>
 
-static const unsigned long deviceId = 1000000000;
-static const char* serverUrl = "https://backend-server-lg5msmrrza-el.a.run.app"; // IP address of the server
+static const unsigned long deviceId = 1000000003;
+static const char* serverUrl = "https://plant-care-automation-backend.onrender.com"; // IP address of the server
 
 #define soil_moisture_pin A0
 #define DHTTYPE DHT11  // Define the sensor type (DHT11)
-#define dht_dpin D2   // Pin where the DHT11 sensor is connected
+#define dht_dpin D4   // Pin where the DHT11 sensor is connected
 
-const int RELAY_PIN = D1; // Connect relay to D1 pin
+const int RELAY_PIN = D0; // Connect relay to 0 pin
 const int pump_led = D8;  // Pump LED connected to d3 pin
 const int server_led = D6; // Turns on when server is down/not connected
-const int wifi_led = D4;
-int checkDelayDuration = 5000; //cooldown time between each check
+const int wifi_led = D2;
+long checkDelayDuration = 60000; //cooldown time between each check
 int pumpFlowDuration = 5000; 
-
+int moisturethreshold=400;
 bool pumpActivated = false; // Flag to track whether the pump has been activated
 unsigned long lastPumpActivationTime = 0; // Timestamp of the last pump activation
 
@@ -64,12 +64,25 @@ void fetchDeviceSettings() {
       }
 
     // Extract checkIntervals and pumpDuration from the JSON
-    long checkIntervals = doc["checkIntervals"];
-    long pumpDuration = doc["pumpDuration"];
+    long checkIntervals = doc["data"]["checkIntervals"];
+    long pumpDuration = doc["data"]["pumpDuration"];
+    int threshold = doc["data"]["threshold"];
+
+    delay(1000);
 
     // Update checkDelayDuration and pumpFlowDuration
-    checkDelayDuration = checkIntervals;
-    pumpFlowDuration = pumpDuration;
+    checkDelayDuration = (checkIntervals*60000);
+    pumpFlowDuration = (pumpDuration*1000);
+    moisturethreshold = (1024-((threshold*1024)/100));//70.703125% =300
+
+    delay(1000);
+    
+    Serial.print("\nDELAY DURATION:");
+    Serial.println(checkDelayDuration);
+    Serial.print("\nPump flow DURATION:");
+    Serial.println(pumpFlowDuration);
+    Serial.print("\nMOISTURE threshold:");
+    Serial.println(moisturethreshold);
   } else {
     digitalWrite(server_led, HIGH); // Not connecting to server, turn on error light
     Serial.print("Error fetching device settings. https response code: ");
@@ -81,7 +94,7 @@ void fetchDeviceSettings() {
 
 // Function to send sensor data
 void sendDataToServer() {
-  if (soil_moisture <=750 && soil_moisture>150){
+  if (soil_moisture <=750 && soil_moisture>50){
     
     // Create a WiFi Client
     HTTPClient https;
@@ -133,7 +146,8 @@ int readSoilMoisture() {
 
 // Function to control water pump
 void controlWaterPump() {
-  if(!pumpActivated && soil_moisture > 450  && soil_moisture < 750){
+  if(!pumpActivated && soil_moisture > moisturethreshold  && soil_moisture < 950){
+    Serial.println("Water Level:"+String(soil_moisture));
     pumpActivated = true;
     lastPumpActivationTime = millis(); // Record the timestamp of pump activation
     digitalWrite(RELAY_PIN, LOW); // Turn on pump
@@ -192,15 +206,11 @@ int readTemperatureHumidity() {
 }
 
 void setup() {
-  // Put your setup code here, to run once:
-  
-  Serial.println("Humidity, Temperature, and Soil Moisture Level\n\n");
   dht.begin();
 
   pinMode(wifi_led, OUTPUT);
   digitalWrite(wifi_led, LOW); // Turn off wifi led (blue)
   Serial.begin(9600);
-  delay(600000); // Delay for 10 minutes to ensure accurate data ****************CHANGE THIS WHEN DEMONSTRATING *************************
   
   // Create an instance of WiFiManager
   WiFiManager wifiManager;
@@ -211,31 +221,28 @@ void setup() {
   digitalWrite(wifi_led, HIGH); // Turn on wifi led (blue)
   Serial.println("Humidity, Temperature, and Soil Moisture Level\n\n");
   
+  fetchDeviceSettings();
   pinMode(RELAY_PIN, OUTPUT);
   pinMode(pump_led, OUTPUT);
   pinMode(server_led, OUTPUT);
   digitalWrite(RELAY_PIN, HIGH); // Turn off pump
   
-  fetchDeviceSettings();
-  delay(700);
 }
 
 // Main code here, to run repeatedly:
 void loop() {
   Serial.println("Humidity, Temperature, and Soil Moisture Level\n\n");
   fetchDeviceSettings();
-
   unsigned long currentTime = millis(); // Get the current time
 
-  if (currentTime - lastPumpActivationTime >= 3600000) { // 3600000 = 1hour
+  if (currentTime - lastPumpActivationTime >= 10800000) { // 3600000 = 1hour
     // 900000 If 15 minutes have elapsed since last pump activation
     pumpActivated = false; // Reset the pump activation flag
   }
 
   if(readSoilMoisture() && readTemperatureHumidity()){
     sendDataToServer(); // Send data to server
-
     controlWaterPump();
+    delay(checkDelayDuration); // Set value at top of programdelay
   }
-  delay(checkDelayDuration); // Set value at top of program
 }
