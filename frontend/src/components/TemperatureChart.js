@@ -75,8 +75,10 @@ const TemperatureChart = ({ deviceId }) => {
 
   const [timeRange, setTimeRange] = useState('day');
   const [customStartDate, setCustomStartDate] = useState(null);
-  const [ setShowStartDatePicker] = useState(true);
-  const [setShowEndDatePicker] = useState(false);
+  // eslint-disable-next-line no-unused-vars
+  const [showStartDatePicker, setShowStartDatePicker] = useState(true);
+  // eslint-disable-next-line no-unused-vars
+const [showEndDatePicker, setShowEndDatePicker] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [customEndDate] = useState(null);
   // Function to fetch Temperature data
@@ -87,9 +89,7 @@ const TemperatureChart = ({ deviceId }) => {
       switch (timeRange) {
         case 'day':
           startDate = addHours(todayUTC, -24); // Subtract 24 hours in UTC
-          startDate.setMinutes(0);
           endDate = todayUTC; // End date is current time in UTC
-          endDate.setMinutes(0);
           break;
         case 'week':
           startDate = addWeeks(todayUTC, -1); // Subtract 1 week in UTC
@@ -106,6 +106,10 @@ const TemperatureChart = ({ deviceId }) => {
         case 'custom':
           startDate = customStartDate ? customStartDate : todayUTC; // Use custom start date or current UTC time
           endDate = customEndDate ? customEndDate : todayUTC;
+          endDate.setHours(0);
+          startDate.setMinutes(0);
+          endDate.setMinutes(59)
+          endDate.setHours(23);
           break;
         default:
           startDate = addMonths(todayUTC, -1); // Default to 1 month ago in UTC
@@ -120,7 +124,6 @@ const TemperatureChart = ({ deviceId }) => {
         endpoint = `${API_URL}/sensor_readings/alltemp`;
       }
       const response = await axios.get(`${endpoint}?deviceId=${deviceId}&startDate=${formattedStartDate}&endDate=${formattedEndDate}`);
-      console.log(`${endpoint}?deviceId=${deviceId}&startDate=${formattedStartDate}&endDate=${formattedEndDate}`);
       
       const data = response.data;
       const categories = [];
