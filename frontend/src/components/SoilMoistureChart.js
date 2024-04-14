@@ -109,7 +109,6 @@ const SoilMoistureChart = ({ deviceId }) => {
           startDate = addMonths(todayUTC, -1); // Default to 1 month ago in UTC
           endDate = todayUTC;
       }
-
       const formattedStartDate = startDate.toISOString();
       const formattedEndDate = endDate.toISOString();
 
@@ -126,7 +125,7 @@ const SoilMoistureChart = ({ deviceId }) => {
 
       if (timeRange === 'day') {
         data.data.forEach((item) => {
-          item.timeRange=(item.timeRange+5)%24;
+          item.timeRange=(item.timeRange+6)%24;
           if ((item.timeRange) % 3 === 0) {
             categories.push(item.timeRange + ':00');
           } else {

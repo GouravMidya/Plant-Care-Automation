@@ -179,8 +179,8 @@ const getAverageTemperature = async (req, res) => {
 const getAllSoilMoistureRecords = async (req, res) => {
   try {
     const { deviceId, startDate, endDate } = req.query;
-    const currentHour = new Date().getUTCHours(); // Get the current hour in UTC
-    const endhour = currentHour === 0 ? 23 : currentHour; // Calculate endhour based on current hour in UTC
+    const currentHour = (new Date().getUTCHours())%24; // Get the current hour in UTC
+    const endhour = currentHour === 0 ? 23 : currentHour-1; // Calculate endhour based on current hour in UTC
     // Construct the query based on parameters
     const query = { deviceId };
 if (startDate && endDate) {
@@ -202,7 +202,7 @@ sensorRecords.forEach((record) => {
 // Calculate average soil moisture for each hour
 let formattedHourlyAverages = hourlyAverages.map((hourData, hour) => {
   const average = hourData.count > 0 ? (hourData.sum / hourData.count) : 0;
-  const timeRange = hour;
+  const timeRange = hour+1;
   // Calculate percentage soil moisture
   if(average!=0)
   {
@@ -237,7 +237,7 @@ const getAllTemperatureRecords = async (req, res) => {
 try {
   const { deviceId, startDate, endDate } = req.query;
   const currentHour = new Date().getUTCHours(); // Get the current hour in UTC
-  const endhour = currentHour === 0 ? 23 : currentHour ; // Calculate endhour based on current hour in UTC
+  const endhour = currentHour === 0 ? 23 : currentHour-1 ; // Calculate endhour based on current hour in UTC
 
   const query = { deviceId };
   if (startDate && endDate) {
@@ -260,7 +260,7 @@ try {
   // Calculate average temperature for each hour
   const formattedHourlyAverages = hourlyAverages.map((hourData, hour) => {
     const average = hourData.count > 0 ? (hourData.sum / hourData.count).toFixed(2) : 0;
-    const timeRange = hour;
+    const timeRange = hour+1;
     return { timeRange, temperature: average };
   });
   // Split the formattedHourlyAverages array into two parts
