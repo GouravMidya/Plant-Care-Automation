@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import {
   Container,
   Grid,
@@ -34,10 +34,11 @@ const Troubleshoot = () => {
     fetchDevice();
   }, [deviceId]);
 
+
   const troubleshootingGuides = [
     {
       id: 1,
-      title: 'Sensor readings are inconsistent or not updating',
+      title: 'Sensor readings inconsistent',
       steps: [
         'Check sensor connections to ensure they are securely attached to the central control unit.',
         'Verify that sensors are properly calibrated according to manufacturer instructions.',
@@ -56,7 +57,7 @@ const Troubleshoot = () => {
     },
     {
       id: 3,
-      title: 'Incorrect Watering Patterns:',
+      title: 'Incorrect Watering Patterns',
       steps: [
         'Review and adjust watering parameters in the system settings to better match plant requirements.',
         'Verify that sensors are accurately measuring soil moisture levels and other environmental factors.',
@@ -105,6 +106,14 @@ const Troubleshoot = () => {
             </Card>
           </Grid>
         ))}
+
+         {/* Add button to raise a ticket */}
+         <Grid item xs={12} textAlign={'center'}>
+          <Button component={Link} to="/tickets" sx={{ color: '80ed99' }} variant="outlined">
+            Still Facing Issues? Raise a Ticket
+          </Button>
+        </Grid>
+
       </Grid>
     </Container>
   );

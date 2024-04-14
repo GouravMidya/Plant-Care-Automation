@@ -130,7 +130,7 @@ const TemperatureChart = ({ deviceId }) => {
       if (timeRange === 'day') {
         // Generate categories representing each hour of the past day
           data.data.forEach((item) => {
-            item.timeRange=(item.timeRange+6)%24;
+            item.timeRange=(item.timeRange+5)%24;
             if(item.timeRange%3===0){
               categories.push(item.timeRange+':00');
             }
