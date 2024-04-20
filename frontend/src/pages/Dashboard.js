@@ -117,7 +117,7 @@ const Dashboard = () => {
     });
   };
 
-  const handleTroubleshootClick = (deviceId) => {
+  const handleTroubleshootClick = () => {
     navigate('/troubleshoot');
   };
 
@@ -215,7 +215,7 @@ const Dashboard = () => {
           <Grid item xs={12} md={6} key={device.deviceId}
             // sx={{ display: 'flex' }}
           >
-            <Card sx={{ width: '100%' }}>
+            <Card sx={{ width: '100%' }}  elevation={8}>
               <CardHeader
                 title={device.deviceName}
                 subheader={`device id: ${device.deviceId}`}
@@ -383,34 +383,69 @@ const Dashboard = () => {
                 </Box>
               </CardContent>
               <CardActions>
-                <Button
-                  size="small"
-                  onClick={() => handleExpandClick(device.deviceId)}
-                >
-                  {expandedDeviceId === device.deviceId ? 'Collapse' : 'Expand'}
-                </Button>
-                {editingDeviceId === device.deviceId ? (
-                  <>
-                    <Button size="small" onClick={() => setEditingDeviceId(null)}>
-                      Cancel
+                <Grid container spacing={1}>
+                  <Grid item xs={6} >
+                    <Button
+                      fullWidth
+                      size="small"
+                      onClick={() => handleExpandClick(device.deviceId)}
+                    >
+                      {expandedDeviceId === device.deviceId ? 'Collapse' : 'Expand'}
                     </Button>
-                    <Button size="small" onClick={() => handleSave(device.deviceId)}>
-                      Save
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    <Button size="small" onClick={() => handleEditClick(device.deviceId)}>
-                      Edit Details
-                    </Button>
-                    <Button size="small" onClick={() => handleTroubleshootClick(device.deviceId)}>
-                      Troubleshoot
-                    </Button>
-                    <Button size="small" onClick={() => handleRaiseTicket(device.deviceId)}>
-                      Raise Ticket
-                    </Button>
-                  </>
-                )}
+                  </Grid>
+                  {editingDeviceId === device.deviceId ? (
+                    <>
+                      <Grid item xs={3} >
+                        <Button
+                          fullWidth
+                          size="small"
+                          onClick={() => setEditingDeviceId(null)}
+                        >
+                          Cancel
+                        </Button>
+                      </Grid>
+                      <Grid item xs={3} >
+                        <Button
+                          fullWidth
+                          size="small"
+                          onClick={() => handleSave(device.deviceId)}
+                        >
+                          Save
+                        </Button>
+                      </Grid>
+                    </>
+                  ) : (
+                    <>
+                      <Grid item xs={6} >
+                        <Button
+                          fullWidth
+                          size="small"
+                          onClick={() => handleEditClick(device.deviceId)}
+                        >
+                          Edit Details
+                        </Button>
+                      </Grid>
+                      <Grid item xs={6} >
+                        <Button
+                          fullWidth
+                          size="small"
+                          onClick={() => handleTroubleshootClick(device.deviceId)}
+                        >
+                          Troubleshoot
+                        </Button>
+                      </Grid>
+                      <Grid item xs={6} >
+                        <Button
+                          fullWidth
+                          size="small"
+                          onClick={() => handleRaiseTicket(device.deviceId)}
+                        >
+                          Raise Ticket
+                        </Button>
+                      </Grid>
+                    </>
+                  )}
+                </Grid>
               </CardActions>
               <Collapse in={expandedDeviceId === device.deviceId}>
                 <CardContent>

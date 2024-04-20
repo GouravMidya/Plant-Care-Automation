@@ -3,3 +3,4 @@ frontend-old/node_modules
 backend/.env
 backend/node_modules
 aws cloud steps.txt
+flask-app

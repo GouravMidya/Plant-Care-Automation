@@ -15,24 +15,24 @@ import axios from 'axios';
 import { API_URL } from '../utils/apiConfig'
 
 const Troubleshoot = () => {
-  const { deviceId } = useParams();
-  const [device, setDevice] = useState(null);
+  // const { deviceId } = useParams();
+  // const [device, setDevice] = useState(null);
   const [expandedGuideId, setExpandedGuideId] = useState(null);
 
-  useEffect(() => {
-    const fetchDevice = async () => {
-      try {
-        const payload = {
-          deviceId,
-        };
-        const response = await axios.post(`${API_URL}/api/user_devices/settings`, payload);
-        setDevice(response.data.data);
-      } catch (error) {
-        console.error('Error fetching device:', error);
-      }
-    };
-    fetchDevice();
-  }, [deviceId]);
+  // useEffect(() => {
+  //   const fetchDevice = async () => {
+  //     try {
+  //       const payload = {
+  //         deviceId,
+  //       };
+  //       const response = await axios.post(`${API_URL}/api/user_devices/settings`, payload);
+  //       setDevice(response.data.data);
+  //     } catch (error) {
+  //       console.error('Error fetching device:', error);
+  //     }
+  //   };
+  //   fetchDevice();
+  // }, [deviceId]);
 
 
   const troubleshootingGuides = [
