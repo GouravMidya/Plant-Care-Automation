@@ -30,11 +30,11 @@ const TemperatureChart = ({ deviceId }) => {
       chart: {
         toolbar: {
           tools: {
-            selection: true,
-            zoom: true,
-            download: true, 
-            zoomin: false ,
-            zoomout: false,
+            download: true,
+            selection: false,
+            zoom: false,
+            zoomin: true,
+            zoomout: true,
             pan: true,
             reset: true | '<img src="/static/icons/reset.png" width="40">',
           },
@@ -88,7 +88,7 @@ const [showEndDatePicker, setShowEndDatePicker] = useState(false);
       const todayUTC = new Date(); // Get current UTC date
       switch (timeRange) {
         case 'day':
-          startDate = addHours(todayUTC, -24); // Subtract 24 hours in UTC
+          startDate = addHours(todayUTC, -23); // Subtract 24 hours in UTC
           endDate = todayUTC; // End date is current time in UTC
           break;
         case 'week':

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import Chart from 'react-apexcharts';
-import { addWeeks, addMonths, addYears, addHours } from 'date-fns';
+import { addWeeks, addMonths, addYears, addHours} from 'date-fns';
 import DatePicker from 'react-datepicker';
 import { Box, Grid, Button,Typography } from '@mui/material';
 import DateRangeIcon from '@mui/icons-material/DateRange';
@@ -86,7 +86,7 @@ const SoilMoistureChart = ({ deviceId }) => {
       const todayUTC = new Date(); // Get current UTC date
       switch (timeRange) {
         case 'day':
-          startDate = addHours(todayUTC, -24); // Subtract 24 hours in UTC
+          startDate = addHours(todayUTC, -23); // Subtract 24 hours in UTC
           
           endDate = todayUTC; // End date is current time in UTC
           break;

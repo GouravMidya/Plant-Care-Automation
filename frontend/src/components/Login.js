@@ -23,6 +23,7 @@ const Login = ({ setUser }) => {
       localStorage.setItem('jwt', token);
       setUser(user); // Pass user object to setUser
       navigate('/');
+      window.location.reload();
     } catch (err) {
       if (err.response && err.response.status === 400) {
         alert(err.response.data.message); // Display the error message

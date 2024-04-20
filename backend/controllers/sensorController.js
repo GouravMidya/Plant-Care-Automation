@@ -124,8 +124,14 @@ const getAverageSoilMoisture = async (req, res) => {
         return { timeRange, soilMoisture: percentage };
       }
     });
-    // Respond with the hourly average soil moisture
-    res.status(200).json({ success: true, data: formattedHourlyAverages });
+
+    const firstPart = formattedHourlyAverages.slice(5 );
+    const secondPart = formattedHourlyAverages.slice(0, 5 );
+// Rearrange the array so that hours from endHour to 23 are at the front
+    const rearrangedHourlyAverages = firstPart.concat(secondPart);
+// Respond with the rearranged hourly average soil moisture
+    res.status(200).json({ success: true, data: rearrangedHourlyAverages });
+
   } catch (error) {
     // Handle any errors
     console.error('Error fetching and calculating hourly average soil moisture:', error);
@@ -166,8 +172,13 @@ const getAverageTemperature = async (req, res) => {
       const average = hourData.count > 0 ? (hourData.sum / hourData.count).toFixed(2) : 0;
       return { timeRange: timeRanges[hour], temperature: average };
     });
-    // Respond with the hourly average temperature
-    res.status(200).json({ success: true, data: formattedHourlyAverages });
+    const firstPart = formattedHourlyAverages.slice(5 );
+    const secondPart = formattedHourlyAverages.slice(0, 5 );
+    // Rearrange the array so that hours from endHour to 23 are at the front
+    const rearrangedHourlyAverages = firstPart.concat(secondPart);
+    // Respond with the rearranged hourly average soil moisture
+    res.status(200).json({ success: true, data: rearrangedHourlyAverages });
+
   } catch (error) {
     // Handle any errors
     console.error('Error fetching and calculating hourly average temperature:', error);
@@ -180,7 +191,7 @@ const getAllSoilMoistureRecords = async (req, res) => {
   try {
     const { deviceId, startDate, endDate } = req.query;
     const currentHour = (new Date().getUTCHours())%24; // Get the current hour in UTC
-    const endhour = currentHour === 0 ? 23 : currentHour; // Calculate endhour based on current hour in UTC
+    const endhour = currentHour === 0 ? 23 : currentHour+1; // Calculate endhour based on current hour in UTC
     // Construct the query based on parameters
     const query = { deviceId };
 if (startDate && endDate) {
@@ -218,8 +229,8 @@ let formattedHourlyAverages = hourlyAverages.map((hourData, hour) => {
 });
 
 // Split the formattedHourlyAverages array into two parts
-const firstPart = formattedHourlyAverages.slice(endhour + 1);
-const secondPart = formattedHourlyAverages.slice(0, endhour + 1);
+const firstPart = formattedHourlyAverages.slice(endhour );
+const secondPart = formattedHourlyAverages.slice(0, endhour );
 // Rearrange the array so that hours from endHour to 23 are at the front
 const rearrangedHourlyAverages = firstPart.concat(secondPart);
 // Respond with the rearranged hourly average soil moisture
@@ -237,7 +248,7 @@ const getAllTemperatureRecords = async (req, res) => {
 try {
   const { deviceId, startDate, endDate } = req.query;
   const currentHour = new Date().getUTCHours(); // Get the current hour in UTC
-  const endhour = currentHour === 0 ? 23 : currentHour ; // Calculate endhour based on current hour in UTC
+  const endhour = currentHour === 0 ? 23 : currentHour+1 ; // Calculate endhour based on current hour in UTC
 
   const query = { deviceId };
   if (startDate && endDate) {
@@ -264,8 +275,8 @@ try {
     return { timeRange, temperature: average };
   });
   // Split the formattedHourlyAverages array into two parts
-  const firstPart = formattedHourlyAverages.slice(endhour + 1);
-  const secondPart = formattedHourlyAverages.slice(0, endhour + 1);
+  const firstPart = formattedHourlyAverages.slice(endhour );
+  const secondPart = formattedHourlyAverages.slice(0, endhour );
   // Rearrange the array so that hours from endHour to 23 are at the front
   const rearrangedHourlyAverages = firstPart.concat(secondPart);
   // Respond with the rearranged hourly average soil moisture

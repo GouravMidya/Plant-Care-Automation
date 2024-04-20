@@ -40,6 +40,14 @@ function Homepage({user}) {
               <div sx={{ marginTop: '1rem' }}>
                 <Link to="/aboutus"><StyledButton variant="outlined"  >Learn More</StyledButton></Link>
                 {user ? null : <Link to="/signup"><StyledButton  variant="outlined" className="signup">Sign Up</StyledButton></Link>}
+                {user !== null && (
+                  <Link to="/dashboard">
+                    <StyledButton variant="outlined" className="dashboard">
+                      Dashboard
+                    </StyledButton>
+                  </Link>
+                )}
+
               </div>
             </Container>
           </div>

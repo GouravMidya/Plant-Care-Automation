@@ -4,12 +4,15 @@ const PumpHistory = require('../models/pumpHistoryModel');
 const insertPumpHistory = async (req, res) => {
   try {
     // Extract data from the request body
-    const { deviceId, pumpDuration } = req.body;
+    const { deviceId, pumpDuration,threshold } = req.body;
 
+    // Convert pump duration from milliseconds to seconds
+    const pumpDurationInSeconds = pumpDuration / 1000;
     // Create a new pump history record object
     const newPumpHistory = new PumpHistory({
       deviceId,
-      pumpDuration
+      pumpDuration: pumpDurationInSeconds,
+      threshold
     });
 
     // Save the new pump history record to the database

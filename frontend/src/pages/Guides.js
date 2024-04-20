@@ -30,8 +30,8 @@ const Guides = () => {
         {
           stepNumber: 3,
           heading: 'Submerge the pump in a water container',
-          description: 'Submerge the pump in a water container.',
-          videoSource: '/videos/2.mp4',
+          description: 'Submerge the pump in a water container. Make sure the water container is either placed at the same level as your plant pot or below it as keeping it above will cause the water to flow constantly.',
+          videoSource: '/videos/3.mp4',
         },
         {
           stepNumber: 4,

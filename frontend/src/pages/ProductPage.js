@@ -1,3 +1,4 @@
+//ProductPage.js
 import React from 'react';
 import { Typography, IconButton, Container } from '@mui/material';
 import ShoppingBagRoundedIcon from '@mui/icons-material/ShoppingBagRounded';

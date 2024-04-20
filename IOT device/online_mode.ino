@@ -22,6 +22,7 @@ const int wifi_led = D2;
 long checkDelayDuration = 60000; //cooldown time between each check
 int pumpFlowDuration = 5000; 
 int moisturethreshold=400;
+int threshold=0;
 bool pumpActivated = false; // Flag to track whether the pump has been activated
 unsigned long lastPumpActivationTime = 0; // Timestamp of the last pump activation
 
@@ -66,7 +67,7 @@ void fetchDeviceSettings() {
     // Extract checkIntervals and pumpDuration from the JSON
     long checkIntervals = doc["data"]["checkIntervals"];
     long pumpDuration = doc["data"]["pumpDuration"];
-    int threshold = doc["data"]["threshold"];
+    threshold = doc["data"]["threshold"];
 
     delay(1000);
 
@@ -76,13 +77,6 @@ void fetchDeviceSettings() {
     moisturethreshold = (1024-((threshold*1024)/100));//70.703125% =300
 
     delay(1000);
-    
-    Serial.print("\nDELAY DURATION:");
-    Serial.println(checkDelayDuration);
-    Serial.print("\nPump flow DURATION:");
-    Serial.println(pumpFlowDuration);
-    Serial.print("\nMOISTURE threshold:");
-    Serial.println(moisturethreshold);
   } else {
     digitalWrite(server_led, HIGH); // Not connecting to server, turn on error light
     Serial.print("Error fetching device settings. https response code: ");
@@ -170,7 +164,7 @@ void controlWaterPump() {
     // Start the https connection
     https.begin(client, url);
     https.addHeader("Content-Type", "application/json");
-    String requestBody = "{\"deviceId\": " + String(deviceId) + ", \"pumpDuration\": " + String(pumpFlowDuration) + "}";
+    String requestBody = "{\"deviceId\": " + String(deviceId) + ", \"pumpDuration\": " + String(pumpFlowDuration) +", \threshold\": "+ String(threshold) + "}";
     int httpsResponseCode = https.POST(requestBody);
     if (httpsResponseCode > 0) {
       Serial.print("Pump activation data sent to server. https Response code: ");

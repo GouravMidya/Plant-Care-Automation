@@ -1,3 +1,4 @@
+//ProductCard.js
 import React, { useState, useEffect } from 'react';
 import { Paper, CardContent, CardMedia, Typography, IconButton, Box, Collapse, Container } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
