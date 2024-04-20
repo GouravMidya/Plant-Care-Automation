@@ -59,7 +59,9 @@ const Tickets = ({ user }) => {
   };
 
   const handleOpenRaiseTicketDialog = (deviceId) => {
-    setFormData({ ...formData, deviceId });
+    setFormData({ ...formData,
+      deviceId: deviceId || '', // Set deviceId if provided, otherwise set an empty string
+      });
     setOpenRaiseTicketDialog(true);
   };
 
@@ -101,9 +103,18 @@ const Tickets = ({ user }) => {
 
   return (
     <Box sx={{ padding: '20px' }}>
-      <Typography variant="h4" gutterBottom>
-        Tickets
-      </Typography>
+      <Grid container alignItems="center" spacing={2}>
+        <Grid item xs={6} >
+          <Typography variant="h4" gutterBottom>
+            Tickets
+          </Typography>
+        </Grid>
+        <Grid item xs={6}  textAlign={{ sm: 'right' }}>
+          <Button variant="contained" color="primary" onClick={() => handleOpenRaiseTicketDialog()}>
+            Raise Ticket
+          </Button>
+        </Grid>
+      </Grid>
 
       <Box sx={{ marginBottom: '20px' }}>
         <Typography variant="h5">Current Tickets</Typography>
