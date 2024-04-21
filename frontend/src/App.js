@@ -46,6 +46,7 @@ function App() {
                 <Route path="/aboutus" element={<AboutUs />} />
                 <Route path="/troubleshoot" element={<Troubleshoot />} />
                 <Route path="/order-history" element={<ProtectedRoute user={user}><OrderHistory user={user}/></ProtectedRoute>} />
+                <Route path="/order-history" element={<ProtectedRoute user={user}><OrderHistory user={user}/></ProtectedRoute>} />
                 <Route path="/tickets" element={<ProtectedRoute user={user}><Tickets user={user} isAdmin={false}/></ProtectedRoute>} />
                 <Route path="/order-confirmed" element={<ProtectedRoute user={user} isAdmin={false}><OrderConfirmed /></ProtectedRoute>} />
                 <Route path="/checkout" element={<ProtectedRoute user={user} isAdmin={false}><CheckOutPage /></ProtectedRoute>} />

@@ -4,13 +4,14 @@ const Order = require('../models/Order');
 // Create a new order
 exports.createOrder = async (req, res) => {
   try {
+    console.log('Request body:', req.body);
     const { userId, items, totalPrice, address } = req.body;
     const newOrder = new Order({
       userId,
       items,
       totalPrice,
       address,
-      status: [{ status: 'Order Placed', updatedAt: Date.now() }], // Set initial status as 'Order Placed'
+      status: [{ status: 'Order Placed', updatedAt: Date.now() }], // Set initial status as 'pending'
     });
     await newOrder.save();
     res.status(201).json(newOrder);

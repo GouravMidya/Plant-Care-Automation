@@ -8,6 +8,7 @@ import {
   CardContent,
   IconButton,
   Collapse,
+  Container,
   Box,
 } from '@mui/material';
 import { API_URL } from '../utils/apiConfig';
@@ -27,8 +28,8 @@ const OrderHistory = ({ user }) => {
       try {
         const response = await axios.get(`${API_URL}/orders/${user.id}`);
         const orders = response.data;
-        const current = orders.filter(order => order.status[order.status.length - 1].status !== 'delivered');
-        const past = orders.filter(order => order.status[order.status.length - 1].status === 'delivered');
+        const current = orders.filter(order => order.status[order.status.length - 1].status !== 'Delivered');
+        const past = orders.filter(order => order.status[order.status.length - 1].status === 'Delivered');
         setCurrentOrders(current);
         setPastOrders(past);
         setLoading(false);
@@ -38,7 +39,7 @@ const OrderHistory = ({ user }) => {
         setLoading(false);
       }
     };
-
+  
     fetchOrders();
   }, [user]);
 
@@ -50,7 +51,7 @@ const OrderHistory = ({ user }) => {
   };
 
   return (
-    <div>
+    <Container maxWidth="lg">
       <Typography variant="h4" gutterBottom>
         Order History
       </Typography>
@@ -209,7 +210,7 @@ const OrderHistory = ({ user }) => {
   </Box>
   </div>
 )}
-              </div>
+              </Container>
               );
 };
 
