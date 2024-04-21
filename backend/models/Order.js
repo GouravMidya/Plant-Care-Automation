@@ -15,21 +15,58 @@ const orderSchema = new mongoose.Schema({
         ref: 'Product',
         required: true,
       },
-      quantity: { type: Number, required: true },
-      price: { type: Number, required: true },
+      quantity: {
+        type: Number,
+        required: true,
+      },
+      price: {
+        type: Number,
+        required: true,
+      },
     },
   ],
-  totalPrice: { type: Number, required: true },
+  totalPrice: {
+    type: Number,
+    required: true,
+  },
   address: {
-    receiverName: { type: String, required: true },
-    contactNumber: { type: String, required: true },
-    flatNumber: { type: String, required: true },
-    area: { type: String, required: true },
-    city: { type: String, required: true },
-    state: { type: String, required: true },
-    country: { type: String, required: true },
-    pincode: { type: String, required: true },
-  }
+    receiverName: {
+      type: String,
+      required: true,
+    },
+    contactNumber: {
+      type: String,
+      required: true,
+    },
+    flatNumber: {
+      type: String,
+      required: true,
+    },
+    area: {
+      type: String,
+      required: true,
+    },
+    city: {
+      type: String,
+      required: true,
+    },
+    state: {
+      type: String,
+      required: true,
+    },
+    country: {
+      type: String,
+      required: true,
+    },
+    pincode: {
+      type: String,
+      required: true,
+    },
+  },
+  status: {
+    type: String,
+    default: 'pending',
+  },
 });
 
 const Order = mongoose.model('Order', orderSchema);

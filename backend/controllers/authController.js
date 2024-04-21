@@ -7,9 +7,10 @@ const User = require('../models/User');
 const JWT_SECRET = 'your_secret_key';
 
 // Generate JWT token
+// Generate JWT token
 const generateToken = (user) => {
   return jwt.sign(
-    { id: user._id, username: user.username },
+    { id: user._id, username: user.username, role: user.role }, // Include the role in the payload
     JWT_SECRET,
     { expiresIn: '1h' }
   );

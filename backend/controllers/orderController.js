@@ -29,3 +29,37 @@ exports.getOrderHistory = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+exports.getAllOrders = async (req, res) => {
+  try {
+    const orders = await Order.find();
+
+    const pending = orders.filter((order) => order.status === 'pending');
+    const shipped = orders.filter((order) => order.status === 'shipped');
+    const delivered = orders.filter((order) => order.status === 'delivered');
+
+    res.json({ pending, shipped, delivered });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.updateOrderStatus = async (req, res) => {
+  try {
+    const { orderId, newStatus } = req.body;
+
+    const updatedOrder = await Order.findByIdAndUpdate(
+      orderId,
+      { status: newStatus },
+      { new: true }
+    );
+
+    if (!updatedOrder) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    res.json({ message: 'Order status updated successfully', order: updatedOrder });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

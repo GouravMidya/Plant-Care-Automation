@@ -54,8 +54,18 @@ const Navbar = ({ user, setUser }) => {
 
   const renderMobileMenu = (
     <Drawer anchor="right" open={mobileMenuOpen} onClose={handleMobileMenuClose}>
-      <Box sx={{ width: 250 }} role="presentation" onClick={handleMobileMenuClose} onKeyDown={handleMobileMenuClose}>
+      <Box
+        sx={{ width: 250 }}
+        role="presentation"
+        onClick={handleMobileMenuClose}
+        onKeyDown={handleMobileMenuClose}
+      >
         <List>
+          {user && user.role === 'admin' && (
+            <ListItem button component={Link} to="/admin">
+              <ListItemText primary="Admin Dashboard" />
+            </ListItem>
+          )}
           <ListItem button component={Link} to="/dashboard">
             <ListItemText primary="Dashboard" />
           </ListItem>
@@ -68,9 +78,11 @@ const Navbar = ({ user, setUser }) => {
           <ListItem button component={Link} to="/troubleshoot">
             <ListItemText primary="Troubleshoot" />
           </ListItem>
-          <ListItem button component={Link} to="/tickets">
-            <ListItemText primary="Tickets" />
-          </ListItem>
+          {user && user.role !== 'admin' && (
+            <ListItem button component={Link} to="/tickets">
+              <ListItemText primary="Tickets" />
+            </ListItem>
+          )}
           <ListItem button onClick={handleLogout}>
             <ListItemText primary="Logout" />
           </ListItem>
@@ -86,6 +98,11 @@ const Navbar = ({ user, setUser }) => {
           BloomBuddy
         </Typography>
         <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center' }}>
+          {user && user.role === 'admin' && (
+            <Button component={Link} to="/admin" sx={{ color: 'white' }} variant="outlined">
+              Admin Dashboard
+            </Button>
+          )}
           <Button component={Link} to="/dashboard" sx={{ color: 'white' }} variant="outlined">
             Dashboard
           </Button>
@@ -98,9 +115,11 @@ const Navbar = ({ user, setUser }) => {
           <Button component={Link} to="/troubleshoot" sx={{ color: 'white' }} variant="outlined">
             Troubleshoot
           </Button>
-          <Button component={Link} to="/tickets" sx={{ color: 'white' }} variant="outlined">
-            Tickets
-          </Button>
+          {user && user.role !== 'admin' && (
+            <Button component={Link} to="/tickets" sx={{ color: 'white' }} variant="outlined">
+              Tickets
+            </Button>
+          )}
         </Box>
         <Box sx={{ flexGrow: 1 }} />
         <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
