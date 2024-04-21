@@ -16,4 +16,7 @@ router.get('/', orderController.getAllOrders);
 // Route to update order status
 router.put('/update-status', orderController.updateOrderStatus);
 
+// Route to update order status
+router.put('/:orderId/status', orderController.updateOrderStatus);
+
 module.exports = router;

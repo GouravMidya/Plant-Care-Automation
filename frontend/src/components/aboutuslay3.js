@@ -1,50 +1,117 @@
 import React from "react";
-
+import { Typography, Container, Grid, Box, IconButton } from "@mui/material";
+import { LinkedIn, Twitter, Instagram } from "@mui/icons-material";
 
 function aboutuslay3() {
-
-    return (
+  return (
+    <Container maxWidth="lg">
+      <Typography variant="h4" align="left" sx={{ paddingBottom: '2rem' }} gutterBottom>
+        <strong>Introducing the team</strong>
+      </Typography>
       <div className="aboutl3">
-          <h2>Introducing the team</h2>
-          <div className="left-column">
-            <div className="left">
-                <img src="1.jpg" alt="Your Image" className="aboutimage2" />
-                <div className="Large">Gourav Midya</div>
-                <div className="Middle">Co-Founder</div>
-                <div className="quote">“With innovation as our compass and plants as our passion, we're leading the charge towards a greener, more sustainable future.”</div>
-                <div className="icons">
-                    <img src="linkedin.png" alt="Your Image" className="icon" />
-                    <img src="twitter.png" alt="Your Image" className="icon" />
-                    <img src="instagram2.png" alt="Your Image" className="icon" />
-                </div>
-            </div>
-            <div className="middle">
-                <img src="1.jpg" alt="Your Image" className="aboutimage3" />
-                <div className="Large">Prathamesh Naik</div>
-                <div className="Middle">Co-Founder</div>
-                <div className="quote">"In a world of complexities, we thrive on simplifying the plant care experience for our users and paving the way for effortless greenery."</div>
-                <div className="icons">
-                    <img src="linkedin.png" alt="Your Image" className="icon" />
-                    <img src="twitter.png" alt="Your Image" className="icon" />
-                    <img src="instagram2.png" alt="Your Image" className="icon" />
-                </div>
-            </div>
-            <div className="right">
-                <img src="1.jpg" alt="Your Image" className="aboutimage4" />
-                <div className="Large">Harsh Maurya</div>
-                <div className="Middle">Co-Founder</div>
-                <div className="quote">"By dissecting problems with analytical precision, we uncover insights that drive innovation and elevate our products to new heights of effectiveness."</div>
-                <div className="icons">
-                    <img src="linkedin.png" alt="Your Image" className="icon" />
-                    <img src="twitter.png" alt="Your Image" className="icon" />
-                    <img src="instagram2.png" alt="Your Image" className="icon" />
-                </div>
-            </div>
-
-          </div>
+        <Grid container spacing={10} justifyContent="center">
+          <Grid item xs={12} sm={4}>
+            <Box textAlign="justify" style={developerCardStyle}>
+              <img src="Gourav.jpg" alt="Gourav Midya" className="aboutimage2" style={imageStyle} />
+              <Typography variant="h6" gutterBottom>
+                <strong>Gourav Midya</strong>
+              </Typography>
+              <Typography variant="subtitle1" gutterBottom>
+                Co-Founder
+              </Typography>
+              <Typography variant="body1" textAlign="justify" gutterBottom>
+                “With innovation as our compass and plants as our passion, we're leading the charge towards a greener, more sustainable future.”
+              </Typography>
+              <div style={socialIconsStyle}>
+                <IconButton aria-label="LinkedIn" color="primary">
+                  <LinkedIn />
+                </IconButton>
+                <IconButton aria-label="Twitter" color="primary">
+                  <Twitter />
+                </IconButton>
+                <IconButton aria-label="Instagram" color="primary">
+                  <Instagram />
+                </IconButton>
+              </div>
+            </Box>
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <Box textAlign="justify" style={developerCardStyle}>
+              <img src="Prathamesh.jpg" alt="Prathamesh Naik" className="aboutimage2" style={imageStyle} />
+              <Typography variant="h6" gutterBottom>
+                <strong>Prathamesh Naik</strong>
+              </Typography>
+              <Typography variant="subtitle1" gutterBottom>
+                Co-Founder
+              </Typography>
+              <Typography variant="body1" textAlign="justify" gutterBottom>
+                "In a world of complexities, we thrive on simplifying the plant care experience for our users and paving the way for effortless greenery."
+              </Typography>
+              <div style={socialIconsStyle}>
+                <IconButton aria-label="LinkedIn" color="primary">
+                  <LinkedIn />
+                </IconButton>
+                <IconButton aria-label="Twitter" color="primary">
+                  <Twitter />
+                </IconButton>
+                <IconButton aria-label="Instagram" color="primary">
+                  <Instagram />
+                </IconButton>
+              </div>
+            </Box>
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <Box textAlign="justify" style={developerCardStyle}>
+              <img src="Harsh.jpg" alt="Harsh Maurya" className="aboutimage2" style={imageStyle} />
+              <Typography variant="h6" gutterBottom>
+                <strong>Harsh Maurya</strong>
+              </Typography>
+              <Typography variant="subtitle1" gutterBottom>
+                Co-Founder
+              </Typography>
+              <Typography variant="body1" textAlign="justify" gutterBottom>
+              “Through precise analysis of problems, we gain insights that fuel innovation and enhance our products.”
+              </Typography>
+              <div style={socialIconsStyle}>
+                <IconButton aria-label="LinkedIn" color="primary">
+                  <LinkedIn />
+                </IconButton>
+                <IconButton aria-label="Twitter" color="primary">
+                  <Twitter />
+                </IconButton>
+                <IconButton aria-label="Instagram" color="primary">
+                  <Instagram />
+                </IconButton>
+              </div>
+            </Box>
+          </Grid>
+        </Grid>
       </div>
+      <br/>
+    </Container>
+  );
+}
 
-    );
-  }
-  
-  export default aboutuslay3;
+export default aboutuslay3;
+
+const developerCardStyle = {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  padding: '2rem',
+  border: '1px solid #ccc',
+  borderRadius: '8px',
+};
+
+const imageStyle = {
+  width: '100%',
+  height: '20%',
+  borderRadius: '1rem',
+  marginBottom: '1rem',
+};
+
+const socialIconsStyle = {
+  display: 'flex',
+  gap: '10px',
+  marginTop: '10px',
+};

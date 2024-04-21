@@ -10,6 +10,7 @@ exports.createOrder = async (req, res) => {
       items,
       totalPrice,
       address,
+      status: [{ status: 'Order Placed', updatedAt: Date.now() }], // Set initial status as 'Order Placed'
     });
     await newOrder.save();
     res.status(201).json(newOrder);
@@ -18,6 +19,22 @@ exports.createOrder = async (req, res) => {
   }
 };
 
+// Update order status
+exports.updateOrderStatus = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const { status, remarks } = req.body;
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+    order.status.push({ status, remarks, updatedAt: Date.now() });
+    await order.save();
+    res.json(order);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 // Controller method to get order history by user ID
 exports.getOrderHistory = async (req, res) => {

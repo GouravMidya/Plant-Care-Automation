@@ -23,7 +23,7 @@ const AddDevice = () => {
     description: '',
     checkIntervals: 15, // Default to recommended value
     pumpDuration: 8, // Default to recommended value for small pots
-    threshold: 450, // Default to recommended value
+    threshold: 70, // Default to recommended value
   });
 
   const handleChange = (e) => {
@@ -128,11 +128,11 @@ const AddDevice = () => {
           <Grid item xs={12}>
             <Alert severity="info" sx={{ marginBottom: 2 }}>
               <AlertTitle>Threshold</AlertTitle>
-              Observe what threshold looks good for your plants. 0 means completely wet, and 1024 means completely dry.
+              Monitor moisture levels: 0% is too dry, 100% is too wet for plants. Adjust accordingly for optimal growth ( Mostly kept at 70% ). 🌱 
             </Alert>
             <TextField
               name="threshold"
-              label="Watering Threshold"
+              label="Watering Threshold (%)"
               value={formData.threshold}
               onChange={handleChange}
               type="number"

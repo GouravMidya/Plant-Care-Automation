@@ -8,6 +8,13 @@ const orderSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
   },
+  status: [
+    {
+      status: { type: String, required: true },
+      remarks: { type: String },
+      updatedAt: { type: Date, default: Date.now },
+    },
+  ],
   items: [
     {
       productId: {

@@ -22,6 +22,8 @@ import { CartProvider } from './hooks/CartContext';
 import OrderConfirmed from './components/OrderConfirmed';
 import { isAuthenticated } from './utils/authUtils';
 
+import OrderHistory from './components/OrderHistory'; // Import OrderHistory component
+
 function App() {
   const [user, setUser] = useState(null); // Initialize user state
 
@@ -43,6 +45,7 @@ function App() {
                 <Route path="/guides" element={<Guides />} />
                 <Route path="/aboutus" element={<AboutUs />} />
                 <Route path="/troubleshoot" element={<Troubleshoot />} />
+                <Route path="/order-history" element={<ProtectedRoute user={user}><OrderHistory user={user}/></ProtectedRoute>} />
                 <Route path="/tickets" element={<ProtectedRoute user={user}><Tickets user={user} isAdmin={false}/></ProtectedRoute>} />
                 <Route path="/order-confirmed" element={<ProtectedRoute user={user} isAdmin={false}><OrderConfirmed /></ProtectedRoute>} />
                 <Route path="/checkout" element={<ProtectedRoute user={user} isAdmin={false}><CheckOutPage /></ProtectedRoute>} />

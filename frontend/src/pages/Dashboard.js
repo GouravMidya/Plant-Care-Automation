@@ -66,7 +66,7 @@ const Dashboard = () => {
             };
             const sensorReadingResponse = await axios.post(`${API_URL}/sensor_readings/latest`, payload);
             const sensorData = sensorReadingResponse.data.data;
-    
+  
             let pumpData = null;
             let pumpTimestamp = null;
             try {
@@ -76,7 +76,7 @@ const Dashboard = () => {
             } catch (error) {
               console.error(`Error fetching latest pump history for device ${device.deviceId}:`, error);
             }
-    
+  
             return {
               [device.deviceId]: {
                 ...sensorData,
@@ -96,9 +96,12 @@ const Dashboard = () => {
       }
     };
     fetchLatestRecords();
-    
-  }, [devices]);
-
+    const interval = setInterval(fetchLatestRecords, 600000); // Fetch data every 10 minutes
+  
+    // Cleanup function to clear the interval
+    return () => clearInterval(interval);
+  }, [devices]); // Only run the effect when the devices array changes
+  
 
   const handleExpandClick = (deviceId) => {
     setExpandedDeviceId(deviceId === expandedDeviceId ? null : deviceId);

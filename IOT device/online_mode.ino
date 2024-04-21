@@ -41,6 +41,7 @@ unsigned long lastPumpActivationTime = 0; // Timestamp of the last pump activati
 int sns1, sns2, sns3, sns4, sns5, sns6, sns7, sns8; // value read from the pot
 int readingList[8][2]; // 2D array to store binary value and corresponding reading
 int listSize = 0;
+int threshold=0;
 
 DHT dht(dht_dpin, DHTTYPE);
 float humidity,temperature;
@@ -119,7 +120,7 @@ void fetchDeviceSettings() {
     // Extract checkIntervals and pumpDuration from the JSON
     long checkIntervals = doc["data"]["checkIntervals"];
     long pumpDuration = doc["data"]["pumpDuration"];
-    int threshold = doc["data"]["threshold"];
+    threshold = doc["data"]["threshold"];
 
     delay(1000);
 
@@ -128,7 +129,7 @@ void fetchDeviceSettings() {
     pumpFlowDuration = (pumpDuration*1000);
     moisturethreshold = (1024-((threshold*1024)/100));//70.703125% =300
 
-    delay(1000);
+    delay(1000); 
     
     Serial.print("\nDELAY DURATION:");
     Serial.println(checkDelayDuration);
@@ -228,7 +229,7 @@ void controlWaterPump() {
     // Start the https connection
     https.begin(client, url);
     https.addHeader("Content-Type", "application/json");
-    String requestBody = "{\"deviceId\": " + String(deviceId) + ", \"pumpDuration\": " + String(pumpFlowDuration) + "}";
+    String requestBody = "{\"deviceId\": " + String(deviceId) + ", \"pumpDuration\": " + String(pumpFlowDuration) + ", \"threshold\": "+String(threshold) +"}";
     int httpsResponseCode = https.POST(requestBody);
     if (httpsResponseCode > 0) {
       Serial.print("Pump activation data sent to server. https Response code: ");

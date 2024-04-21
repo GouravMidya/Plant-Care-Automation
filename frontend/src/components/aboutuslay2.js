@@ -1,19 +1,50 @@
 import React from "react";
-
+import { Typography, Container, Grid, Box } from "@mui/material";
 
 function aboutuslay2() {
+  return (
+    <Container maxWidth="lg" sx={{padding:'3rem'}}>
+      <Typography variant="h4" align="left" gutterBottom>
+        <strong>Rooted in Values: Our Guiding Principles</strong>
+      </Typography>
 
-    return (
-      <div className="aboutl2">
-          <h2>Rooted in Values: Our Guiding Principles</h2>
-          <div className="left-column">
-            <div className="left"><img src="1.jpg" alt="Your Image" className="aboutimage2" /><h4>Passion for Plants</h4><text>Our deep-seated passion for plants drives everything we do. We are dedicated to fostering a love for greenery and cultivating thriving ecosystems.</text></div>
-            <div className="middle"><img src="1.jpg" alt="Your Image" className="aboutimage3" /><h4>Innovation</h4><text>Innovation is at the core of our company. We are committed to pushing the boundaries of plant care technology, constantly seeking new ways to enhance the experience for our users.</text></div>
-            <div className="right"><img src="1.jpg" alt="Your Image" className="aboutimage4" /><h4>Environmental Stewardship</h4><text>We prioritize environmental sustainability in all aspects of our business. We are dedicated to promoting responsible gardening practices and minimizing our ecological footprint to preserve the planet for future generations.</text></div>
-          </div>
-      </div>
+      <Grid container spacing={5} sx={{paddingTop:'1rem'}}>
+        <Grid item xs={12} md={4}>
+          <Box textAlign="center">
+            <img src="1.jpg" alt="Your Image" className="aboutimage2" style={{ maxWidth: "100%", marginBottom: "10px" }} />
+            <Typography variant="h6" gutterBottom>
+              <strong>Passion for Plants</strong>
+            </Typography>
+            <Typography align="center" paragraph>
+              Our deep-seated passion for plants drives everything we do. We are dedicated to fostering a love for greenery and cultivating thriving ecosystems.
+            </Typography>
+          </Box>
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <Box textAlign="center">
+            <img src="1.jpg" alt="Your Image" className="aboutimage3" style={{ maxWidth: "100%", marginBottom: "10px" }} />
+            <Typography variant="h6" gutterBottom>
+            <strong>Innovation</strong>
+            </Typography>
+            <Typography align="center" paragraph>
+              Innovation is at the core of our company. We are committed to pushing the boundaries of plant care technology, constantly seeking new ways to enhance the experience for our users.
+            </Typography>
+          </Box>
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <Box textAlign="center">
+            <img src="1.jpg" alt="Your Image" className="aboutimage4" style={{ maxWidth: "100%", marginBottom: "10px" }} />
+            <Typography variant="h6" gutterBottom>
+            <strong>Environmental Stewardship</strong>
+            </Typography>
+            <Typography align="center" paragraph>
+              We prioritize environmental sustainability in all aspects of our business. We are dedicated to promoting responsible gardening practices and minimizing our ecological footprint to preserve the planet for future generations.
+            </Typography>
+          </Box>
+        </Grid>
+      </Grid>
+    </Container>
+  );
+}
 
-    );
-  }
-  
-  export default aboutuslay2;
+export default aboutuslay2;

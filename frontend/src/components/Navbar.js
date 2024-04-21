@@ -72,6 +72,9 @@ const Navbar = ({ user, setUser }) => {
           <ListItem button component={Link} to="/products">
             <ListItemText primary="Products" />
           </ListItem>
+          <ListItem button component={Link} to="/order-history">
+            <ListItemText primary="Orders" />
+          </ListItem>
           <ListItem button component={Link} to="/guides">
             <ListItemText primary="Guides" />
           </ListItem>
@@ -108,6 +111,9 @@ const Navbar = ({ user, setUser }) => {
           </Button>
           <Button component={Link} to="/products" sx={{ color: 'white' }} variant="outlined">
             Products
+          </Button>
+          <Button component={Link} to="/order-history" sx={{ color: 'white' }} variant="outlined">
+            Orders
           </Button>
           <Button component={Link} to="/guides" sx={{ color: 'white' }} variant="outlined">
             Guides
