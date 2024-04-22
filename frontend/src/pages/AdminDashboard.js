@@ -29,6 +29,11 @@ const AdminDashboard = () => {
   const [orders, setOrders] = useState({ pending: [], shipped: [], delivered: [] });
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredTickets, setFilteredTickets] = useState([]);
+  const [filteredOrders, setFilteredOrders] = useState({
+    pending: [],
+    shipped: [],
+    delivered: [],
+  });
   const [expandTickets, setExpandTickets] = useState(false);
   const [expandOrders, setExpandOrders] = useState(false);
   const [expanded, setExpanded] = useState({});
@@ -65,6 +70,7 @@ const AdminDashboard = () => {
       const response = await axios.get(`${API_URL}/orders`);
       const { pending, shipped, delivered } = response.data;
       setOrders({ pending, shipped, delivered });
+      setFilteredOrders({ pending, shipped, delivered });
       //console.log(response.data)
     } catch (error) {
       console.error('Error fetching orders:', error);
@@ -76,12 +82,27 @@ const AdminDashboard = () => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
 
-    const filtered = tickets.filter((ticket) => {
+    const filteredTickets  = tickets.filter((ticket) => {
       const user = ticket.user[0].username.toLowerCase();
       return user.includes(query);
     });
+    const filteredPendingOrders = orders.pending.filter((order) =>
+      order.userId.username.toLowerCase().includes(query)
+    );
 
-    setFilteredTickets(filtered);
+    const filteredShippedOrders = orders.shipped.filter((order) =>
+      order.userId.username.toLowerCase().includes(query)
+    );
+
+    const filteredDeliveredOrders = orders.delivered.filter((order) =>
+      order.userId.username.toLowerCase().includes(query)
+    );
+    setFilteredTickets(filteredTickets);
+    setFilteredOrders({
+      pending: filteredPendingOrders,
+      shipped: filteredShippedOrders,
+      delivered: filteredDeliveredOrders,
+    });
   };
 
   const handleExpandTickets = () => {
@@ -154,13 +175,6 @@ const AdminDashboard = () => {
       </Box>
 
       <Box sx={{ marginBottom: '20px' }}>
-        <Box display="flex" alignItems="center" justifyContent="space-between">
-          <Typography variant="h5">Tickets</Typography>
-          <IconButton onClick={handleExpandTickets}>
-            {expandTickets ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-          </IconButton>
-        </Box>
-        <Collapse in={expandTickets} timeout="auto" unmountOnExit>
           <TextField
             label="Search by username"
             value={searchQuery}
@@ -168,6 +182,13 @@ const AdminDashboard = () => {
             fullWidth
             margin="normal"
           />
+        <Box display="flex" alignItems="center" justifyContent="space-between">
+          <Typography variant="h5">Tickets</Typography>
+          <IconButton onClick={handleExpandTickets}>
+            {expandTickets ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+          </IconButton>
+        </Box>
+        <Collapse in={expandTickets} timeout="auto" unmountOnExit>
           <Grid container spacing={2}>
             {filteredTickets.length > 0 ? (
               filteredTickets.map((ticket) => (
@@ -240,78 +261,121 @@ const AdminDashboard = () => {
         </Box>
         <Collapse in={expandOrders} timeout="auto" unmountOnExit>
         <Box sx={{ marginTop: '20px' }}>
-  <Typography variant="h6">Pending Orders</Typography>
-  <Grid container spacing={2}>
-    {orders.pending.map((order) => (
-      <Grid item xs={12} sm={6} md={4} key={order._id}>
-        <Card>
-          <CardContent>
-            <Box display="flex" alignItems="center" justifyContent="space-between">
-              <Typography variant="h6">{order.userId.username}</Typography>
-              <Typography variant="h6">Total Price: ${order.totalPrice}</Typography>
-              <Button variant="contained" color="primary" onClick={() => handleShippedClick(order)}>
-                Shipped
-              </Button>
-            </Box>
+          <Typography variant="h6">Pending Orders</Typography>
+          <Grid container spacing={2}>
+            {filteredOrders.pending.map((order) => (
+              <Grid item xs={12} sm={6} md={4} key={order._id}>
+                <Card>
+                  <CardContent>
+                    <Box display="flex" alignItems="center" justifyContent="space-between">
+                      <Typography variant="h6">{order.userId.username}</Typography>
+                      <Typography variant="h6">Total Price: ${order.totalPrice}</Typography>
+                      <Button variant="contained" color="primary" onClick={() => handleShippedClick(order)}>
+                        Shipped
+                      </Button>
+                    </Box>
 
-            {/* Render order items */}
-            {order.items.map((item) => (
-              <Box key={item._id} display="flex" alignItems="center" marginTop={2}>
-                <Box>
-                  <Typography variant="subtitle1">{item.productId.name}</Typography>
-                  <Typography variant="body2">Quantity: {item.quantity}</Typography>
-                </Box>
-              </Box>
+                    {/* Render order items */}
+                    {order.items.map((item) => (
+                      <Box key={item._id} display="flex" alignItems="center" marginTop={2}>
+                        <Box>
+                          <Typography variant="subtitle1">{item.productId.name}</Typography>
+                          <Typography variant="body2">Quantity: {item.quantity}</Typography>
+                        </Box>
+                      </Box>
+                    ))}
+
+                    {/* Render address details */}
+                    <Box marginTop={2}>
+                      <Typography variant="subtitle1">Address:</Typography>
+                      <Typography variant="body2">{order.address.receiverName}</Typography>
+                      <Typography variant="body2">{order.address.contactNumber}</Typography>
+                      <Typography variant="body2">{order.address.flatNumber}, {order.address.area}</Typography>
+                      <Typography variant="body2">{order.address.city}, {order.address.state}</Typography>
+                      <Typography variant="body2">{order.address.country}, {order.address.pincode}</Typography>
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Grid>
             ))}
+          </Grid>
+        </Box>
+        <Box sx={{ marginTop: '20px' }}>
+          <Typography variant="h6">Shipped Orders</Typography>
+          <Grid container spacing={2}>
+            {filteredOrders.shipped.map((order) => (
+              <Grid item xs={12} sm={6} md={4} key={order._id}>
+                <Card>
+                  <CardContent>
+                    <Box display="flex" alignItems="center" justifyContent="space-between">
+                      <Typography variant="h6">{order.userId.username}</Typography>
+                      <Typography variant="h6">Total Price: ${order.totalPrice}</Typography>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => handleDeliveredClick(order)}
+                      >
+                        Delivered
+                      </Button>
+                    </Box>
 
-            {/* Render address details */}
-            <Box marginTop={2}>
-              <Typography variant="subtitle1">Address:</Typography>
-              <Typography variant="body2">{order.address.receiverName}</Typography>
-              <Typography variant="body2">{order.address.contactNumber}</Typography>
-              <Typography variant="body2">{order.address.flatNumber}, {order.address.area}</Typography>
-              <Typography variant="body2">{order.address.city}, {order.address.state}</Typography>
-              <Typography variant="body2">{order.address.country}, {order.address.pincode}</Typography>
-            </Box>
-          </CardContent>
-        </Card>
-      </Grid>
-    ))}
-  </Grid>
-</Box>
-          <Box sx={{ marginTop: '20px' }}>
-            <Typography variant="h6">Shipped Orders</Typography>
+                    {/* Render order items */}
+                    {order.items.map((item) => (
+                      <Box key={item._id} display="flex" alignItems="center" marginTop={2}>
+                        <Box>
+                          <Typography variant="subtitle1">{item.productId.name}</Typography>
+                          <Typography variant="body2">Quantity: {item.quantity}</Typography>
+                        </Box>
+                      </Box>
+                    ))}
+
+                    {/* Render address details */}
+                    <Box marginTop={2}>
+                      <Typography variant="subtitle1">Address:</Typography>
+                      <Typography variant="body2">{order.address.receiverName}</Typography>
+                      <Typography variant="body2">{order.address.contactNumber}</Typography>
+                      <Typography variant="body2">{order.address.flatNumber}, {order.address.area}</Typography>
+                      <Typography variant="body2">{order.address.city}, {order.address.state}</Typography>
+                      <Typography variant="body2">{order.address.country}, {order.address.pincode}</Typography>
+                    </Box>
+                    {/* Render other order details */}
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        </Box>
+        <Box sx={{ marginTop: '20px' }}>
+          <Typography variant="h6">Delivered Orders</Typography>
             <Grid container spacing={2}>
-              {orders.shipped.map((order) => (
+              {filteredOrders.delivered.map((order) => (
                 <Grid item xs={12} sm={6} md={4} key={order._id}>
                   <Card>
                     <CardContent>
                       <Box display="flex" alignItems="center" justifyContent="space-between">
-                        <Typography variant="h6">Order</Typography>
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          onClick={() => handleDeliveredClick(order)}
-                        >
-                          Delivered
-                        </Button>
+                        <Typography variant="h6">{order.userId.username}</Typography>
+                        <Typography variant="h6">Total Price: ${order.totalPrice}</Typography>
                       </Box>
-                      {/* Render other order details */}
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
-          </Box>
-          <Box sx={{ marginTop: '20px' }}>
-            <Typography variant="h6">Delivered Orders</Typography>
-            <Grid container spacing={2}>
-              {orders.delivered.map((order) => (
-                <Grid item xs={12} sm={6} md={4} key={order._id}>
-                  <Card>
-                    <CardContent>
-                      {/* Render order details */}
-                      <Typography variant="h6">Order</Typography>
+
+                      {/* Render order items */}
+                      {order.items.map((item) => (
+                        <Box key={item._id} display="flex" alignItems="center" marginTop={2}>
+                          <Box>
+                            <Typography variant="subtitle1">{item.productId.name}</Typography>
+                            <Typography variant="body2">Quantity: {item.quantity}</Typography>
+                          </Box>
+                        </Box>
+                      ))}
+
+                      {/* Render address details */}
+                      <Box marginTop={2}>
+                        <Typography variant="subtitle1">Address:</Typography>
+                        <Typography variant="body2">{order.address.receiverName}</Typography>
+                        <Typography variant="body2">{order.address.contactNumber}</Typography>
+                        <Typography variant="body2">{order.address.flatNumber}, {order.address.area}</Typography>
+                        <Typography variant="body2">{order.address.city}, {order.address.state}</Typography>
+                        <Typography variant="body2">{order.address.country}, {order.address.pincode}</Typography>
+                      </Box>
                     </CardContent>
                   </Card>
                 </Grid>
