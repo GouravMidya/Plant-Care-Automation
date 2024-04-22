@@ -50,6 +50,7 @@ const AdminDashboard = () => {
     } catch (error) {
       console.error('Error fetching tickets:', error);
     }
+    
   };
 
   const handleExpandClick = (ticketId) => {
@@ -68,7 +69,7 @@ const AdminDashboard = () => {
     } catch (error) {
       console.error('Error fetching orders:', error);
     }
-    console.log(orders)
+    console.log(tickets)
   };
 
   const handleSearchChange = (e) => {
@@ -76,7 +77,7 @@ const AdminDashboard = () => {
     setSearchQuery(query);
 
     const filtered = tickets.filter((ticket) => {
-      const user = ticket.userId.name.toLowerCase();
+      const user = ticket.user[0].username.toLowerCase();
       return user.includes(query);
     });
 
@@ -173,7 +174,7 @@ const AdminDashboard = () => {
                 <Grid item xs={12} sm={6} md={4} key={ticket._id}>
                   <Card>
                     <CardContent>
-                      <Typography variant="h6">User</Typography>
+                      <Typography variant="h6">{ticket.user[0].username}</Typography>
                       <IconButton
                         onClick={() => handleExpandClick(ticket._id)}
                         aria-expanded={expanded[ticket._id]}
@@ -188,6 +189,11 @@ const AdminDashboard = () => {
                             display="flex"
                             flexDirection="column"
                             alignItems="flex-start"
+                            mb={2} // Add some bottom margin for spacing
+                            p={2} // Add some padding
+                            boxShadow={3} // Add box shadow for elevation
+                            borderRadius={2} // Add border radius for rounded corners
+                            bgcolor="background.paper"
                           >
                             <Box display="flex" alignItems="center" justifyContent="space-between" width="100%">
                               <Typography variant="h6">{ticketData.title}</Typography>
@@ -241,7 +247,7 @@ const AdminDashboard = () => {
         <Card>
           <CardContent>
             <Box display="flex" alignItems="center" justifyContent="space-between">
-              <Typography variant="h6">Order</Typography>
+              <Typography variant="h6">{order.userId.username}</Typography>
               <Typography variant="h6">Total Price: ${order.totalPrice}</Typography>
               <Button variant="contained" color="primary" onClick={() => handleShippedClick(order)}>
                 Shipped
@@ -252,7 +258,7 @@ const AdminDashboard = () => {
             {order.items.map((item) => (
               <Box key={item._id} display="flex" alignItems="center" marginTop={2}>
                 <Box>
-                  {/* <Typography variant="subtitle1">{item.product.name}</Typography> */}
+                  <Typography variant="subtitle1">{item.productId.name}</Typography>
                   <Typography variant="body2">Quantity: {item.quantity}</Typography>
                 </Box>
               </Box>

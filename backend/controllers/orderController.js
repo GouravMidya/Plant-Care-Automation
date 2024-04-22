@@ -55,7 +55,15 @@ exports.getOrderHistory = async (req, res) => {
 
 exports.getAllOrders = async (req, res) => {
   try {
-    const orders = await Order.find();
+    const orders = await Order.find({})
+    .populate({
+      path: 'items.productId',
+      model: 'Product' // Assuming 'Product' is the model name for products
+    })
+    .populate({
+      path: 'userId',
+      model: 'User' // Assuming 'User' is the model name for users
+    });
 
     const pending = [];
     const shipped = [];

@@ -17,7 +17,7 @@ app.use(cors())
 
 // Import routes
 const sensorRoutes = require('./routes/sensorEndpoints');
-//const userRoutes = require('./routes/userEndpoints');
+const userRoutes = require('./routes/userEndpoints');
 const userDeviceRoutes = require('./routes/userDeviceEndpoints');
 const pumpRoutes = require('./routes/pumpEndpoints')
 const blogRoutes =require('./routes/blogPostEndpoints');
@@ -38,7 +38,7 @@ app.use((req,res,next) =>{
 
 //routes
 app.use('/sensor_readings', sensorRoutes);
-//app.use('/api/users', userRoutes);
+app.use('/api/users', userRoutes);
 app.use('/api/user_devices', userDeviceRoutes);
 app.use('/pump',pumpRoutes);
 app.use('/blogs',blogRoutes);

@@ -1,10 +1,10 @@
-const User = require('../models/userModel');
+const User = require('../models/User');
 
 // Controller function to create a new user
 const createUser = async (req, res) => {
   try {
-    const { name, email, password, googleId } = req.body;
-    const newUser = new User({ name, email, password, googleId });
+    const { name, email, password } = req.body;
+    const newUser = new User({ name, email, password });
     await newUser.save();
     res.status(201).json({ success: true, message: 'User created successfully', data: newUser });
   } catch (error) {

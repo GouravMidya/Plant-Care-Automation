@@ -1,5 +1,6 @@
 // controllers/ticketController.js
 const Ticket = require('../models/ticketModel');
+const User = require('../models/User');
 
 exports.createTicket = async (req, res) => {
   try {
@@ -72,11 +73,20 @@ exports.getAllTickets = async (req, res) => {
   try {
     const tickets = await Ticket.aggregate([
       {
+        $lookup: {
+          from: 'users', // Name of the User model collection
+          localField: 'userId', // Field in the Ticket model to match
+          foreignField: '_id', // Field in the User model to match
+          as: 'user', // Alias for the joined data
+        },
+      },
+      {
         $group: {
           _id: '$userId',
-          tickets: { $push: '$$ROOT' }
-        }
-      }
+          user: { $first: '$user' }, // Include the first matched user document
+          tickets: { $push: '$$ROOT' },
+        },
+      },
     ]);
 
     res.json(tickets);
