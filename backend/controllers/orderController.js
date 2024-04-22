@@ -11,7 +11,7 @@ exports.createOrder = async (req, res) => {
       items,
       totalPrice,
       address,
-      status: [{ status: 'Order Placed', updatedAt: Date.now() }], // Set initial status as 'pending'
+      status: [{ status: 'Pending', updatedAt: Date.now() }], // Set initial status as 'pending'
     });
     await newOrder.save();
     res.status(201).json(newOrder);
@@ -23,13 +23,18 @@ exports.createOrder = async (req, res) => {
 // Update order status
 exports.updateOrderStatus = async (req, res) => {
   try {
-    const { orderId } = req.params;
-    const { status, remarks } = req.body;
+    const { orderId, newStatus } = req.body;
     const order = await Order.findById(orderId);
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }
-    order.status.push({ status, remarks, updatedAt: Date.now() });
+
+    order.status.push({
+      status: newStatus,
+      remarks: '',
+      updatedAt: Date.now(),
+    });
+
     await order.save();
     res.json(order);
   } catch (error) {
@@ -52,31 +57,25 @@ exports.getAllOrders = async (req, res) => {
   try {
     const orders = await Order.find();
 
-    const pending = orders.filter((order) => order.status === 'pending');
-    const shipped = orders.filter((order) => order.status === 'shipped');
-    const delivered = orders.filter((order) => order.status === 'delivered');
+    const pending = [];
+    const shipped = [];
+    const delivered = [];
+
+    orders.forEach((order) => {
+      if (order.status && order.status.length > 0) {
+        const latestStatus = order.status[order.status.length - 1];
+
+        if (latestStatus.status === 'Pending') {
+          pending.push(order);
+        } else if (latestStatus.status === 'Shipped') {
+          shipped.push(order);
+        } else if (latestStatus.status === 'Delivered') {
+          delivered.push(order);
+        }
+      }
+    });
 
     res.json({ pending, shipped, delivered });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-exports.updateOrderStatus = async (req, res) => {
-  try {
-    const { orderId, newStatus } = req.body;
-
-    const updatedOrder = await Order.findByIdAndUpdate(
-      orderId,
-      { status: newStatus },
-      { new: true }
-    );
-
-    if (!updatedOrder) {
-      return res.status(404).json({ message: 'Order not found' });
-    }
-
-    res.json({ message: 'Order status updated successfully', order: updatedOrder });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

@@ -68,7 +68,7 @@ const AdminDashboard = () => {
     } catch (error) {
       console.error('Error fetching orders:', error);
     }
-    //console.log(orders)
+    console.log(orders)
   };
 
   const handleSearchChange = (e) => {
@@ -89,6 +89,7 @@ const AdminDashboard = () => {
 
   const handleExpandOrders = () => {
     setExpandOrders((prevState) => !prevState);
+    console.log(orders)
   };
 
   const handleStatusChange = (ticketId, ticket) => {
@@ -119,11 +120,11 @@ const AdminDashboard = () => {
     setNewRemark('');
   };
 
-  const handleShippedClick = async (orderId) => {
+  const handleShippedClick = async (order) => {
     try {
       await axios.put(`${API_URL}/orders/update-status`, {
-        orderId,
-        newStatus: 'shipped',
+        orderId: order._id,
+        newStatus: 'Shipped',
       });
       fetchOrders();
     } catch (error) {
@@ -131,11 +132,11 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleDeliveredClick = async (orderId) => {
+  const handleDeliveredClick = async (order) => {
     try {
       await axios.put(`${API_URL}/orders/update-status`, {
-        orderId,
-        newStatus: 'delivered',
+        orderId: order._id,
+        newStatus: 'Delivered',
       });
       fetchOrders();
     } catch (error) {
@@ -232,70 +233,86 @@ const AdminDashboard = () => {
           </IconButton>
         </Box>
         <Collapse in={expandOrders} timeout="auto" unmountOnExit>
+        <Box sx={{ marginTop: '20px' }}>
+  <Typography variant="h6">Pending Orders</Typography>
+  <Grid container spacing={2}>
+    {orders.pending.map((order) => (
+      <Grid item xs={12} sm={6} md={4} key={order._id}>
+        <Card>
+          <CardContent>
+            <Box display="flex" alignItems="center" justifyContent="space-between">
+              <Typography variant="h6">Order</Typography>
+              <Typography variant="h6">Total Price: ${order.totalPrice}</Typography>
+              <Button variant="contained" color="primary" onClick={() => handleShippedClick(order)}>
+                Shipped
+              </Button>
+            </Box>
+
+            {/* Render order items */}
+            {order.items.map((item) => (
+              <Box key={item._id} display="flex" alignItems="center" marginTop={2}>
+                <Box>
+                  {/* <Typography variant="subtitle1">{item.product.name}</Typography> */}
+                  <Typography variant="body2">Quantity: {item.quantity}</Typography>
+                </Box>
+              </Box>
+            ))}
+
+            {/* Render address details */}
+            <Box marginTop={2}>
+              <Typography variant="subtitle1">Address:</Typography>
+              <Typography variant="body2">{order.address.receiverName}</Typography>
+              <Typography variant="body2">{order.address.contactNumber}</Typography>
+              <Typography variant="body2">{order.address.flatNumber}, {order.address.area}</Typography>
+              <Typography variant="body2">{order.address.city}, {order.address.state}</Typography>
+              <Typography variant="body2">{order.address.country}, {order.address.pincode}</Typography>
+            </Box>
+          </CardContent>
+        </Card>
+      </Grid>
+    ))}
+  </Grid>
+</Box>
           <Box sx={{ marginTop: '20px' }}>
-            <Typography variant="h6">Pending Orders</Typography>
-              <Grid container spacing={2}>
-                {orders.pending.map((order) => (
-                  <Grid item xs={12} sm={6} md={4} key={order._id}>
-                    <Card>
-                      <CardContent>
-                        <Box display="flex" alignItems="center" justifyContent="space-between">
-                          <Typography variant="h6">{order.items[0].productId.name}</Typography>
-                          <Button
+            <Typography variant="h6">Shipped Orders</Typography>
+            <Grid container spacing={2}>
+              {orders.shipped.map((order) => (
+                <Grid item xs={12} sm={6} md={4} key={order._id}>
+                  <Card>
+                    <CardContent>
+                      <Box display="flex" alignItems="center" justifyContent="space-between">
+                        <Typography variant="h6">Order</Typography>
+                        <Button
                           variant="contained"
                           color="primary"
-                          onClick={() => handleShippedClick(order._id)}
-                          >
-                          Shipped
-                          </Button>
-                        </Box>
+                          onClick={() => handleDeliveredClick(order)}
+                        >
+                          Delivered
+                        </Button>
+                      </Box>
                       {/* Render other order details */}
-                      </CardContent>
-                    </Card>
-                  </Grid>
-                ))}
-              </Grid>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
           </Box>
           <Box sx={{ marginTop: '20px' }}>
-                  <Typography variant="h6">Shipped Orders</Typography>
-                  <Grid container spacing={2}>
-                    {orders.shipped.map((order) => (
-                      <Grid item xs={12} sm={6} md={4} key={order._id}>
-                        <Card>
-                          <CardContent>
-                            <Box display="flex" alignItems="center" justifyContent="space-between">
-                              <Typography variant="h6">{order.items[0].productId.name}</Typography>
-                              <Button
-                                variant="contained"
-                                color="primary"
-                                onClick={() => handleDeliveredClick(order._id)}
-                              >
-                                Delivered
-                              </Button>
-                            </Box>
-                            {/* Render other order details */}
-                          </CardContent>
-                        </Card>
-                      </Grid>
-                    ))}
-                  </Grid>
-                </Box>
-
-                <Box sx={{ marginTop: '20px' }}>
-                  <Typography variant="h6">Delivered Orders</Typography>
-                  <Grid container spacing={2}>
-                    {orders.delivered.map((order) => (
-                      <Grid item xs={12} sm={6} md={4} key={order._id}>
-                        <Card>
-                          <CardContent>
-                            {/* Render order details */}
-                          </CardContent>
-                        </Card>
-                      </Grid>
-                    ))}
-                  </Grid>
-                </Box>
-              </Collapse>
+            <Typography variant="h6">Delivered Orders</Typography>
+            <Grid container spacing={2}>
+              {orders.delivered.map((order) => (
+                <Grid item xs={12} sm={6} md={4} key={order._id}>
+                  <Card>
+                    <CardContent>
+                      {/* Render order details */}
+                      <Typography variant="h6">Order</Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+        </Collapse>
       </Box>
 
       <Dialog open={openDialog} onClose={handleCloseDialog}>
