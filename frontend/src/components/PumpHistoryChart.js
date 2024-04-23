@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import Chart from 'react-apexcharts';
-import { addWeeks, addMonths, addYears, addHours } from 'date-fns';
-import DatePicker from 'react-datepicker';
-import { Button, Box, Typography, Grid } from '@mui/material';
-import DateRangeIcon from '@mui/icons-material/DateRange';
-import { styled } from '@mui/material/styles';
 import { API_URL } from '../utils/apiConfig';
 import axios from 'axios';
+import { Box, Grid, Typography, Button } from '@mui/material'; // Import Material-UI components
+import { styled } from '@mui/material/styles';
+import DateRangeIcon from '@mui/icons-material/DateRange'; // Import DateRangeIcon
+import DatePicker from 'react-datepicker';
 
 const StyledButton = styled(Button)(({ theme }) => ({
   textTransform: 'none',
@@ -19,54 +18,74 @@ const StyledButton = styled(Button)(({ theme }) => ({
 }));
 
 const PumpHistoryChart = ({ deviceId }) => {
-  const [dateRange, setDateRange] = useState({
-    startDate: new Date(),
-    endDate: new Date(),
-  });
-
-  const [state, setState] = useState({
-    options: {
-      chart: {
-        toolbar: {
-          tools: {
-            download: true,
-            selection: false,
-            zoom: false,
-            zoomin: true,
-            zoomout: true,
-            pan: true,
-            reset: true | '<img src="/static/icons/reset.png" width="40">',
-          },
-        },
-        id: 'pump-history-chart',
-      },
-      xaxis: {
-        type: 'datetime',
-        categories: [],
-      },
-      yaxis: {
-        title: {
-          text: 'Threshold',
-        },
-      },
-      markers: {
-        size: [], // Empty array for dynamic marker sizes
+  const [frequencyData, setFrequencyData] = useState([]);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [customStartDate, setCustomStartDate] = useState(null);
+  const [customEndDate, setCustomEndDate] = useState(null);
+  const [timeRange, setTimeRange] = useState('day');
+  const [options, setOptions] = useState({
+    chart: {
+      type: 'bar',
+      toolbar: {
+        show: false,
       },
     },
-    series: [
-      {
-        name: 'Pump History',
-        data: [],
+    plotOptions: {
+      bar: {
+        horizontal: false,
+        columnWidth: '90%',
+        colors: {
+          ranges: [{
+            from: 0,
+            to: 100,
+            color: '#80ed99' // Green color
+          }]
+        },
       },
-    ],
+    },
+    xaxis: {
+      type: 'string',
+      categories: [],
+      title: {
+        text: 'Time',
+      },
+      tickPlacement: 'on',
+      labels: {
+        rotate: -45,
+      },
+      axisTicks: {
+        show: true,
+        placement: 'on',
+        alignWithLabels: true, // To align the ticks with the labels
+      },
+      tickAmount: 12, // Display only every third tick
+    },
+    yaxis: {
+      title: {
+        text: 'Frequency',
+      },
+    },
+    tooltip: {
+      x: {
+        formatter: function(val) {
+          const hours = Math.floor(val);
+          const start = `${hours}:00`;
+          const end = `${hours + 1}:00`;
+          return `${start} to ${end}`;
+        }
+      },
+      y: {
+        formatter: function(val) {
+          return `Frequency: ${val}`; // Update this line
+        }
+      }
+    }
   });
 
-  const [timeRange, setTimeRange] = useState('day');
-  const [customStartDate, setCustomStartDate] = useState(null);
-  const [showStartDatePicker, setShowStartDatePicker] = useState(true);
-  const [showEndDatePicker, setShowEndDatePicker] = useState(false);
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [customEndDate] = useState(null);
+  useEffect(() => {
+    fetchPumpHistoryData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deviceId, timeRange, customStartDate, customEndDate]);
 
   const fetchPumpHistoryData = async () => {
     try {
@@ -74,32 +93,44 @@ const PumpHistoryChart = ({ deviceId }) => {
       const todayUTC = new Date();
       switch (timeRange) {
         case 'day':
-          startDate = addHours(todayUTC, -23);
-          endDate = todayUTC;
+          startDate = new Date(todayUTC);
+          startDate.setHours(0, 0, 0, 0);
+          endDate = new Date(todayUTC);
+          endDate.setHours(23, 59, 59, 999);
           break;
         case 'week':
-          startDate = addWeeks(todayUTC, -1);
-          endDate = todayUTC;
+          startDate = new Date(todayUTC);
+          startDate.setDate(startDate.getDate() - 7);
+          startDate.setHours(0, 0, 0, 0);
+          endDate = new Date(todayUTC);
+          endDate.setHours(23, 59, 59, 999);
           break;
         case 'month':
-          startDate = addMonths(todayUTC, -1);
-          endDate = todayUTC;
+          startDate = new Date(todayUTC);
+          startDate.setMonth(startDate.getMonth() - 1);
+          startDate.setHours(0, 0, 0, 0);
+          endDate = new Date(todayUTC);
+          endDate.setHours(23, 59, 59, 999);
           break;
         case 'year':
-          startDate = addYears(todayUTC, -1);
-          endDate = todayUTC;
+          startDate = new Date(todayUTC);
+          startDate.setFullYear(startDate.getFullYear() - 1);
+          startDate.setHours(0, 0, 0, 0);
+          endDate = new Date(todayUTC);
+          endDate.setHours(23, 59, 59, 999);
           break;
         case 'custom':
           startDate = customStartDate || todayUTC;
           endDate = customEndDate || todayUTC;
-          endDate.setHours(0);
-          startDate.setMinutes(0);
-          endDate.setMinutes(59);
-          endDate.setHours(23);
+          startDate.setHours(0, 0, 0, 0);
+          endDate.setHours(23, 59, 59, 999);
           break;
         default:
-          startDate = addMonths(todayUTC, -1);
-          endDate = todayUTC;
+          startDate = new Date(todayUTC);
+          startDate.setMonth(startDate.getMonth() - 1);
+          startDate.setHours(0, 0, 0, 0);
+          endDate = new Date(todayUTC);
+          endDate.setHours(23, 59, 59, 999);
       }
 
       const formattedStartDate = startDate.toISOString();
@@ -113,89 +144,37 @@ const PumpHistoryChart = ({ deviceId }) => {
       };
       const response = await axios.get(endpoint, { params });
 
-      const data = response.data;
-      const categories = [];
-      const pumpHistoryData = [];
-      const markerSizes = [];
-
-      data.data.forEach((item) => {
-        const timestamp = new Date(item.timestamp).getTime(); // Get the timestamp
-        const markerSize = isNaN(item.pumpDuration) ? 0 : item.pumpDuration;
-        markerSizes.push(markerSize); // Collect marker sizes for all data points
-        console.log(markerSizes);
-        pumpHistoryData.push({
-          x: timestamp,
-          y: item.threshold || 70,
-          marker: {
-            size: markerSize,
-          },
-        });
+      const data = response.data.data;
+      const categories = data.map(item => {
+        console.log(item.time);
+        return item.time;
       });
 
-      setState((prevState) => ({
-        ...prevState,
-        options: {
-          ...prevState.options,
-          xaxis: {
-            ...prevState.options.xaxis,
-            type: 'datetime', // Set the x-axis type to datetime
-            labels: {
-              formatter: function(value) {
-                // Format the value to display as time
-                return new Date(value).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
-              }
-            }
-          },
-          markers: {
-            size: markerSizes, // Assign collected marker sizes to options
-          },
+      setFrequencyData(data.map(item => ({ x: item.time, y: item.frequency })));
+
+      setOptions(prevOptions => ({
+        ...prevOptions,
+        xaxis: {
+          ...prevOptions.xaxis,
+          categories: categories,
         },
-        series: [
-          {
-            name: 'Pump History',
-            data: pumpHistoryData,
-          },
-        ],
       }));
-           
     } catch (error) {
       console.error('Error fetching data:', error);
     }
   };
 
-  useEffect(() => {
-    fetchPumpHistoryData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [deviceId, timeRange, dateRange, customStartDate]);
-
   const handleTimeRangeButtonClick = (range) => {
     setTimeRange(range);
-    if (range !== 'custom') {
-      setShowDatePicker(false);
-      setCustomStartDate(null);
-    } else {
-      setShowDatePicker(true);
-    }
+    setShowDatePicker(range === 'custom');
   };
 
   const handleCustomStartDateChange = (date) => {
-    const startDateWithTime = new Date(date);
-    startDateWithTime.setHours(0, 0, 0, 0);
-    setCustomStartDate(startDateWithTime);
-    setDateRange({ ...dateRange, startDate: startDateWithTime, endDate: null });
-    setShowStartDatePicker(false);
-    setShowEndDatePicker(true);
+    setCustomStartDate(date);
   };
 
   const handleCustomEndDateChange = (date) => {
-    const endDateWithTime = new Date(date);
-    endDateWithTime.setHours(23, 59, 59, 999);
-
-    if (endDateWithTime > customStartDate) {
-      setDateRange({ ...dateRange, endDate: endDateWithTime });
-      setShowEndDatePicker(false);
-      setShowStartDatePicker(true);
-    }
+    setCustomEndDate(date);
   };
 
   return (
@@ -247,7 +226,6 @@ const PumpHistoryChart = ({ deviceId }) => {
                 >
                   Start Date:
                 </Typography>
-
                 <DatePicker
                   selected={customStartDate}
                   onChange={handleCustomStartDateChange}
@@ -277,7 +255,7 @@ const PumpHistoryChart = ({ deviceId }) => {
             </Grid>
           )}
         </Grid>
-        <Chart options={state.options} series={state.series} type="scatter" height={400} />
+        <Chart options={options} series={[{ data: frequencyData }]} type="bar" height={400} />
       </Box>
     </div>
   );

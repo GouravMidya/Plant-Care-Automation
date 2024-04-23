@@ -47,7 +47,6 @@ const getLatestPumpHistory = async (req, res) => {
   }
 };
 
-// Controller function to fetch pump history records for a given time range
 const getPumpHistoryByTimeRange = async (req, res) => {
   try {
     const { deviceId, startDate, endDate } = req.query;
@@ -59,15 +58,31 @@ const getPumpHistoryByTimeRange = async (req, res) => {
     }
 
     // Fetch pump history records from the database
-    const pumpHistoryRecords = await PumpHistory.find(query).sort({ timestamp: 1 });
+    let pumpHistoryRecords = await PumpHistory.find(query).sort({ timestamp: 1 });
+
+    // Initialize frequency data for each hour
+    const frequencyData = Array(24).fill(0);
+
+    // Calculate frequency for each hour
+    pumpHistoryRecords.forEach(record => {
+      const hour = new Date(record.timestamp).getHours();
+      frequencyData[hour]++; // Increment frequency for the respective hour
+    });
+
+    // Format the result
+    const result = frequencyData.map((frequency, index) => ({
+      time: index+":00",
+      frequency
+    }));
 
     // Respond with the pump history records
-    res.status(200).json({ success: true, data: pumpHistoryRecords });
+    res.status(200).json({ success: true, data: result });
   } catch (error) {
     console.error('Error fetching pump history records:', error);
     res.status(500).json({ success: false, message: 'Failed to fetch pump history records' });
   }
 };
+
 
 module.exports = {
   insertPumpHistory,
