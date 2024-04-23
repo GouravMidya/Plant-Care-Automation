@@ -19,7 +19,7 @@ function aboutuslay1() {
         </Grid>
         </Container>
         <Grid item xs={12}>
-          <img src="1.jpg" alt="Your Image" className="aboutimage" style={{ maxWidth: "100%"}} />
+          <img src="1.jpg" alt="Your Image" className="aboutimage" style={{ maxWidth: "100%",  borderRadius: "23px"}} />
         </Grid>
       </Grid>
     </Container>

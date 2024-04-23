@@ -11,7 +11,7 @@ function aboutuslay2() {
       <Grid container spacing={5} sx={{paddingTop:'1rem'}}>
         <Grid item xs={12} md={4}>
           <Box textAlign="center">
-            <img src="1.jpg" alt="Your Image" className="aboutimage2" style={{ maxWidth: "100%", marginBottom: "10px" }} />
+            <img src="2.jpg" alt="Your Image" className="aboutimage2" style={{ maxWidth: "100%", marginBottom: "10px",  borderRadius: "9px" }} />
             <Typography variant="h6" gutterBottom>
               <strong>Passion for Plants</strong>
             </Typography>
@@ -22,7 +22,7 @@ function aboutuslay2() {
         </Grid>
         <Grid item xs={12} md={4}>
           <Box textAlign="center">
-            <img src="1.jpg" alt="Your Image" className="aboutimage3" style={{ maxWidth: "100%", marginBottom: "10px" }} />
+            <img src="3.jpg" alt="Your Image" className="aboutimage3" style={{ maxWidth: "100%", marginBottom: "10px", borderRadius: "9px" }} />
             <Typography variant="h6" gutterBottom>
             <strong>Innovation</strong>
             </Typography>
@@ -33,7 +33,7 @@ function aboutuslay2() {
         </Grid>
         <Grid item xs={12} md={4}>
           <Box textAlign="center">
-            <img src="1.jpg" alt="Your Image" className="aboutimage4" style={{ maxWidth: "100%", marginBottom: "10px" }} />
+            <img src="4.jpg" alt="Your Image" className="aboutimage4" style={{ maxWidth: "100%", marginBottom: "10px",  borderRadius: "9px" }} />
             <Typography variant="h6" gutterBottom>
             <strong>Environmental Stewardship</strong>
             </Typography>
