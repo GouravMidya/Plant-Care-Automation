@@ -25,11 +25,11 @@ exports.getTickets = async (req, res) => {
     const { userId } = req.query;
     const currentTickets = await Ticket.find({
       userId,
-      'status.status': 'Open',
+      'status.status': { $ne: 'Closed' },
     });
     const ticketHistory = await Ticket.find({
       userId,
-      'status.status': { $ne: 'Open' },
+      'status.status': 'Closed',
     });
     res.status(200).json({ currentTickets, ticketHistory });
   } catch (error) {

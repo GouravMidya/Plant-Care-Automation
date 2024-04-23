@@ -12,7 +12,7 @@
 #include <LiquidCrystal_I2C.h>
 
 static const char* serverUrl = "https://plant-care-automation-backend.onrender.com"; // IP address of the server
-static const int deviceIDbundle[8] = {101, 102, 103, 104, 105, 106, 107, 108};
+static const int deviceIDbundle[8] = {108, 107, 103, 104, 105, 106, 102, 101};
 static const unsigned long deviceId = deviceIDbundle[0];
 
 
@@ -84,6 +84,29 @@ int readAnalogMUX() {
   return listIndex;
 }
 
+void scrollTexts(String text1, String text2, int delayTime) {
+    int text1Length = text1.length();
+    int text2Length = text2.length();
+    int displayWidth = 16; // Adjust this value based on your LCD display width
+
+    // Determine the maximum length between the two texts
+    int maxLength = max(text1Length, text2Length);
+
+    for (int position = 0; position < maxLength; position++) {
+        lcd.clear();
+
+        // Print line 1 text
+        lcd.setCursor(0, 0);
+        lcd.print(text1.substring(position, position + displayWidth));
+
+        // Print line 2 text
+        lcd.setCursor(0, 1);
+        lcd.print(text2.substring(position, position + displayWidth));
+
+        delay(delayTime);
+    }
+}
+
 // Function to update check delay and pump flow
 void fetchDeviceSettings() {
 
@@ -103,6 +126,25 @@ void fetchDeviceSettings() {
   https.addHeader("Content-Type", "application/json");
 
   int httpsResponseCode = https.POST(requestBody);
+
+  if (httpsResponseCode == 404) {
+    String line1 = "Please add device in your dashboard";
+    String line2 = "Go to Dashboard > + (Add Device)";
+    scrollTexts(line1,line2,400);
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Put Device ID:");
+    lcd.setCursor(0, 1);
+    lcd.print(String(deviceId));
+    delay(5000);
+    scrollTexts(line1,line2,400);
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Put Device ID:");
+    lcd.setCursor(0, 1);
+    lcd.print(String(deviceId));
+    delay(5000);
+  }
 
   if (httpsResponseCode == 200) {
     //digitalWrite(server_led,LOW); // Connected to server turn off server error led
@@ -138,6 +180,12 @@ void fetchDeviceSettings() {
     Serial.println(pumpFlowDuration);
     Serial.print("\nMOISTURE threshold:");
     Serial.println(moisturethreshold);
+
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Fetched Device");
+    lcd.setCursor(0, 1);
+    lcd.print("Settings!");
   } else {
     //digitalWrite(server_led, HIGH); // Not connecting to server, turn on error light
     Serial.print("Error fetching device settings. https response code: ");
@@ -339,24 +387,29 @@ void setup() {
   WiFiManager wifiManager;
 
   // Start the configuration portal
-  wifiManager.autoConnect("ESP8266_AP");
+  if (!wifiManager.autoConnect("BloomBuddy")) {
+    // WiFi connection timed out
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Couldn't connect");
+    lcd.setCursor(0, 1);
+    lcd.print("to WiFi");
+    delay(3000); // Wait for 3 seconds before trying again
+  } else {
+    // WiFi connected successfully
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Connected");
+    lcd.setCursor(0, 1);
+    lcd.print("to WiFi!");
+  }
   
-  lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.print("Connected");
-  lcd.setCursor(0, 1);
-  lcd.print("to WiFi!");
 
   //digitalWrite(wifi_led, HIGH); // Turn on wifi led (blue)
   Serial.println("Humidity, Temperature, and Soil Moisture Level\n\n");
   
   fetchDeviceSettings();
 
-  lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.print("Fetched Device");
-  lcd.setCursor(0, 1);
-  lcd.print("Settings!");
   pinMode(RELAY_PIN, OUTPUT);
   //pinMode(pump_led, OUTPUT);
   //pinMode(server_led, OUTPUT);
