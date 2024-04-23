@@ -16,7 +16,7 @@ function Layout2() {
         </Grid>
         <Grid item xs={12} md={6} className='right-column' sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           
-            <img src="PlantHome2.png" alt="Yourfile" className="image1" style={{ width: '100%', height:'80%'}}/>
+            <img src="PlantHome2.png" alt="Yourfile" className="image1" style={{ width: '100%', height:'80%',  borderRadius: "9px"}}/>
           
         </Grid>
       </Grid>

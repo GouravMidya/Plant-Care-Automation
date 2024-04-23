@@ -95,7 +95,7 @@ const Navbar = ({ user, setUser }) => {
   );
 
   return (
-    <AppBar position="static" sx={{ backgroundColor: '#2e7d32' }}>
+    <AppBar position="sticky" sx={{ backgroundColor: '#2e7d32' }}>
       <Toolbar>
         <Typography variant="h6" component={Link} to="/" sx={{ flexGrow: 1, textDecoration: 'none', color: 'white' }}>
           BloomBuddy

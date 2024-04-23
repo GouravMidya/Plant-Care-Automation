@@ -49,7 +49,7 @@ function Layout1({ headerHeight,user }) {
         </div>
         <div className="row">
           <div className="image-container">
-            <img src="1.jpg" alt="Your " className="image" />
+            <img src="1.jpg" alt="Your " className="image" style={{ borderRadius: "23px"}}/>
           </div>
         </div>
     </Container>
