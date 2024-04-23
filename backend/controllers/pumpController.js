@@ -7,7 +7,7 @@ const insertPumpHistory = async (req, res) => {
     const { deviceId, pumpDuration,threshold } = req.body;
 
     // Convert pump duration from milliseconds to seconds
-    const pumpDurationInSeconds = pumpDuration / 1000;
+    const pumpDurationInSeconds = pumpDuration;
     // Create a new pump history record object
     const newPumpHistory = new PumpHistory({
       deviceId,

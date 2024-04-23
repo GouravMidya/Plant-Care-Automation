@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import SoilMoistureChart from '../components/SoilMoistureChart'; // Import the SoilMoistureChart component
 import TemperatureChart from '../components/TemperatureChart'; // Import the SoilMoistureChart component
+import PumpHistoryChart from '../components/PumpHistoryChart';
 import {
   Grid,
   Card,
@@ -556,6 +557,10 @@ const Dashboard = () => {
                     <Grid item xs={12}>
                     <Typography variant="h6"><strong>Temperature Chart</strong></Typography>
                       <TemperatureChart deviceId={device.deviceId} /> 
+                    </Grid>
+                    <Grid item xs={12}>
+                    <Typography variant="h6"><strong>Pump History Chart</strong></Typography>
+                      <PumpHistoryChart deviceId={device.deviceId} /> 
                     </Grid>
                   </Grid>
                 </CardContent>

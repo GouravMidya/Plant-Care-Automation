@@ -51,12 +51,23 @@ const OrderHistory = ({ user }) => {
   };
 
   return (
-    <Container maxWidth="lg">
+    <Container maxWidth="lg" sx={{padding:'2rem'}}>
       <Typography variant="h4" gutterBottom>
         Order History
       </Typography>
       {loading ? (
-        <CircularProgress />
+        <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="50vh"
+        flexDirection="column"
+      >
+        <CircularProgress size={80} />
+        <Typography variant="h5" mt={2}>
+          Please wait while we fetch your Orders
+        </Typography>
+      </Box>
       ) : (
         <div>
           <Box sx={{ marginBottom: '20px' }}>
@@ -88,36 +99,42 @@ const OrderHistory = ({ user }) => {
                           ))}
                           {order.status.map((statusObj, index) => (
                             <Box
-                              key={index}
+                            key={index}
+                            sx={{
+                              display: 'flex',
+                              flexDirection: 'column', // Change flex direction to column
+                              marginBottom: 1,
+                              padding: 1,
+                              backgroundColor: index === order.status.length - 1 ? '#f5f5f5' : 'white',
+                            }}
+                          >
+                            <Box
                               sx={{
                                 display: 'flex',
                                 alignItems: 'center',
                                 marginBottom: 1,
-                                padding: 1,
-                                backgroundColor: index === order.status.length - 1 ? '#f5f5f5' : 'white',
                               }}
                             >
-                              <Box
-                                sx={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  flexGrow: 1,
-                                }}
-                              >
-                                {index === order.status.length - 1 ? (
-                                  <AccessTimeIcon sx={{ marginRight: 1 }} />
-                                ) : (
-                                  <CheckCircleIcon sx={{ marginRight: 1, color: green[500] }} />
-                                )}
-                                <Typography variant="body2">
-                                  {statusObj.status}
-                                  {statusObj.remarks && ` - Remarks: ${statusObj.remarks}`}
-                                </Typography>
-                              </Box>
-                              <Typography variant="body2">
-                                Updated At: {new Date(statusObj.updatedAt).toLocaleString()}
+                              {index === order.status.length - 1 ? (
+                                <CheckCircleIcon sx={{ marginRight: 1, color: green[500] }} />
+                              ) : (
+                                <CheckCircleIcon sx={{ marginRight: 1, color: green[500] }} />
+                              )}
+                              <Typography variant="body2" sx={{ flexGrow: 1 }}>
+                                {statusObj.status}
+                                {statusObj.remarks && ` - Remarks: ${statusObj.remarks}`}
                               </Typography>
                             </Box>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}> {/* Add this container */}
+                              <Typography variant="body2">
+                                Updated At:
+                              </Typography>
+                              <Typography variant="body2" sx={{ textAlign: 'right' }}>
+                                {new Date(statusObj.updatedAt).toLocaleString()}
+                              </Typography>
+                            </Box>
+                          </Box>
+                          
                           ))}
                         </Collapse>
                       </CardContent>
@@ -163,36 +180,42 @@ const OrderHistory = ({ user }) => {
                           ))}
                           {order.status.map((statusObj, index) => (
                             <Box
-                              key={index}
+                            key={index}
+                            sx={{
+                              display: 'flex',
+                              flexDirection: 'column', // Change flex direction to column
+                              marginBottom: 1,
+                              padding: 1,
+                              backgroundColor: index === order.status.length - 1 ? '#f5f5f5' : 'white',
+                            }}
+                          >
+                            <Box
                               sx={{
                                 display: 'flex',
                                 alignItems: 'center',
                                 marginBottom: 1,
-                                padding: 1,
-                                backgroundColor: index === order.status.length - 1 ? '#f5f5f5' : 'white',
                               }}
                             >
-                              <Box
-                                sx={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  flexGrow: 1,
-                                }}
-                              >
-                                {index === order.status.length - 1 ? (
-                                  <CheckCircleIcon sx={{ marginRight: 1, color: green[500] }} />
-                                ) : (
-                                  <CheckCircleIcon sx={{ marginRight: 1, color: green[500] }} />
-                                )}
-                                <Typography variant="body2">
-                                  {statusObj.status}
-                                  {statusObj.remarks && ` - Remarks: ${statusObj.remarks}`}
-                                </Typography>
-                              </Box>
-                              <Typography variant="body2">
-                                Updated At: {new Date(statusObj.updatedAt).toLocaleString()}
+                              {index === order.status.length - 1 ? (
+                                <CheckCircleIcon sx={{ marginRight: 1, color: green[500] }} />
+                              ) : (
+                                <CheckCircleIcon sx={{ marginRight: 1, color: green[500] }} />
+                              )}
+                              <Typography variant="body2" sx={{ flexGrow: 1 }}>
+                                {statusObj.status}
+                                {statusObj.remarks && ` - Remarks: ${statusObj.remarks}`}
                               </Typography>
                             </Box>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}> {/* Add this container */}
+                              <Typography variant="body2">
+                                Updated At:
+                              </Typography>
+                              <Typography variant="body2" sx={{ textAlign: 'right' }}>
+                                {new Date(statusObj.updatedAt).toLocaleString()}
+                              </Typography>
+                            </Box>
+                          </Box>
+                          
                           ))}
                         </Collapse>
                       </CardContent>

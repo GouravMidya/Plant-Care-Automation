@@ -139,21 +139,28 @@ const Tickets = ({ user }) => {
                     </IconButton>
                     <Collapse in={expanded[ticket._id]} timeout="auto" unmountOnExit>
                       {ticket.status.map((statusObj, index) => (
-                        <Card
-                          key={index}
+                        <Box
+                        key={index}
+                        sx={{
+                          display: 'flex',
+                          flexDirection: 'column', // Change flex direction to column
+                          marginBottom: 1,
+                          padding: 1,
+                          backgroundColor: index === ticket.status.length - 1 ? '#f5f5f5' : 'white',
+                        }}
+                      >
+                        <Box
                           sx={{
                             display: 'flex',
-                            alignItems: 'center',
+                            flexDirection: 'column', // Change flex direction to column
+                            alignItems: 'flex-start', // Align items to the start of the column
                             marginBottom: 1,
-                            padding: 1,
-                            backgroundColor: index === ticket.status.length - 1 ? '#f5f5f5' : 'white',
                           }}
                         >
                           <Box
                             sx={{
                               display: 'flex',
                               alignItems: 'center',
-                              flexGrow: 1,
                             }}
                           >
                             {index === ticket.status.length - 1 ? (
@@ -162,14 +169,26 @@ const Tickets = ({ user }) => {
                               <CheckCircleIcon sx={{ marginRight: 1, color: 'green' }} />
                             )}
                             <Typography variant="body2">
-                              {statusObj.status}
-                              {statusObj.remarks && ` - Remarks: ${statusObj.remarks}`}
+                              Status: {statusObj.status}
                             </Typography>
                           </Box>
+                          {statusObj.remarks && (
+                            <Typography variant="body2">
+                              Remarks: {statusObj.remarks}
+                            </Typography>
+                          )}
+                        </Box>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                           <Typography variant="body2">
-                            Updated At: {new Date(statusObj.updatedAt).toLocaleString()}
+                            Updated At:
                           </Typography>
-                        </Card>
+                          <Typography variant="body2" sx={{ textAlign: 'right' }}>
+                            {new Date(statusObj.updatedAt).toLocaleString()}
+                          </Typography>
+                        </Box>
+                      </Box>
+                      
+                      
                       ))}
                     </Collapse>
                   </CardContent>
@@ -209,15 +228,54 @@ const Tickets = ({ user }) => {
                     </IconButton>
                     <Collapse in={expanded[ticket._id]} timeout="auto" unmountOnExit>
                       {ticket.status.map((statusObj, index) => (
-                        <Box key={index}>
+                        <Box
+                        key={index}
+                        sx={{
+                          display: 'flex',
+                          flexDirection: 'column', // Change flex direction to column
+                          marginBottom: 1,
+                          padding: 1,
+                          backgroundColor: index === ticket.status.length - 1 ? '#f5f5f5' : 'white',
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            flexDirection: 'column', // Change flex direction to column
+                            alignItems: 'flex-start', // Align items to the start of the column
+                            marginBottom: 1,
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                            }}
+                          >
+                            {index === ticket.status.length - 1 ? (
+                              <AccessTimeIcon sx={{ marginRight: 1 }} />
+                            ) : (
+                              <CheckCircleIcon sx={{ marginRight: 1, color: 'green' }} />
+                            )}
+                            <Typography variant="body2">
+                              Status: {statusObj.status}
+                            </Typography>
+                          </Box>
+                          {statusObj.remarks && (
+                            <Typography variant="body2">
+                              Remarks: {statusObj.remarks}
+                            </Typography>
+                          )}
+                        </Box>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                           <Typography variant="body2">
-                            Status: {statusObj.status}
-                            {statusObj.remarks && ` - Remarks: ${statusObj.remarks}`}
+                            Updated At:
                           </Typography>
-                          <Typography variant="body2">
-                            Updated At: {new Date(statusObj.updatedAt).toLocaleString()}
+                          <Typography variant="body2" sx={{ textAlign: 'right' }}>
+                            {new Date(statusObj.updatedAt).toLocaleString()}
                           </Typography>
                         </Box>
+                      </Box>
                       ))}
                     </Collapse>
                   </CardContent>

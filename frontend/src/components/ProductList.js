@@ -46,15 +46,18 @@ const ProductList = ({ cartItems, handleAddToCart, handleIncreaseQuantity, handl
 
   if (isLoading) {
     return (
-      <Container
-        style={{
-          display: 'grid',
-          placeItems: 'center',
-          height: '100vh', // Adjust this if you want the CircularProgress to cover a different height
-        }}
-      >
-        <CircularProgress />
-      </Container>
+      <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="50vh"
+          flexDirection="column"
+        >
+          <CircularProgress size={80} />
+          <Typography variant="h5" mt={2}>
+            Please wait while we fetch our Products
+          </Typography>
+        </Box>
     );
   }
 
@@ -71,7 +74,7 @@ const ProductList = ({ cartItems, handleAddToCart, handleIncreaseQuantity, handl
   };
 
   return (
-    <Container maxWidth="xl">
+    <Container maxWidth="xl" sx={{paddingBottom:'2rem'}}>
       <Container sx={{ marginBottom: '1rem', display: 'flex', alignItems: 'center' }}>
         <Box sx={{ flexGrow: 1 }}>
           <SearchFilter onSearch={handleSearch} />
