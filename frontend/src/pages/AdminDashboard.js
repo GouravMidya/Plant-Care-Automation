@@ -75,7 +75,6 @@ const AdminDashboard = () => {
     } catch (error) {
       console.error('Error fetching orders:', error);
     }
-    console.log(tickets)
   };
 
   const handleSearchChange = (e) => {
@@ -111,7 +110,6 @@ const AdminDashboard = () => {
 
   const handleExpandOrders = () => {
     setExpandOrders((prevState) => !prevState);
-    console.log(orders)
   };
 
   const handleStatusChange = (ticketId, ticket) => {

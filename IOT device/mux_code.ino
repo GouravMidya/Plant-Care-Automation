@@ -11,9 +11,9 @@
 #include <Wire.h> 
 #include <LiquidCrystal_I2C.h>
 
-static const unsigned long deviceId = 1000000001;
 static const char* serverUrl = "https://plant-care-automation-backend.onrender.com"; // IP address of the server
 static const int deviceIDbundle[8] = {101, 102, 103, 104, 105, 106, 107, 108};
+static const unsigned long deviceId = deviceIDbundle[0];
 
 
 // Set the LCD address to 0x27 for a 16 chars and 2 line display
@@ -36,6 +36,8 @@ const int SELECT_3 = D4;
 long checkDelayDuration = 60000; //cooldown time between each check
 int pumpFlowDuration = 5000; 
 int moisturethreshold=400;
+int pumpDuration = pumpFlowDuration/1000;
+int threshold;
 bool pumpActivated = false; // Flag to track whether the pump has been activated
 unsigned long lastPumpActivationTime = 0; // Timestamp of the last pump activation
 int sns1, sns2, sns3, sns4, sns5, sns6, sns7, sns8; // value read from the pot
@@ -118,8 +120,8 @@ void fetchDeviceSettings() {
 
     // Extract checkIntervals and pumpDuration from the JSON
     long checkIntervals = doc["data"]["checkIntervals"];
-    long pumpDuration = doc["data"]["pumpDuration"];
-    int threshold = doc["data"]["threshold"];
+    pumpDuration = doc["data"]["pumpDuration"];
+    threshold = doc["data"]["threshold"];
 
     delay(1000);
 
@@ -215,7 +217,7 @@ void printReadingList() {
 // Function to control water pump
 void controlWaterPump() {
   printReadingList();
-  int soilMoisture = readingList[1][1]; // Read soil moisture from sensor 1
+  int soilMoisture = readingList[0][1]; // Read soil moisture from sensor 1
   Serial.println("Soil moisture value: " + String(soilMoisture));
   if(!pumpActivated && soilMoisture > moisturethreshold  && soilMoisture < 950){ //
     Serial.println("Water Level:"+String(soilMoisture));
@@ -256,7 +258,7 @@ void controlWaterPump() {
       // Start the https connection
       https.begin(client, url);
       https.addHeader("Content-Type", "application/json");
-      String requestBody = "{\"deviceId\": " + String(deviceIDbundle[deviceIdIndex]) + ", \"pumpDuration\": " + String(pumpFlowDuration) + "}";
+      String requestBody = "{\"deviceId\": " + String(deviceIDbundle[deviceIdIndex]) + ", \"pumpDuration\": " + String(pumpDuration) +  ", \"threshold\": " + String(threshold) +"}";
       int httpsResponseCode = https.POST(requestBody);
       if (httpsResponseCode > 0) {
         Serial.print("Pump activation data sent to server. https Response code: ");
@@ -387,11 +389,11 @@ void loop() {
     //Print on lcd
     lcdDisplay();
     sendDataToServer(); // Send data to server
-    // Serial.println("Before control water pump.");
+    Serial.println("Before control water pump.");
     controlWaterPump();
     delay(1000);
     lcdDisplay();
-    // Serial.println("After control water pump");
+    Serial.println("After control water pump");
     delay(checkDelayDuration); // Set value at top of programdelay
   }
 }
