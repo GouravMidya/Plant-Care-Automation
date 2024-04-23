@@ -59,6 +59,14 @@ const getPumpHistoryByTimeRange = async (req, res) => {
 
     // Fetch pump history records from the database
     let pumpHistoryRecords = await PumpHistory.find(query).sort({ timestamp: 1 });
+    
+    // Convert timestamps to IST
+    pumpHistoryRecords = pumpHistoryRecords.map(record => {
+      return {
+        ...record.toObject(), // Convert Mongoose document to plain object
+        timestamp: record.timestamp.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }) // Convert to IST
+      };
+    });
 
     // Initialize frequency data for each hour
     const frequencyData = Array(24).fill(0);
@@ -68,7 +76,7 @@ const getPumpHistoryByTimeRange = async (req, res) => {
       const hour = new Date(record.timestamp).getHours();
       frequencyData[hour]++; // Increment frequency for the respective hour
     });
-
+    
     // Format the result
     const result = frequencyData.map((frequency, index) => ({
       time: index+":00",

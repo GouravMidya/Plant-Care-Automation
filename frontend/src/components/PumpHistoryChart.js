@@ -69,8 +69,8 @@ const PumpHistoryChart = ({ deviceId }) => {
       x: {
         formatter: function(val) {
           const hours = Math.floor(val);
-          const start = `${hours}:00`;
-          const end = `${hours + 1}:00`;
+          const start = `${hours-1}:00`;
+          const end = `${hours }:00`;
           return `${start} to ${end}`;
         }
       },
@@ -146,7 +146,6 @@ const PumpHistoryChart = ({ deviceId }) => {
 
       const data = response.data.data;
       const categories = data.map(item => {
-        console.log(item.time);
         return item.time;
       });
 
