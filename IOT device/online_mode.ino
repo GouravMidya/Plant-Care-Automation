@@ -10,7 +10,7 @@
 #include <Wire.h> 
 #include <LiquidCrystal_I2C.h>
 
-static const unsigned long deviceId = 1000;
+static const unsigned long deviceId = 1000000003;
 static const char* serverUrl = "https://plant-care-automation-backend.onrender.com"; // IP address of the server
 static const int maxSoilReading = 720;
 static const int minSoilReading = 150;
@@ -27,7 +27,7 @@ const int RELAY_PIN = D6; // Connect relay to 0 pin
 //const int pump_led = D8;  // Pump LED connected to d3 pin
 //const int server_led = D6; // Turns on when server is down/not connected
 //const int wifi_led = D2;
-long checkDelayDuration = 60000; //cooldown time between each check
+long checkDelayDuration = 600000; //cooldown time between each check
 int pumpFlowDuration = 5000; 
 int pumpDuration = pumpFlowDuration/1000;
 int moisturethreshold=400;
@@ -127,14 +127,30 @@ void fetchDeviceSettings() {
     pumpFlowDuration = (pumpDuration*1000);
     moisturethreshold = (float(100-threshold)/100)*(maxSoilReading-minSoilReading)+minSoilReading;//70.703125% =300
 
-    delay(1000);
-  } else {
-    // digitalWrite(server_led, HIGH); // Not connecting to server, turn on error light
-    String err_line = "Error: ";
-    err_line += String(httpsResponseCode);
-    lcd.print(err_line);
-    Serial.print("Error fetching device settings. https response code: ");
-    Serial.println(httpsResponseCode);
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Fetched Device");
+    lcd.setCursor(0, 1);
+    lcd.print("Settings!");
+    delay(2000);
+  }
+  else if(httpsResponseCode == 500){
+    Serial.println("Server not reachable");
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("Server not ");
+      lcd.setCursor(0, 1);
+      lcd.print("Reachable");
+      delay(5000);
+  }
+  else {
+      Serial.println("Did not Receive device settings");
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("Internet not ");
+      lcd.setCursor(0, 1);
+      lcd.print("working");
+      delay(5000);
   }
 
   https.end();
@@ -174,12 +190,19 @@ void sendDataToServer() {
     } else {
       Serial.print("Error sending data to server. https Response code: ");
       Serial.println(httpsResponseCode);
+      // Display message on LCD
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("Failed to send");
+      lcd.setCursor(0, 1);
+      lcd.print("data to server");
+      delay(5000);
     }
     Serial.print("Sent data to server.");
     // End the https connection
     https.end();
-  }else{
-    Serial.println("Invalid Reading , Sensor not in soil/n Reading is:"+String(soil_moisture));
+  } else {
+    Serial.println("Invalid Reading, Sensor not in soil/n Reading is:" + String(soil_moisture));
   }
 }
 
@@ -311,12 +334,7 @@ void setup() {
   //digitalWrite(wifi_led, HIGH); // Turn on wifi led (blue)
   Serial.println("Humidity, Temperature, and Soil Moisture Level\n\n");
   
-  fetchDeviceSettings();
-  lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.print("Fetched Device");
-  lcd.setCursor(0, 1);
-  lcd.print("Settings!");
+  fetchDeviceSettings();      
   pinMode(RELAY_PIN, OUTPUT);
   //pinMode(pump_led, OUTPUT);
   //pinMode(server_led, OUTPUT);
@@ -341,7 +359,7 @@ void loop() {
   lcd.print("Taking Moisture");
   lcd.setCursor(0, 1);
   lcd.print("Readings");
-  delay(1000);
+  delay(2000);
 
   if(readSoilMoisture() && readTemperatureHumidity()){
     lcdDisplay();

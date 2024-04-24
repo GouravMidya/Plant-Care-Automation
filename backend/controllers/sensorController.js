@@ -114,9 +114,11 @@ const getAverageSoilMoisture = async (req, res) => {
       // Calculate percentage soil moisture
       if(average!=0)
       {
-        const minSoilMoisture = 0;
-        const maxSoilMoisture = 1024;
+        console.log("Average: ",average);
+        const minSoilMoisture = 150;
+        const maxSoilMoisture = 720;
         const percentage = ((1 - (average - minSoilMoisture) / (maxSoilMoisture - minSoilMoisture)) * 100).toFixed(2);
+        console.log(percentage);
         return { timeRange, soilMoisture: percentage };
       }
       else{
@@ -217,8 +219,8 @@ let formattedHourlyAverages = hourlyAverages.map((hourData, hour) => {
   // Calculate percentage soil moisture
   if(average!=0)
   {
-    const minSoilMoisture = 0;
-    const maxSoilMoisture = 1024;
+    const minSoilMoisture = 150;
+    const maxSoilMoisture = 720;
     const percentage = ((1 - (average - minSoilMoisture) / (maxSoilMoisture - minSoilMoisture)) * 100).toFixed(2);
     return { timeRange, soilMoisture: percentage };
   }

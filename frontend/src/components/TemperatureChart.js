@@ -36,7 +36,7 @@ const TemperatureChart = ({ deviceId }) => {
             zoomin: true,
             zoomout: true,
             pan: true,
-            reset: true | '<img src="/static/icons/reset.png" width="40">',
+            reset: true,
           },
         },
         id: "basic-bar"
@@ -332,6 +332,7 @@ const [showEndDatePicker, setShowEndDatePicker] = useState(false);
            options={state.options}
            series={state.series}
            type="area"
+           height={300}
          />
     </Box>
     </div>

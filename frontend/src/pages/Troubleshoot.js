@@ -38,39 +38,57 @@ const Troubleshoot = () => {
   const troubleshootingGuides = [
     {
       id: 1,
-      title: 'Sensor readings inconsistent',
+      title: 'No Display on LCD Screen',
       steps: [
-        'Check sensor connections to ensure they are securely attached to the central control unit.',
-        'Verify that sensors are properly calibrated according to manufacturer instructions.',
-        'Clean sensors regularly to remove any dirt or debris that may interfere with readings.',
-        'Replace sensors if they are damaged or faulty.'
+        'Ensure the Power is turned on.',
+        'Ensure the switch the adapter is plugged to provides enough voltage current to BloomBuddy',
+        'Check Power Connection: Ensure that the LCD screen is properly connected to the power source and turned on.',
+        'Replace LCD display if it is damaged or faulty.'
       ],
     },
     {
       id: 2,
-      title: 'Network Issues (Red light on device is on)',
+      title: '"Internet Not Working" Error',
       steps: [
-        'Ensure that the central control unit is powered on and connected to the internet.',
-        'Check network connectivity and Wi-Fi signal strength.',
-        'Restart the central control unit and/or router to refresh connections.',
+        'Restart Router: Power cycle the router or access point to refresh the internet connection and resolve any temporary network issues.',
+        'Check Wi-Fi Credentials: Verify that the Wi-Fi credentials (SSID and password) configured in the Arduino code match those of the network the device is trying to connect to.',
+        'Inspect Signal Strength: Ensure that the Arduino device is within range of the Wi-Fi network and that the signal strength is sufficient for stable connectivity.',
       ],
     },
     {
       id: 3,
-      title: 'Incorrect Watering Patterns',
+      title: '"Error Sending Data to Server" Error',
       steps: [
-        'Review and adjust watering parameters in the system settings to better match plant requirements.',
-        'Verify that sensors are accurately measuring soil moisture levels and other environmental factors.',
-        'Inspect the irrigation system for any leaks or blockages that may be affecting water distribution.'],
+        'Check if it could be due to temporary network issues.',
+        'Wait for a few moments and try again.',
+        'If the problem persists, please contact customer support for assistance.'],
     },
     {
-      id: 4,
+      id:4,
+      title:'"Server not Reachable" Error' ,
+      steps:[
+        'Our server might not be reachable at the moment',
+        'We apologize for inconvenience we will get it back as soon as possible'
+      ]
+    },
+    {
+      id: 5,
       title: 'Power Interruptions',
       steps: [
         'Check power connections to ensure they are secure and free from damage.',
         'Install a backup power source (e.g., battery backup) to prevent interruptions during power outages.',
       ],
     },
+    {
+      id:6,
+      title: 'Pump not working',
+      steps:[
+        'Ensure the pump is suubmerged completely under water',
+        'Check if the wires seem to be loose, if so correct it.',
+        'Try to use other pump to see if the pump component has been damaged'
+      ]
+    }
+    
   ];
 
   const handleExpandClick = (guideId) => {

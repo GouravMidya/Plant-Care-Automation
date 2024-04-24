@@ -118,9 +118,9 @@ const Checkout = () => {
         <strong>Checkout</strong>
       </Typography>
 
-      <Grid container spacing={6} marginTop={'-1rem'} sx={{ paddingBottom: '2rem' }}>
+      <Grid container spacing={12} marginTop={'-1rem'} sx={{ paddingBottom: '2rem' }} >
         <Grid item xs={12} md={6}>
-          <Paper elevation={6} sx={{ width: { xs: '80%', md: '85%', lg: '90%' }, padding: '2rem' }}>
+          <Paper elevation={6} sx={{ width: { xs: '80%', md: '85%', lg: '90%' }, padding: '3rem', alignSelf:'center'}}>
             <Typography variant="h6" gutterBottom>
               Delivery Address
             </Typography>
@@ -184,7 +184,7 @@ const Checkout = () => {
         </Grid>
 
         <Grid item xs={12} md={6}>
-          <Paper elevation={6} sx={{ width: { xs: '80%', md: '85%', lg: '90%' }, padding: '2rem' }} xs={12} md={6}>
+          <Paper elevation={6} sx={{ width: { xs: '80%', md: '85%', lg: '90%' }, padding: '3rem' }} xs={12} md={6}>
             <Typography variant="h5" gutterBottom textAlign={'center'}>
               <strong>Cart Summary</strong>
             </Typography>

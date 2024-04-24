@@ -23,8 +23,8 @@ import {
 import { isAuthenticated } from '../utils/authUtils';
 import { API_URL } from '../utils/apiConfig';
 import AddIcon from '@mui/icons-material/Add';
-
-
+import { maxSoilMoisture } from '../utils/apiConfig';
+import { minSoilMoisture } from '../utils/apiConfig';
 const Dashboard = () => {
   const [user, setUser] = useState(null);
   const [devices, setDevices] = useState([]);
@@ -160,7 +160,7 @@ const Dashboard = () => {
     const checkInterval = device.checkIntervals * 60 * 1000; // Convert check interval from minutes to milliseconds
     
     // Check if the last timestamp plus the check interval is older than the current timestamp
-    if (lastTimestamp + checkInterval < currentTimestamp) {
+    if (lastTimestamp + checkInterval + 60000 < currentTimestamp) {
       return 'Off'; // Device is considered off
     } else {
       return 'On'; // Device is considered on
@@ -255,10 +255,10 @@ const Dashboard = () => {
                         border: '2px solid green',
                         fontSize: '1.2rem',
                         fontWeight: 'bold',
-                        color: latestRecords[device.deviceId]?.soilMoisture > (1024-((device.threshold*1024)/100)) ? 'red' : 'green',
+                        color: ((1-(latestRecords[device.deviceId]?.soilMoisture -minSoilMoisture)/(maxSoilMoisture-minSoilMoisture))*100) < device.threshold ? 'red' : 'green',
                       }}
                     >
-                          {((1-(latestRecords[device.deviceId]?.soilMoisture )/1024)*100).toFixed(2)+'%'|| '-'}
+                          {((1-(latestRecords[device.deviceId]?.soilMoisture -minSoilMoisture)/(maxSoilMoisture-minSoilMoisture))*100).toFixed(2)+'%'|| '-'}
                     </Box>
                   </Grid>
                   <Grid item xs={4}>
@@ -554,11 +554,11 @@ const Dashboard = () => {
                     <Typography variant="h6"><strong>Soil Moisture Chart</strong></Typography>
                       <SoilMoistureChart deviceId={device.deviceId} /> 
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid item xs={12} sx={{marginTop:'1rem'}}>
                     <Typography variant="h6"><strong>Temperature Chart</strong></Typography>
                       <TemperatureChart deviceId={device.deviceId} /> 
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid item xs={12} sx={{marginTop:'1rem'}}>
                     <Typography variant="h6"><strong>Pump History Chart</strong></Typography>
                       <PumpHistoryChart deviceId={device.deviceId} /> 
                     </Grid>

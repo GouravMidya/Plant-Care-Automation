@@ -27,7 +27,15 @@ const PumpHistoryChart = ({ deviceId }) => {
     chart: {
       type: 'bar',
       toolbar: {
-        show: false,
+        tools: {
+          download: true,
+          selection: false,
+          zoom: false,
+          zoomin: true,
+          zoomout: true,
+          pan: true,
+          reset: true,
+        },
       },
     },
     plotOptions: {
@@ -254,7 +262,7 @@ const PumpHistoryChart = ({ deviceId }) => {
             </Grid>
           )}
         </Grid>
-        <Chart options={options} series={[{ data: frequencyData }]} type="bar"  />
+        <Chart options={options} series={[{ data: frequencyData }]} height={300} type="bar"  />
       </Box>
     </div>
   );
