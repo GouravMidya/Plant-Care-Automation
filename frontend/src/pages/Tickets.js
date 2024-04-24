@@ -16,6 +16,10 @@ import {
   TextField,
   IconButton,
   Collapse,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -26,6 +30,7 @@ const Tickets = ({ user }) => {
   const [currentTickets, setCurrentTickets] = useState([]);
   const [ticketHistory, setTicketHistory] = useState([]);
   const [openRaiseTicketDialog, setOpenRaiseTicketDialog] = useState(false);
+  const [devices, setDevices] = useState([]);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -39,6 +44,7 @@ const Tickets = ({ user }) => {
   useEffect(() => {
     if (user) {
       fetchTickets();
+      fetchUserDevices();
     }
 
     const { state } = location;
@@ -46,6 +52,15 @@ const Tickets = ({ user }) => {
       handleOpenRaiseTicketDialog(state.deviceId);
     }
   }, [user, location]);
+
+  const fetchUserDevices = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/api/user_devices?userId=${user.id}`);
+      setDevices(response.data.data);
+    } catch (error) {
+      console.error('Error fetching user devices:', error);
+    }
+  };
 
   const fetchTickets = async () => {
     try {
@@ -295,6 +310,23 @@ const Tickets = ({ user }) => {
       <Dialog open={openRaiseTicketDialog} onClose={handleCloseRaiseTicketDialog}>
         <DialogTitle>Raise Ticket</DialogTitle>
         <DialogContent>
+          <FormControl fullWidth margin="normal">
+            <InputLabel id="device-id-label">Device ID</InputLabel>
+            <Select
+              labelId="device-id-label"
+              value={devices.some((device) => device.deviceId === formData.deviceId)
+                ? formData.deviceId
+                : ''}
+              onChange={(e) => handleFormChange({ target: { name: 'deviceId', value: e.target.value } })}
+            >
+              <MenuItem value="">Select a device</MenuItem>
+              {devices.map((device) => (
+                <MenuItem key={device.deviceId} value={device.deviceId}>
+                  {device.deviceName} ({device.deviceId})
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
           <TextField
             name="title"
             label="Title"

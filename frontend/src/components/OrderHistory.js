@@ -33,7 +33,6 @@ const OrderHistory = ({ user }) => {
         setCurrentOrders(current);
         setPastOrders(past);
         setLoading(false);
-        console.log("Fetching successfully: ", response.data);
       } catch (error) {
         console.error('Error fetching orders:', error);
         setLoading(false);
@@ -79,7 +78,7 @@ const OrderHistory = ({ user }) => {
                     <Card>
                       <CardContent>
                         <Typography variant="h6">Order ID: {order._id}</Typography>
-                        <Typography variant="body2">Total Price: ${order.totalPrice}</Typography>
+                        <Typography variant="body2">Total Price: Rs. {order.totalPrice}</Typography>
                         <Typography variant="body2">
                           Status: {order.status[order.status.length - 1].status}
                         </Typography>

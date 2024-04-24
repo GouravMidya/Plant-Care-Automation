@@ -41,12 +41,23 @@ function Homepage({user}) {
                 <Link to="/aboutus"><StyledButton variant="outlined"  >Learn More</StyledButton></Link>
                 {user ? null : <Link to="/signup"><StyledButton  variant="outlined" className="signup">Sign Up</StyledButton></Link>}
                 {user !== null && (
-                  <Link to="/dashboard">
-                    <StyledButton variant="outlined" className="dashboard">
-                      Dashboard
-                    </StyledButton>
-                  </Link>
-                )}
+                  <>
+                    {user.role === 'user' && (
+                      <Link to="/dashboard">
+                        <StyledButton variant="outlined" className="dashboard">
+                          Dashboard
+                        </StyledButton>
+                      </Link>
+                    )}
+                    {user.role === 'admin' && (
+                      <Link to="/admin">
+                        <StyledButton variant="outlined" className="dashboard">
+                          Admin Dashboard
+                        </StyledButton>
+                      </Link>
+                    )}
+                  </>
+              )}
 
               </div>
             </Container>

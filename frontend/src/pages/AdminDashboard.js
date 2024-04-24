@@ -267,7 +267,7 @@ const AdminDashboard = () => {
                   <CardContent>
                     <Box display="flex" alignItems="center" justifyContent="space-between">
                       <Typography variant="h6">{order.userId.username}</Typography>
-                      <Typography variant="h6">Total Price: ${order.totalPrice}</Typography>
+                      <Typography variant="h6">Total Price: Rs. {order.totalPrice}</Typography>
                       <Button variant="contained" color="primary" onClick={() => handleShippedClick(order)}>
                         Shipped
                       </Button>

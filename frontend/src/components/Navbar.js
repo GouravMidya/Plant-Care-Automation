@@ -66,9 +66,11 @@ const Navbar = ({ user, setUser }) => {
               <ListItemText primary="Admin Dashboard" />
             </ListItem>
           )}
-          <ListItem button component={Link} to="/dashboard">
-            <ListItemText primary="Dashboard" />
-          </ListItem>
+          {user && user.role !== 'admin' && (
+            <ListItem button component={Link} to="/dashboard">
+              <ListItemText primary="Dashboard" />
+            </ListItem>
+          )}
           <ListItem button component={Link} to="/products">
             <ListItemText primary="Products" />
           </ListItem>
@@ -106,9 +108,11 @@ const Navbar = ({ user, setUser }) => {
               Admin Dashboard
             </Button>
           )}
+          {user && user.role !== 'admin' && (
           <Button component={Link} to="/dashboard" sx={{ color: 'white' }} variant="outlined">
             Dashboard
           </Button>
+          )}
           <Button component={Link} to="/products" sx={{ color: 'white' }} variant="outlined">
             Products
           </Button>
