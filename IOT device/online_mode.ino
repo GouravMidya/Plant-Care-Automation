@@ -10,8 +10,10 @@
 #include <Wire.h> 
 #include <LiquidCrystal_I2C.h>
 
-static const unsigned long deviceId = 1000000003;
+static const unsigned long deviceId = 1000;
 static const char* serverUrl = "https://plant-care-automation-backend.onrender.com"; // IP address of the server
+static const int maxSoilReading = 720;
+static const int minSoilReading = 150;
 
 // Set the LCD address to 0x27 for a 16 chars and 2 line display
 LiquidCrystal_I2C lcd(0x27, 16, 2);
@@ -37,6 +39,29 @@ DHT dht(dht_dpin, DHTTYPE);
 float humidity,temperature;
 int soil_moisture;
 
+void scrollTexts(String text1, String text2, int delayTime) {
+    int text1Length = text1.length();
+    int text2Length = text2.length();
+    int displayWidth = 16; // Adjust this value based on your LCD display width
+
+    // Determine the maximum length between the two texts
+    int maxLength = max(text1Length, text2Length);
+
+    for (int position = 0; position < maxLength; position++) {
+        lcd.clear();
+
+        // Print line 1 text
+        lcd.setCursor(0, 0);
+        lcd.print(text1.substring(position, position + displayWidth));
+
+        // Print line 2 text
+        lcd.setCursor(0, 1);
+        lcd.print(text2.substring(position, position + displayWidth));
+
+        delay(delayTime);
+    }
+}
+
 // Function to update check delay and pump flow
 void fetchDeviceSettings() {
 
@@ -57,8 +82,27 @@ void fetchDeviceSettings() {
 
   int httpsResponseCode = https.POST(requestBody);
 
+  if (httpsResponseCode == 404) {
+    String line1 = "Please add device in your dashboard";
+    String line2 = "Go to Dashboard > + (Add Device)";
+    scrollTexts(line1,line2,400);
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Put Device ID:");
+    lcd.setCursor(0, 1);
+    lcd.print(String(deviceId));
+    delay(5000);
+    scrollTexts(line1,line2,400);
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Put Device ID:");
+    lcd.setCursor(0, 1);
+    lcd.print(String(deviceId));
+    delay(5000);
+  }
+
   if (httpsResponseCode == 200) {
-    digitalWrite(server_led,LOW); // Connected to server turn off server error led
+    // digitalWrite(server_led,LOW); // Connected to server turn off server error led
     String response = https.getString();
     Serial.println("Received device settings:");
     Serial.println(response);
@@ -81,11 +125,14 @@ void fetchDeviceSettings() {
     // Update checkDelayDuration and pumpFlowDuration
     checkDelayDuration = (checkIntervals*60000);
     pumpFlowDuration = (pumpDuration*1000);
-    moisturethreshold = (1024-((threshold*1024)/100));//70.703125% =300
+    moisturethreshold = (float(100-threshold)/100)*(maxSoilReading-minSoilReading)+minSoilReading;//70.703125% =300
 
     delay(1000);
   } else {
-    digitalWrite(server_led, HIGH); // Not connecting to server, turn on error light
+    // digitalWrite(server_led, HIGH); // Not connecting to server, turn on error light
+    String err_line = "Error: ";
+    err_line += String(httpsResponseCode);
+    lcd.print(err_line);
     Serial.print("Error fetching device settings. https response code: ");
     Serial.println(httpsResponseCode);
   }
@@ -95,7 +142,7 @@ void fetchDeviceSettings() {
 
 // Function to send sensor data
 void sendDataToServer() {
-  if (soil_moisture <=750 && soil_moisture>50){
+  if (soil_moisture <=500 && soil_moisture>50){
     
     // Create a WiFi Client
     HTTPClient https;
@@ -147,16 +194,27 @@ int readSoilMoisture() {
 
 // Function to control water pump
 void controlWaterPump() {
-  if(!pumpActivated && soil_moisture > moisturethreshold  && soil_moisture < 950){
+  if(!pumpActivated && soil_moisture > moisturethreshold  && soil_moisture < 650){
     Serial.println("Water Level:"+String(soil_moisture));
     pumpActivated = true;
     lastPumpActivationTime = millis(); // Record the timestamp of pump activation
     digitalWrite(RELAY_PIN, LOW); // Turn on pump
-    digitalWrite(pump_led, HIGH); // Turn on LED for pump
+    // digitalWrite(pump_led, HIGH); // Turn on LED for pump
     Serial.println("Water Level Low! Pumping Water");
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Water Level Low!");
+    lcd.setCursor(0, 1);
+    lcd.print("Pumping Water");
     delay(pumpFlowDuration); // Set value at top of program
     digitalWrite(RELAY_PIN, HIGH); // Turn off pump
-    digitalWrite(pump_led, LOW); // Turn off light
+    // digitalWrite(pump_led, LOW); // Turn off light
+    Serial.println("Water Pump turned off");
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Water Pump");
+    lcd.setCursor(0, 1);
+    lcd.print("Turned Off!");
     Serial.println("Water Pump turned off");
 
     // Send pump activation data to the server
@@ -171,7 +229,7 @@ void controlWaterPump() {
     // Start the https connection
     https.begin(client, url);
     https.addHeader("Content-Type", "application/json");
-    String requestBody = "{\"deviceId\": " + String(deviceId) + ", \"pumpDuration\": " + String(pumpDuration) +", \threshold\": "+ String(threshold) + "}";
+    String requestBody = "{\"deviceId\": " + String(deviceId) + ", \"pumpDuration\": " + String(pumpDuration) +", \"threshold\": "+ String(threshold) + "}";
     int httpsResponseCode = https.POST(requestBody);
     if (httpsResponseCode > 0) {
       Serial.print("Pump activation data sent to server. https Response code: ");
@@ -215,14 +273,7 @@ void lcdDisplay(){
 
   lcd.setCursor(0, 1);
   String line2 = "Mois:" ;
-  for (int i = 0; i < listSize; i++) {
-    // line2 += ("[");
-    // line2 += String(readingList[i][0]);
-    // line2 += (",");
-    line2 += ((1.00 - readingList[i][1] / 1024.00) * 100);
-    // line2 += ("]");
-    line2 += (" ");
-  }
+  line2 += String(((1 - float(soil_moisture - minSoilReading) / (maxSoilReading - minSoilReading)) * 100));
   lcd.print(line2);
 }
 
@@ -249,7 +300,7 @@ void setup() {
   WiFiManager wifiManager;
 
   // Start the configuration portal
-  wifiManager.autoConnect("ESP8266_AP");
+  wifiManager.autoConnect("BloomBuddy");
   
   lcd.clear();
   lcd.setCursor(0, 0);

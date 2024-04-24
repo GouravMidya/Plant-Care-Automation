@@ -12,8 +12,10 @@
 #include <LiquidCrystal_I2C.h>
 
 static const char* serverUrl = "https://plant-care-automation-backend.onrender.com"; // IP address of the server
-static const int deviceIDbundle[8] = {108, 107, 103, 104, 105, 106, 102, 101};
+static const int deviceIDbundle[8] = {101, 102, 103, 104, 105, 106, 107, 108};
 static const unsigned long deviceId = deviceIDbundle[0];
+static const int maxSoilReading = 720;
+static const int minSoilReading = 150;
 
 
 // Set the LCD address to 0x27 for a 16 chars and 2 line display
@@ -170,7 +172,7 @@ void fetchDeviceSettings() {
     // Update checkDelayDuration and pumpFlowDuration
     checkDelayDuration = (checkIntervals*60000);
     pumpFlowDuration = (pumpDuration*1000);
-    moisturethreshold = (1024-((threshold*1024)/100));//70.703125% =300
+    moisturethreshold = (float(100-threshold)/100)*(maxSoilReading-minSoilReading)+minSoilReading;//70.703125% =300
 
     delay(1000);
     
@@ -354,7 +356,9 @@ void lcdDisplay(){
     // line2 += ("[");
     // line2 += String(readingList[i][0]);
     // line2 += (",");
-    line2 += ((1.00 - readingList[i][1] / 1024.00) * 100);
+    // line2 += ((1.00 - readingList[i][1] / 1024.00) * 100);
+    line2 += String(((1 - float(readingList[i][1] - minSoilReading) / (maxSoilReading - minSoilReading)) * 100));
+
     // line2 += ("]");
     line2 += (" ");
   }
