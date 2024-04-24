@@ -254,7 +254,7 @@ const PumpHistoryChart = ({ deviceId }) => {
             </Grid>
           )}
         </Grid>
-        <Chart options={options} series={[{ data: frequencyData }]} type="bar" height={400} />
+        <Chart options={options} series={[{ data: frequencyData }]} type="bar"  />
       </Box>
     </div>
   );
