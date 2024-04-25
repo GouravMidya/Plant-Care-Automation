@@ -250,7 +250,7 @@ const Tickets = ({ user }) => {
                           flexDirection: 'column', // Change flex direction to column
                           marginBottom: 1,
                           padding: 1,
-                          backgroundColor: index === ticket.status.length - 1 ? '#f5f5f5' : 'white',
+                          backgroundColor: index === ticket.status.length - 1 ? '#D3FFCE' : 'white',
                         }}
                       >
                         <Box
@@ -267,11 +267,7 @@ const Tickets = ({ user }) => {
                               alignItems: 'center',
                             }}
                           >
-                            {index === ticket.status.length - 1 ? (
-                              <AccessTimeIcon sx={{ marginRight: 1 }} />
-                            ) : (
-                              <CheckCircleIcon sx={{ marginRight: 1, color: 'green' }} />
-                            )}
+                            <CheckCircleIcon sx={{ marginRight: 1, color: 'green' }} />
                             <Typography variant="body2">
                               Status: {statusObj.status}
                             </Typography>

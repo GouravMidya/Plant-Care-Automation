@@ -25,15 +25,15 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 #define DHTTYPE DHT11  // Define the sensor type (DHT11)
 #define dht_dpin D5   // Pin where the DHT11 sensor is connected
 
-const int RELAY_PIN = D6; // Connect relay to 0 pin
+const int RELAY_PIN_1 = D6; // Connect first relay to D6 pin
+const int RELAY_PIN_2 = D7; // Connect second relay to D7 pin
+
 //D1 D2 for led display
 const int SELECT_1 = D0;
 const int SELECT_2 = D3;
 const int SELECT_3 = D4;
 
-// const int pump_led = D8;  // Pump LED connected to d3 pin
-// const int server_led = D7; // Turns on when server is down/not connected
-// const int wifi_led = 3; //RX
+
 
 long checkDelayDuration = 60000; //cooldown time between each check
 int pumpFlowDuration = 5000; 
@@ -267,58 +267,73 @@ void printReadingList() {
 // Function to control water pump
 void controlWaterPump() {
   printReadingList();
-  int soilMoisture = readingList[0][1]; // Read soil moisture from sensor 1
-  Serial.println("Soil moisture value: " + String(soilMoisture));
-  if(!pumpActivated && soilMoisture > moisturethreshold  && soilMoisture < 950){ //
-    Serial.println("Water Level:"+String(soilMoisture));
-    lcd.clear();
-    lcd.print("Water Level:"+String(soilMoisture));
-    pumpActivated = true;
-    lastPumpActivationTime = millis(); // Record the timestamp of pump activation
-    digitalWrite(RELAY_PIN, LOW); // Turn on pump
-    // digitalWrite(pump_led, HIGH); // Turn on LED for pump
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("Water Level Low!");
-    lcd.setCursor(0, 1);
-    lcd.print("Pumping Water");
-    
-    Serial.println("Water Level Low! Pumping Water");
-    delay(pumpFlowDuration); // Set value at top of program 
-    digitalWrite(RELAY_PIN, HIGH); // Turn off pump
-    // digitalWrite(pump_led, LOW); // Turn off light
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("Water Pump");
-    lcd.setCursor(0, 1);
-    lcd.print("Turned Off!");
-    Serial.println("Water Pump turned off");
 
-    // Send pump activation data to the server
-          
-    HTTPClient https;
-    BearSSL::WiFiClientSecure client; 
-    client.setInsecure();
-    String url = String(serverUrl) + "/pump"; // Adjust URL to match your server's endpoint
+  for (int i = 0; i < listSize; i++) {
+    int soilMoisture = readingList[i][1]; // Read soil moisture from the current sensor
+    int deviceIdIndex = readingList[i][0];
+    Serial.println("Soil moisture value for sensor " + String(deviceIdIndex) + ": " + String(soilMoisture));
 
+    if (!pumpActivated && soilMoisture > moisturethreshold && soilMoisture < 950) {
+      // Control the water pump based on the current soil moisture sensor
+      Serial.println("Water Level for sensor " + String(deviceIdIndex) + ": " + String(soilMoisture));
+      lcd.clear();
+      lcd.print("Water Level " + String(deviceIdIndex) + ": " + String(soilMoisture));
+      pumpActivated = true;
+      lastPumpActivationTime = millis(); // Record the timestamp of pump activation
 
-    for (int i = 0; i < listSize; i++) {
-      int deviceIdIndex = readingList[i][0];
-      int soilMoisture = readingList[i][1];
+      int pumpPin; // Declare the pumpPin variable
+      switch (deviceIdIndex) {
+        case 0:
+          pumpPin = RELAY_PIN_1; // Assign the first pump pin for sensor index 0
+          break;
+        case 1:
+          pumpPin = RELAY_PIN_2; // Assign the second pump pin for sensor index 1
+          break;
+        // Add more cases for additional sensors and pump pins
+        default:
+          pumpPin = RELAY_PIN_1; // Use the default pump pin if the sensor index is not recognized
+          break;
+      }
+
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("Water Level Low!");
+      lcd.setCursor(0, 1);
+      lcd.print("Pumping Water");
+      
+      digitalWrite(pumpPin, LOW); // Turn on the corresponding pump
+
+      Serial.println("Water Level Low! Pumping Water");
+      delay(pumpFlowDuration); // Set value at top of program
+      digitalWrite(pumpPin, HIGH); // Turn off the corresponding pump
+
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("Water Pump " + String(deviceIdIndex));
+      lcd.setCursor(0, 1);
+      lcd.print("Turned Off!");
+      Serial.println("Water Pump " + String(deviceIdIndex) + " turned off");
+
+      // Send pump activation data to the server
+      HTTPClient https;
+      BearSSL::WiFiClientSecure client;
+      client.setInsecure();
+      String url = String(serverUrl) + "/pump"; // Adjust URL to match your server's endpoint
+
       // Start the https connection
       https.begin(client, url);
       https.addHeader("Content-Type", "application/json");
-      String requestBody = "{\"deviceId\": " + String(deviceIDbundle[deviceIdIndex]) + ", \"pumpDuration\": " + String(pumpDuration) +  ", \"threshold\": " + String(threshold) +"}";
+      String requestBody = "{\"deviceId\": " + String(deviceIDbundle[deviceIdIndex]) + ", \"pumpDuration\": " + String(pumpDuration) + ", \"threshold\": " + String(threshold) + "}";
       int httpsResponseCode = https.POST(requestBody);
       if (httpsResponseCode > 0) {
-        Serial.print("Pump activation data sent to server. https Response code: ");
+        Serial.print("Pump " + String(deviceIdIndex) + " activation data sent to server. https Response code: ");
         Serial.println(httpsResponseCode);
       } else {
-        Serial.print("Error sending pump activation data to server. https Response code: ");
+        Serial.print("Error sending pump " + String(deviceIdIndex) + " activation data to server. https Response code: ");
         Serial.println(httpsResponseCode);
       }
+      https.end();
     }
-    https.end();
   }
 }
 
@@ -414,10 +429,10 @@ void setup() {
   
   fetchDeviceSettings();
 
-  pinMode(RELAY_PIN, OUTPUT);
-  //pinMode(pump_led, OUTPUT);
-  //pinMode(server_led, OUTPUT);
-  digitalWrite(RELAY_PIN, HIGH); // Turn off pump
+  pinMode(RELAY_PIN_1, OUTPUT);
+  pinMode(RELAY_PIN_2, OUTPUT);
+  digitalWrite(RELAY_PIN_1, HIGH); // Turn off first pump
+  digitalWrite(RELAY_PIN_2, HIGH); // Turn off second pump
   
 }
 
