@@ -21,4 +21,13 @@ const login = async (formData) => {
   }
 };
 
+export const checkEmail = async (email) => {
+  try {
+    const response = await axios.post(`${LOCAL_API_URL}/check-email`, { email });
+    return response.data;
+  } catch (err) {
+    throw err;
+  }
+};
+
 export { signUp, login };

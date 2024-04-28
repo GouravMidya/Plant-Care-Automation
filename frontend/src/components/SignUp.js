@@ -1,8 +1,10 @@
 // frontend/src/components/SignUp.js
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Container, Typography, TextField, Button } from '@mui/material';
-import { signUp } from '../services/authServices';
+import { Container, Typography, TextField, Button, InputAdornment } from '@mui/material';
+import CheckIcon from '@mui/icons-material/Check';
+import WarningIcon from '@mui/icons-material/Warning';
+import { signUp, checkEmail } from '../services/authServices';
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
@@ -10,11 +12,29 @@ const SignUp = () => {
     email: '',
     password: '',
   });
+  const [emailAvailable, setEmailAvailable] = useState(null);
 
   const navigate = useNavigate(); // Initialize the useNavigate hook
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    if (e.target.name === 'email') {
+      handleEmailValidation(e.target.value);
+    }
+  };
+
+  const handleEmailValidation = async (email) => {
+    try {
+      const { message } = await checkEmail(email);
+      setEmailAvailable(message === 'Email available');
+    } catch (err) {
+      // console.error(err);
+      if (err.response && err.response.status === 400) {
+        setEmailAvailable(false);
+      } else {
+        setEmailAvailable(null);
+      }
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -45,6 +65,7 @@ const SignUp = () => {
           name="username"
           value={formData.username}
           onChange={handleChange}
+          required
         />
         <TextField
           fullWidth
@@ -54,7 +75,24 @@ const SignUp = () => {
           type="email"
           value={formData.email}
           onChange={handleChange}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                {emailAvailable === null ? null : emailAvailable ? (
+                  <CheckIcon color="success" />
+                ) : (
+                  <WarningIcon color="error" />
+                )}
+              </InputAdornment>
+            ),
+          }}
+          required
         />
+        {emailAvailable === false && (
+          <Typography variant="caption" color="error">
+            Email already exists
+          </Typography>
+        )}
         <TextField
           fullWidth
           margin="normal"
@@ -63,6 +101,7 @@ const SignUp = () => {
           type="password"
           value={formData.password}
           onChange={handleChange}
+          required
         />
         <Button
           fullWidth

@@ -72,3 +72,20 @@ exports.login = async (req, res) => {
       res.status(500).json({ message: 'Server error' });
     }
   };
+
+
+//already mail exists functionality
+exports.checkEmail = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: 'Email already exists' });
+    }
+    return res.status(200).json({ message: 'Email available' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
