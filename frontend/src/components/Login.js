@@ -1,16 +1,15 @@
-// frontend/src/components/Login.js
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Container, Typography, TextField, Button } from '@mui/material';
+import { Container, Typography, TextField, Button, CircularProgress, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
 import { login } from '../services/authServices';
 
 const Login = ({ setUser }) => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
-
-  const navigate = useNavigate(); // Initialize the useNavigate hook
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [isLoading, setIsLoading] = useState(false);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [showErrorDialog, setShowErrorDialog] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -18,23 +17,32 @@ const Login = ({ setUser }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+
     try {
       const { token, user } = await login(formData);
       localStorage.setItem('jwt', token);
-      setUser(user); // Pass user object to setUser
-      navigate('/');
-      window.location.reload();
+      setUser(user);
+      setShowSuccessDialog(true);
+      setTimeout(() => {
+        setShowSuccessDialog(false);
+        navigate('/');
+        window.location.reload();
+      }, 1000); // Show success dialog for 1 second
     } catch (err) {
       if (err.response && err.response.status === 400) {
-        alert(err.response.data.message); // Display the error message
+        setErrorMessage(err.response.data.message);
+        setShowErrorDialog(true);
       }
       console.error(err);
+      setIsLoading(false);
     }
   };
 
   return (
     <Container maxWidth="xs">
-      <br/><br/>
+      <br />
+      <br />
       <Typography variant="h4" align="center" gutterBottom>
         Log In
       </Typography>
@@ -47,6 +55,7 @@ const Login = ({ setUser }) => {
           type="email"
           value={formData.email}
           onChange={handleChange}
+          disabled={isLoading}
         />
         <TextField
           fullWidth
@@ -56,6 +65,7 @@ const Login = ({ setUser }) => {
           type="password"
           value={formData.password}
           onChange={handleChange}
+          disabled={isLoading}
         />
         <Button
           fullWidth
@@ -63,13 +73,33 @@ const Login = ({ setUser }) => {
           color="primary"
           type="submit"
           sx={{ mt: 2 }}
+          disabled={isLoading}
         >
-          Log In
+          {isLoading ? <CircularProgress size={24} /> : 'Log In'}
         </Button>
         <Typography variant="body2" align="center" sx={{ mt: 2 }}>
           Don't have an account? <Link to="/signup">Sign up</Link>
         </Typography>
       </form>
+
+      {/* Success Dialog */}
+      <Dialog open={showSuccessDialog} onClose={() => setShowSuccessDialog(false)}>
+        <DialogTitle>Success</DialogTitle>
+        <DialogContent>
+          <DialogContentText>Login successful!</DialogContentText>
+        </DialogContent>
+      </Dialog>
+
+      {/* Error Dialog */}
+      <Dialog open={showErrorDialog} onClose={() => setShowErrorDialog(false)}>
+        <DialogTitle>Error</DialogTitle>
+        <DialogContent>
+          <DialogContentText>{errorMessage}</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowErrorDialog(false)}>OK</Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };

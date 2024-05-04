@@ -116,9 +116,11 @@ const Navbar = ({ user, setUser }) => {
           <Button component={Link} to="/products" sx={{ color: 'white' }} variant="outlined">
             Products
           </Button>
-          <Button component={Link} to="/order-history" sx={{ color: 'white' }} variant="outlined">
+          {user && (
+            <Button component={Link} to="/order-history" sx={{ color: 'white' }} variant="outlined">
             Orders
           </Button>
+          )}
           <Button component={Link} to="/guides" sx={{ color: 'white' }} variant="outlined">
             Guides
           </Button>
