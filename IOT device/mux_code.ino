@@ -12,7 +12,7 @@
 #include <LiquidCrystal_I2C.h>
 
 static const char* serverUrl = "https://plant-care-automation-backend.onrender.com"; // IP address of the server
-static const int deviceIDbundle[8] = {101, 102, 103, 104, 105, 106, 107, 108};
+static const int deviceIDbundle[8] = {109, 110, 111, 112, 113, 114, 115, 116};
 static const unsigned long deviceId = deviceIDbundle[0];
 static const int maxSoilReading = 720;
 static const int minSoilReading = 150;
@@ -35,13 +35,15 @@ const int SELECT_3 = D4;
 
 
 
-long checkDelayDuration = 60000; //cooldown time between each check
+long checkDelayDuration = 60000 * 10; //cooldown time between each check
 int pumpFlowDuration = 5000; 
 int moisturethreshold=400;
 int pumpDuration = pumpFlowDuration/1000;
 int threshold;
-bool pumpActivated = false; // Flag to track whether the pump has been activated
-unsigned long lastPumpActivationTime = 0; // Timestamp of the last pump activation
+
+unsigned long lastPumpActivationTime[8] = {0}; // Array to store the last activation time for each pump
+bool pumpActivated[8] = {false}; // Array to track if each pump is activated
+
 int sns1, sns2, sns3, sns4, sns5, sns6, sns7, sns8; // value read from the pot
 int readingList[8][2]; // 2D array to store binary value and corresponding reading
 int listSize = 0;
@@ -273,13 +275,14 @@ void controlWaterPump() {
     int deviceIdIndex = readingList[i][0];
     Serial.println("Soil moisture value for sensor " + String(deviceIdIndex) + ": " + String(soilMoisture));
 
-    if (!pumpActivated && soilMoisture > moisturethreshold && soilMoisture < 950) {
+    if (!pumpActivated[deviceIdIndex] && soilMoisture > moisturethreshold && soilMoisture < 950) {
       // Control the water pump based on the current soil moisture sensor
       Serial.println("Water Level for sensor " + String(deviceIdIndex) + ": " + String(soilMoisture));
       lcd.clear();
       lcd.print("Water Level " + String(deviceIdIndex) + ": " + String(soilMoisture));
-      pumpActivated = true;
-      lastPumpActivationTime = millis(); // Record the timestamp of pump activation
+
+      pumpActivated[deviceIdIndex] = true; // Set the pump activation flag for the current pump
+      lastPumpActivationTime[deviceIdIndex] = millis(); // Record the timestamp of pump activation for the current pump
 
       int pumpPin; // Declare the pumpPin variable
       switch (deviceIdIndex) {
@@ -440,11 +443,13 @@ void setup() {
 void loop() {
   Serial.println("Humidity, Temperature, and Soil Moisture Level\n\n");
   fetchDeviceSettings();
-  unsigned long currentTime = millis(); // Get the current time
 
-  if (currentTime - lastPumpActivationTime >= 10800000) { // 3600000 = 1hour
-    // 900000 If 15 minutes have elapsed since last pump activation
-    pumpActivated = false; // Reset the pump activation flag
+  unsigned long currentTime = millis(); // Get the current time
+  for (int i = 0; i < 8; i++) {
+
+    if (currentTime - lastPumpActivationTime[i] >= 10800000) { // 10800000 = 3 hours in ms
+      pumpActivated[i] = false; // Reset the pump activation flag for the current pump
+    }
   }
 
 
