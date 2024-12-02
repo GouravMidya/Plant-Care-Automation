@@ -111,12 +111,7 @@ class PlantCareAssistant:
         - Directly address the user's query
         - Provide clear, actionable guidance
         - Use a friendly, supportive tone
-        - Focus on solving the user's immediate need
-
-        When discussing website navigation, always:
-        - Explain the purpose of the page
-        - Suggest specific actions
-        - Be precise and user-friendly"""
+        - Focus on solving the user's immediate need"""
 
     def generate_response(self, message: str, chat_history: List[Dict] = []) -> Dict:
         """
@@ -128,18 +123,18 @@ class PlantCareAssistant:
         # Customize response generation based on route
         response_prompt = f"""Context: User is looking to navigate to {route_info.route}
 
-User Query: {message}
+            User Query: {message}
 
-Craft a helpful, concise response that:
-1. Acknowledges the user's intent
-2. Provides clear guidance
-3. Explains what they'll find on the page
-4. Suggests next steps
+            Craft a helpful, concise response that:
+            1. Acknowledges the user's intent
+            2. Provides clear guidance
+            3. Explains what they'll find on the page
+            4. Suggests next steps
 
-Response format:
-- Start with a welcoming, direct statement
-- Explain the page's purpose
-- Give a clear, actionable suggestion"""
+            Response format:
+            - Start with a welcoming, direct statement
+            - Explain the page's purpose
+            - Give a clear, actionable suggestion"""
 
         # Generate response using Ollama
         response = self.llm.invoke(response_prompt)
@@ -150,6 +145,36 @@ Response format:
             "route_description": route_info.description,
             "action_needed": route_info.action_needed
         }
+
+
+class PlantExpertAssistant:
+    def __init__(self):
+        """
+        Specialized assistant for Indian subcontinent plant care
+        """
+        self.llm = Ollama(model="llama3.2")
+        self.system_prompt = """You are a plant care expert with in-depth knowledge of plants and gardening in the Indian subcontinent. 
+        You provide advice on:
+        - Local plants and crops
+        - Soil conditions and climate suitability
+        - Fertilizers and organic care
+        - Seasonal care and pest management
+        - Eco-friendly gardening practices
+        Always be specific, culturally relevant, and practical in your advice."""
+
+    def generate_response(self, message: str, chat_history: List[Dict] = []) -> Dict:
+        """
+        Generate plant domain-specific response
+        """
+        prompt = f"""System Instruction: {self.system_prompt}
+
+        User Query: {message}
+
+        Provide a helpful, culturally relevant response for gardening in the Indian subcontinent."""
+        response = self.llm.invoke(prompt)
+
+        return {"response": response.strip()}
+
 
 # FastAPI Setup
 app = FastAPI(title="Plant Care AI Assistant")
@@ -162,12 +187,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Initialize assistants
 plant_assistant = PlantCareAssistant()
+plant_expert = PlantExpertAssistant()
 
-@app.post("/chat")
-async def chat_endpoint(request: ChatRequest):
+@app.post("/navigate")
+async def navigate_endpoint(request: ChatRequest):
     """
-    Main chat endpoint for AI assistant
+    Endpoint for website navigation assistance
     """
     result = plant_assistant.generate_response(
         request.message, 
@@ -175,4 +202,14 @@ async def chat_endpoint(request: ChatRequest):
     )
     return result
 
-# To run the server, use: uvicorn app:app --reload
+
+@app.post("/chat")
+async def chat_endpoint(request: ChatRequest):
+    """
+    Endpoint for plant domain expertise chat
+    """
+    result = plant_expert.generate_response(
+        request.message, 
+        request.chat_history
+    )
+    return result

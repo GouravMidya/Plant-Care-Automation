@@ -9,13 +9,14 @@ import {
 } from '@mui/material';
 import { Send as SendIcon } from '@mui/icons-material';
 import axios from 'axios';
+import MarkdownRenderer from './MarkdownRenderer';
 
 const ChatbotDialog = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
-  const [selectedQueryType, setSelectedQueryType] = useState(null); // Tracks selected option
+  const [selectedQueryType, setSelectedQueryType] = useState(null);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -29,7 +30,7 @@ const ChatbotDialog = () => {
   const handleSendMessage = async () => {
     if (!inputMessage.trim() || !selectedQueryType) return;
 
-    const apiRoute = selectedQueryType === 'navigation' ? '/navi' : '/chat';
+    const apiRoute = selectedQueryType === 'navigation' ? '/navigate' : '/chat';
 
     const newMessages = [...messages, { sender: 'user', text: inputMessage }];
     setMessages(newMessages);
@@ -86,7 +87,7 @@ const ChatbotDialog = () => {
   return (
     <>
       {!isOpen && (
-        <IconButton
+        <Button
           onClick={handleOpen}
           sx={{
             position: 'fixed',
@@ -107,7 +108,7 @@ const ChatbotDialog = () => {
             alt="Chatbot Icon"
             style={{ width: '50%', height: '50%', objectFit: 'contain' }}
           />
-        </IconButton>
+        </Button>
       )}
 
       {isOpen && (
@@ -140,9 +141,9 @@ const ChatbotDialog = () => {
               padding: 1,
               borderBottom: '1px solid #ddd',
               backgroundColor: 'primary.main',
-            '&:hover': {
-              backgroundColor: 'primary.dark',
-            },
+              '&:hover': {
+                backgroundColor: 'primary.dark',
+              },
               color: 'white',
               borderTopLeftRadius: 10,
               borderTopRightRadius: 10,
@@ -212,14 +213,18 @@ const ChatbotDialog = () => {
                     textAlign: msg.sender === 'user' ? 'right' : 'left',
                   }}
                 >
-                  <Typography variant="body1">{msg.text}</Typography>
+                  {msg.sender === 'ai' ? (
+                    <MarkdownRenderer markdownText={msg.text} />
+                  ) : (
+                    <MarkdownRenderer markdownText={msg.text} color="white"/>
+                  )}
                   {msg.route && (
                     <Typography
                       variant="caption"
                       color="text.secondary"
                       sx={{ mt: 1, display: 'block' }}
                     >
-                      Suggested Route: {msg.route}
+                      Suggested Route: <a href={`http://localhost:3000${msg.route}`}>{msg.route}</a>
                     </Typography>
                   )}
                 </Paper>
