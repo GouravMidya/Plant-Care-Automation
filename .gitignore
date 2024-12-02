@@ -4,3 +4,5 @@ backend/.env
 backend/node_modules
 aws cloud steps.txt
 #flask-app
+frontend/.env
+flask-app/__pycache__/

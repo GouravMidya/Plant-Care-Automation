@@ -21,6 +21,7 @@ import AddDevice from './pages/AddDevice';
 import { CartProvider } from './hooks/CartContext';
 import OrderConfirmed from './components/OrderConfirmed';
 import { isAuthenticated } from './utils/authUtils';
+import ChatbotDialog from './components/ChatbotDialog';
 
 import OrderHistory from './components/OrderHistory'; // Import OrderHistory component
 
@@ -54,6 +55,7 @@ function App() {
             </div>
             <FooterPage />
           </div>
+          <ChatbotDialog />  {/* Add this line */}
         </Router>
       </CartProvider>
     </ThemeProvider>

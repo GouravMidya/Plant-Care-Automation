@@ -1,125 +1,178 @@
-from flask import Flask, request, jsonify
-import pandas as pd
-from sklearn.ensemble import RandomForestRegressor
-import joblib
-import schedule
-import time
-from datetime import datetime, timedelta
-import atexit
-import pickle
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, Field
+from typing import List, Dict, Optional
+from langchain_core.tools import BaseTool
+from langchain_core.language_models import BaseLanguageModel
+from langchain_community.llms import Ollama
+from langchain_core.prompts import PromptTemplate
+from langchain_core.output_parsers import PydanticOutputParser
 
-app = Flask(__name__)
+class RouteInfo(BaseModel):
+    """
+    Structured representation of route information
+    """
+    route: str = Field(description="The frontend route path")
+    description: str = Field(description="Helpful description to guide the user")
+    action_needed: Optional[str] = Field(default=None, description="Any specific action user should take")
 
-# Load the trained model
-model = joblib.load('pump_prediction_model.pkl')
+class RoutingTool(BaseTool):
+    """
+    Enhanced routing tool with detailed route information
+    """
+    name: str = "route_finder"
+    description: str = "Finds the appropriate route path with detailed guidance"
 
-# Define the API endpoint
-@app.route('/predict', methods=['POST'])
-def predict_next_pump():
-    # Get the input data from the request
-    data = request.json
-    soil_moisture = data['soilMoisture']
-    temperature = data['temperature']
-    time_elapsed = data['timeElapsed']
+    def _run(self, query: str) -> RouteInfo:
+        """
+        Determine the correct route with comprehensive information
+        """
+        routes = {
+            "login": RouteInfo(
+                route="/login", 
+                description="Access your account or create a new one",
+                action_needed="Please enter your credentials or sign up"
+            ),
+            "signup": RouteInfo(
+                route="/signup", 
+                description="Create a new account to access plant care features",
+                action_needed="Fill out the registration form with your details"
+            ),
+            "dashboard": RouteInfo(
+                route="/dashboard", 
+                description="Your personal plant care management center",
+                action_needed="View your devices, plants, and settings"
+            ),
+            "add device": RouteInfo(
+                route="/dashboard/addDevice", 
+                description="Add a new plant monitoring device to your account",
+                action_needed="Enter device details and link to your account"
+            ),
+            "products": RouteInfo(
+                route="/products", 
+                description="Browse our range of plant care devices and accessories",
+                action_needed="Explore and select products that suit your needs"
+            ),
+            "guides": RouteInfo(
+                route="/guides", 
+                description="Comprehensive plant care and maintenance guides",
+                action_needed="Learn about plant care, troubleshooting, and best practices"
+            ),
+            "troubleshoot": RouteInfo(
+                route="/troubleshoot", 
+                description="Get help with plant health and device issues",
+                action_needed="Describe your plant or device problem for targeted assistance"
+            ),
+            "tickets": RouteInfo(
+                route="/tickets", 
+                description="View and manage your support tickets",
+                action_needed="Check ticket status or create a new support request"
+            )
+        }
 
-    # Create a DataFrame with the input data
-    input_data = pd.DataFrame([[soil_moisture, temperature, time_elapsed]], 
-                              columns=['soilMoisture', 'temperature', 'time_elapsed'])
+        # Perform intelligent matching
+        best_match = None
+        max_match_score = 0
 
-    # Make the prediction
-    predicted_time_to_next_pump = model.predict(input_data)
+        for key, route_info in routes.items():
+            # Calculate match score based on query similarity
+            match_score = sum(word.lower() in query.lower() for word in key.split())
+            
+            if match_score > max_match_score:
+                max_match_score = match_score
+                best_match = route_info
 
-    # Calculate the next pump timestamp
-    next_pump_timestamp = pd.Timestamp.now() + pd.Timedelta(seconds=predicted_time_to_next_pump[0])
+        # If no good match found, return default route
+        return best_match or RouteInfo(
+            route="/", 
+            description="Welcome to the main page. Let me help you navigate.",
+            action_needed="Browse available options or use the search"
+        )
 
-    # Return the predicted timestamp as the response
-    response = {'nextPumpTimestamp': next_pump_timestamp.isoformat()}
-    return jsonify(response)
+class ChatRequest(BaseModel):
+    message: str
+    chat_history: List[Dict] = []
 
-# Function to update the model with new data
-def update_model():
-    # Load the existing model
-    model = joblib.load('pump_prediction_model.pkl')
+class PlantCareAssistant:
+    def __init__(self):
+        """
+        Initialize Ollama LLM with system prompt and routing tool
+        """
+        # Initialize Ollama LLM
+        self.llm = Ollama(model="llama3.2")
+        
+        # Routing tool
+        self.routing_tool = RoutingTool()
 
-    # Load the latest sensor and pump data
-    sensor_data = pd.read_json('sensor_records.json')
-    pump_data = pd.read_json('pump_history.json')
+        # System prompt with clear instructions
+        self.system_prompt = """You are an expert AI assistant for a plant care automation website. 
+        Your communication should be:
+        - Concise and helpful
+        - Directly address the user's query
+        - Provide clear, actionable guidance
+        - Use a friendly, supportive tone
+        - Focus on solving the user's immediate need
 
-    # Merge sensor and pump data based on timestamp
-    merged_data = pd.merge_asof(pump_data, sensor_data, on='timestamp', by='deviceId', direction='backward')
+        When discussing website navigation, always:
+        - Explain the purpose of the page
+        - Suggest specific actions
+        - Be precise and user-friendly"""
 
-    # Calculate time elapsed since last pumping event
-    merged_data['time_elapsed'] = (merged_data['timestamp'] - merged_data.groupby('deviceId')['timestamp'].shift(1)).dt.total_seconds()
+    def generate_response(self, message: str, chat_history: List[Dict] = []) -> Dict:
+        """
+        Generate response and find appropriate route
+        """
+        # Find route first
+        route_info = self.routing_tool.run(message)
 
-    # Prepare features and target variable
-    X_new = merged_data[['soilMoisture', 'temperature', 'time_elapsed']]
-    y_new = merged_data.groupby('deviceId')['timestamp'].shift(-1) - merged_data['timestamp']
+        # Customize response generation based on route
+        response_prompt = f"""Context: User is looking to navigate to {route_info.route}
 
-    # Update the model with new data
-    model.fit(X_new, y_new)
+User Query: {message}
 
-    # Save the updated model
-    joblib.dump(model, 'pump_prediction_model.pkl')
+Craft a helpful, concise response that:
+1. Acknowledges the user's intent
+2. Provides clear guidance
+3. Explains what they'll find on the page
+4. Suggests next steps
 
-    print("Model updated successfully.")
-    
-    
-def schedule_next_update():
-    # Load the last update timestamp from a file (if exists)
-    try:
-        with open('last_update.pkl', 'rb') as file:
-            last_update = pickle.load(file)
-    except FileNotFoundError:
-        last_update = None
+Response format:
+- Start with a welcoming, direct statement
+- Explain the page's purpose
+- Give a clear, actionable suggestion"""
 
-    # Calculate the next update timestamp
-    if last_update is None:
-        next_update = datetime.now() + timedelta(days=7)
-    else:
-        next_update = last_update + timedelta(days=7)
+        # Generate response using Ollama
+        response = self.llm.invoke(response_prompt)
 
-    # Save the next update timestamp to a file
-    with open('next_update.pkl', 'wb') as file:
-        pickle.dump(next_update, file)    
+        return {
+            "response": response.strip(),
+            "route": route_info.route,
+            "route_description": route_info.description,
+            "action_needed": route_info.action_needed
+        }
 
-def check_and_run_update():
-    # Load the next update timestamp from a file
-    try:
-        with open('next_update.pkl', 'rb') as file:
-            next_update = pickle.load(file)
-    except FileNotFoundError:
-        return
+# FastAPI Setup
+app = FastAPI(title="Plant Care AI Assistant")
 
-    # Check if the current time is past the next update timestamp
-    if datetime.now() >= next_update:
-        update_model()
-        schedule_next_update()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-# On a non sleeping continuosly running server
-# def run_scheduled_tasks():
-#     while True:
-#         schedule.run_pending()
-#         time.sleep(1)
+plant_assistant = PlantCareAssistant()
 
-def on_server_shutdown():
-    # Save the last update timestamp to a file
-    with open('last_update.pkl', 'wb') as file:
-        pickle.dump(datetime.now(), file)
+@app.post("/chat")
+async def chat_endpoint(request: ChatRequest):
+    """
+    Main chat endpoint for AI assistant
+    """
+    result = plant_assistant.generate_response(
+        request.message, 
+        request.chat_history
+    )
+    return result
 
-if __name__ == '__main__':
-    # On a non sleeping continuosly running server
-    # # Schedule the update_model() function to run every 7 days
-    # schedule.every(7).days.do(update_model)
-
-    # # Start the scheduled tasks in a separate thread
-    # import threading
-    # threading.Thread(target=run_scheduled_tasks).start()
-    
-    # Register the on_server_shutdown function to be called on server shutdown
-    atexit.register(on_server_shutdown)
-
-    # Check and run the update if necessary
-    check_and_run_update()
-
-    # Start the API server
-    app.run()
+# To run the server, use: uvicorn app:app --reload
