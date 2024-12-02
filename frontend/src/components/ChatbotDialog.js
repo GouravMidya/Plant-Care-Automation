@@ -37,7 +37,7 @@ const ChatbotDialog = () => {
     setInputMessage('');
 
     try {
-      const response = await axios.post(`http://127.0.0.1:8000${apiRoute}`, {
+      const response = await axios.post(`${process.env.REACT_APP_PYTHON_URL}${apiRoute}`, {
         message: inputMessage,
         chat_history: messages,
       });
@@ -224,7 +224,7 @@ const ChatbotDialog = () => {
                       color="text.secondary"
                       sx={{ mt: 1, display: 'block' }}
                     >
-                      Suggested Route: <a href={`http://localhost:3000${msg.route}`}>{msg.route}</a>
+                      Suggested Route: <a href={`${process.env.REACT_APP_FRONTEND_URL}${msg.route}`}>{msg.route}</a>
                     </Typography>
                   )}
                 </Paper>
