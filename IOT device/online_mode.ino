@@ -158,7 +158,7 @@ void fetchDeviceSettings() {
 
 // Function to send sensor data
 void sendDataToServer() {
-  if (soil_moisture <=500 && soil_moisture>50){
+  if (soil_moisture <=750 && soil_moisture>50){
     
     // Create a WiFi Client
     HTTPClient https;
@@ -217,7 +217,7 @@ int readSoilMoisture() {
 
 // Function to control water pump
 void controlWaterPump() {
-  if(!pumpActivated && soil_moisture > moisturethreshold  && soil_moisture < 650){
+  if(!pumpActivated && soil_moisture > moisturethreshold  && soil_moisture < 750){
     Serial.println("Water Level:"+String(soil_moisture));
     pumpActivated = true;
     lastPumpActivationTime = millis(); // Record the timestamp of pump activation
